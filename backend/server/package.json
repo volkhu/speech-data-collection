@@ -1,0 +1,18 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server for the smartphone speech data collection app.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index",
+    "start-dev": "nodemon src/index"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
