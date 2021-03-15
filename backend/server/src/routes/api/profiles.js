@@ -8,7 +8,11 @@ router.get("/", (req, res) => {
     req.headers["x-deviceid"],
   ])
     .then((data) => {
-      res.status(200).json(data);
+      if (data) {
+        res.status(200).json(data);
+      } else {
+        res.sendStatus(204);
+      }
     })
     .catch((error) => {
       console.log("ERROR: ", error);
@@ -23,7 +27,7 @@ router.post("/", (req, res) => {
     [
       req.headers["x-deviceid"],
       req.body.year_of_birth,
-      req.body.gender,
+      req.body.gender.charAt(0),
       req.body.native_language,
       req.body.dialect,
     ]
