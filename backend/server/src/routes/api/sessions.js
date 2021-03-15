@@ -2,6 +2,23 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db/db");
 
+// APP: Get random prompt
+router.get("/rprompt", (req, res) => {
+  db.any("SELECT * FROM prompt WHERE project_id = $1", [req.query.pid])
+    .then((data) => {
+      if (data) {
+        chosenPrompt = data[Math.floor(Math.random() * data.length)];
+        res.status(200).json(chosenPrompt);
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((error) => {
+      console.log("ERROR: ", error);
+      res.sendStatus(500);
+    });
+});
+
 // APP: Get sessions associated with this project and my device
 router.get("/", (req, res) => {
   db.any(
