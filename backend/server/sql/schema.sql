@@ -29,7 +29,7 @@ CREATE TABLE project (
 CREATE TABLE prompt (
     prompt_id SERIAL PRIMARY KEY,
     project_id INTEGER NOT NULL,
-    description VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
     image BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     instructions VARCHAR(255),
