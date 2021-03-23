@@ -1,5 +1,6 @@
 package ee.ttu.huvolk.speechdatacollection
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,10 +29,16 @@ class TermsFragment : Fragment() {
             findNavController().navigate(R.id.action_termsFragment_to_welcomeFragment)
         }
         binding.btAgree.setOnClickListener {
+            setTermsAccepted()
             findNavController().navigate(R.id.action_termsFragment_to_profileFragment)
         }
 
         (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_terms)
+    }
+
+    private fun setTermsAccepted() {
+        val sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE)
+        sharedPreferences?.edit()?.putBoolean(getString(R.string.has_accepted_terms_key), true)?.apply()
     }
 
     override fun onDestroyView() {

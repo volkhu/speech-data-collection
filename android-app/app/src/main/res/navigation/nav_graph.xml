@@ -33,5 +33,36 @@
         android:id="@+id/profileFragment"
         android:name="ee.ttu.huvolk.speechdatacollection.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_projectSelectionFragment"
+            app:destination="@id/projectSelectionFragment"
+            app:popUpTo="@id/nav_graph.xml" />
+    </fragment>
+    <fragment
+        android:id="@+id/projectSelectionFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.ProjectSelectionFragment"
+        android:label="fragment_project_selection"
+        tools:layout="@layout/fragment_project_selection" >
+        <action
+            android:id="@+id/action_projectSelectionFragment_to_recordingFragment"
+            app:destination="@id/recordingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordingFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.RecordingFragment"
+        android:label="fragment_recording"
+        tools:layout="@layout/fragment_recording" >
+        <argument
+            android:name="projectId"
+            app:argType="integer"
+            android:defaultValue="1" />
+        <argument
+            android:name="projectTitle"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_recordingFragment_self"
+            app:destination="@id/recordingFragment"
+            app:popUpTo="@id/projectSelectionFragment" />
+    </fragment>
 </navigation>

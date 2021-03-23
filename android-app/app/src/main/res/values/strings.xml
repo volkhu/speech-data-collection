@@ -9,10 +9,32 @@
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="agree">Agree</string>
+    <string name="confirm">Confirm</string>
 
     <string name="title_welcome">Welcome</string>
     <string name="title_terms">Terms</string>
     <string name="title_profile">Profile</string>
+    <string name="title_project_selection">Select Project</string>
 
-    <string name="year_of_birth">Year of Birth</string>
+    <string name="profile_description">Please enter your details to be associated with your recordings.</string>
+    <string name="year_of_birth">Year of birth</string>
+    <string name="gender">Gender</string>
+    <string-array name="gender_list">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other / Undisclosed</item>
+    </string-array>
+    <string name="native_language">Native language (optional)</string>
+    <string name="dialect">Dialect (optional)</string>
+    <string name="field_required">This field is required.</string>
+
+    <string name="project_selection_instructions">You have entered your details and agreed to the terms. Please select a project you wish to participate in.</string>
+    <string name="default_recording_instructions">Please read the following prompt while recording it using the button below.</string>
+    <string name="start_recording_instructions">Press to start voice recording.</string>
+    <string name="stop_recording_instructions">Recording. Speak now. Press to stop.</string>
+
+
+    <string name="has_accepted_terms_key">hasAcceptedTerms</string>
+    <string name="device_id_key">deviceId</string>
+
 </resources>

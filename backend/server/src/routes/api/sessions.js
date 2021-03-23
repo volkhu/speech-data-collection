@@ -1,13 +1,34 @@
 const express = require("express");
+const path = require("path");
 const router = express.Router();
 const db = require("../../db/db");
+const fs = require("fs");
 
 // APP: Get random prompt
 router.get("/rprompt", (req, res) => {
   db.any("SELECT * FROM prompt WHERE project_id = $1", [req.query.pid])
     .then((data) => {
-      if (data) {
+      if (data && data.length) {
         chosenPrompt = data[Math.floor(Math.random() * data.length)];
+
+        if (chosenPrompt.image) {
+          const fileDir = path.join(
+            __dirname,
+            "../../../files/prompt_images/",
+            `${chosenPrompt.prompt_id}.jpg`
+          );
+          console.log(fileDir);
+
+          try {
+            const imageData = fs.readFileSync(fileDir, { encoding: "base64" });
+            chosenPrompt["image_data"] = imageData;
+          } catch (err) {
+            console.error(err);
+          }
+
+          console.log("Has image");
+        }
+
         res.status(200).json(chosenPrompt);
       } else {
         res.sendStatus(204);
