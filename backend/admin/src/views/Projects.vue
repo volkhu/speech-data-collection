@@ -1,47 +1,55 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-card>
-        <v-row no-gutters>
-          <v-col><v-card-title>Projects</v-card-title></v-col>
-          <v-spacer></v-spacer>
-          <v-col cols="auto">
-            <v-text-field
-              single-line
-              append-icon="mdi-magnify"
-              label="Search"
-              v-model="searchQuery"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="auto"
-            ><v-card-title
-              ><v-btn color="primary">
-                NEW PROJECT
-              </v-btn></v-card-title
-            ></v-col
+  <v-container fluid>
+    <v-row>
+      <v-col>
+        <v-card>
+          <v-row no-gutters>
+            <v-col><v-card-title>Projects</v-card-title></v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="auto">
+              <v-text-field
+                single-line
+                append-icon="mdi-magnify"
+                label="Search"
+                v-model="searchQuery"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="auto"
+              ><v-card-title
+                ><v-btn color="primary">
+                  NEW PROJECT
+                </v-btn></v-card-title
+              ></v-col
+            >
+          </v-row>
+          <v-data-table
+            :headers="tableHeaders"
+            :items="projects"
+            :search="searchQuery"
+            v-bind:loading="tableLoading"
           >
-        </v-row>
-        <v-data-table
-          :headers="tableHeaders"
-          :items="projects"
-          :search="searchQuery"
-          v-bind:loading="tableLoading"
-        >
-          <template v-slot:item.active="{ item }">
-            <v-simple-checkbox
-              v-model="item.active"
-              disabled
-            ></v-simple-checkbox>
-          </template>
-          <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2">
-              mdi-arrow
-            </v-icon>
-          </template>
-        </v-data-table>
-      </v-card>
-    </v-col>
-  </v-row>
+            <template v-slot:item.active="{ item }">
+              <v-simple-checkbox
+                v-model="item.active"
+                disabled
+              ></v-simple-checkbox>
+            </template>
+            <template v-slot:item.view="{ item }">
+              <v-btn
+                icon
+                :to="{
+                  name: 'Project Details',
+                  params: { projectId: item.project_id },
+                }"
+              >
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-btn>
+            </template>
+          </v-data-table>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -60,10 +68,12 @@ export default {
       { text: "Active", value: "active" },
       { text: "Prompts", value: "prompts" },
       { text: "Recordings", value: "recordings" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Details", value: "view", sortable: false, align: "center" },
     ],
     projects: [],
   }),
+
+  methods: {},
 
   mounted() {
     axios
