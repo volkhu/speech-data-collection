@@ -1,60 +1,62 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
+    <v-app-bar app color="primary" dark dense clipped-left>
+      <v-app-bar-nav-icon
+        @click.stop="showNavigationDrawer = !showNavigationDrawer"
+      ></v-app-bar-nav-icon>
+      <v-toolbar-title>Admin Dashboard</v-toolbar-title>
       <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
     </v-app-bar>
 
+    <v-navigation-drawer app clipped v-model="showNavigationDrawer">
+      <v-list dense nav>
+        <v-list-item
+          link
+          v-for="item in navigationDrawerItems"
+          :key="item.title"
+          :to="item.route"
+        >
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
     <v-main>
-      <HelloWorld/>
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
-
 export default {
-  name: 'App',
-
-  components: {
-    HelloWorld,
-  },
+  name: "App",
 
   data: () => ({
-    //
+    showNavigationDrawer: true,
+    navigationDrawerItems: [
+      {
+        title: "Home",
+        icon: "mdi-home",
+        route: "/",
+      },
+      {
+        title: "Projects",
+        icon: "mdi-format-list-bulleted",
+        route: "/projects",
+      },
+      {
+        title: "Users",
+        icon: "mdi-account-supervisor",
+        route: "/users",
+      },
+    ],
   }),
 };
 </script>

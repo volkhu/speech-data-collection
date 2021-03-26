@@ -4,7 +4,7 @@ const router = express.Router();
 
 // APP: Get all projects that can be participated in
 router.get("/", (req, res) => {
-  db.any("SELECT * FROM project WHERE active = TRUE")
+  db.any("SELECT * FROM project ORDER BY active DESC, project_id ASC") // TODO: show only active projects to app users
     .then((data) => {
       res.status(200).json(data);
     })
