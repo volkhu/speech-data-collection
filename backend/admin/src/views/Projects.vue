@@ -16,7 +16,13 @@
             </v-col>
             <v-col cols="auto"
               ><v-card-title
-                ><v-btn color="primary">
+                ><v-btn
+                  color="primary"
+                  :to="{
+                    name: 'Project Details',
+                    params: { projectId: 'new' },
+                  }"
+                >
                   NEW PROJECT
                 </v-btn></v-card-title
               ></v-col

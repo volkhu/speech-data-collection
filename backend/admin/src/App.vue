@@ -27,7 +27,8 @@
     </v-navigation-drawer>
 
     <v-main>
-      <router-view></router-view>
+      <!-- Use full path of the route as a key to reload components if they route to themselves -->
+      <router-view :key="$route.fullPath"></router-view>
     </v-main>
   </v-app>
 </template>

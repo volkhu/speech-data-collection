@@ -36,12 +36,39 @@ router.put("/:projectId", (req, res) => {
     });
 });
 
+// ADMIN: Create new project
+router.post("/", (req, res) => {
+  console.log(req.body);
+
+  if (!req.body.name) {
+    res.sendStatus(400);
+    return;
+  }
+
+  db.one(
+    "INSERT INTO project (name, description, randomize_prompt_order, allow_concurrent_sessions, active) VALUES ($1, $2, $3, $4, $5) RETURNING project_id",
+    [
+      req.body.name,
+      req.body.description,
+      req.body.randomize_prompt_order,
+      req.body.allow_concurrent_sessions,
+      req.body.active,
+    ]
+  )
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((error) => {
+      console.log("ERROR: ", error);
+      res.sendStatus(500);
+    });
+});
+
 // APP: Get project with specified ID
 router.get("/:projectId", (req, res) => {
-  db.oneOrNone(
-    "SELECT * FROM project WHERE active = TRUE AND project_id = $1",
-    [req.params.projectId]
-  )
+  db.oneOrNone("SELECT * FROM project WHERE project_id = $1", [
+    req.params.projectId,
+  ])
     .then((data) => {
       if (data === null) {
         res.sendStatus(204);
