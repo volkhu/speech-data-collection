@@ -70,10 +70,10 @@ export default {
       { text: "ID", value: "project_id", width: "4%" },
       { text: "Name", value: "name", align: "start" },
       { text: "Description", value: "description", width: "40%" },
-      { text: "Creation Date", value: "created_at" },
+      { text: "Created", value: "created_at" },
       { text: "Active", value: "active" },
-      { text: "Prompts", value: "prompts" },
-      { text: "Recordings", value: "recordings" },
+      { text: "Prompts", value: "num_prompts" },
+      { text: "Recordings", value: "num_recordings" },
       { text: "Details", value: "view", sortable: false, align: "center" },
     ],
     projects: [],
@@ -92,10 +92,9 @@ export default {
               dateFns.parseJSON(item.created_at),
               "dd.MM.yyyy hh:mm"
             ),
-            prompts: 0,
-            recordings: 0,
           };
         });
+
         this.tableLoading = false;
       })
       .catch((error) => {

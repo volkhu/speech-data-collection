@@ -23,6 +23,7 @@ CREATE TABLE project (
     randomize_prompt_order BOOLEAN NOT NULL DEFAULT FALSE,
     allow_concurrent_sessions BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     description TEXT
 );
 
@@ -32,6 +33,8 @@ CREATE TABLE prompt (
     description TEXT NOT NULL,
     image BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     instructions VARCHAR(255),
     FOREIGN KEY (project_id) REFERENCES project (project_id)
 );

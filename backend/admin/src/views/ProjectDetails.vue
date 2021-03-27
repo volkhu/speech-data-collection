@@ -95,19 +95,21 @@
                   </tr>
                   <tr>
                     <td>Created</td>
-                    <td>{{ projectDetails.created_at }} (Administraator)</td>
+                    <td>{{ projectDetails.created_at }}</td>
                   </tr>
                   <tr>
                     <td>Last Edited</td>
-                    <td>{{ projectDetails.created_at }} (Administraator)</td>
+                    <td>
+                      {{ projectDetails.last_edited_at }}
+                    </td>
                   </tr>
                   <tr>
                     <td>Prompts</td>
-                    <td>{{ projectDetails.num_prompts }}</td>
+                    <td>{{ prompts.length }}</td>
                   </tr>
                   <tr>
                     <td>Participants</td>
-                    <td>{{ projectDetails.num_users }}</td>
+                    <td>{{ projectDetails.num_participants }}</td>
                   </tr>
                   <tr>
                     <td>Sessions</td>
@@ -115,7 +117,12 @@
                   </tr>
                   <tr>
                     <td>Recordings</td>
-                    <td>{{ projectDetails.num_recordings }} (50 minutes)</td>
+                    <td>
+                      {{ projectDetails.num_recordings }} ({{
+                        projectDetails.total_recordings_duration.toFixed(2)
+                      }}
+                      seconds in total)
+                    </td>
                   </tr>
                 </tbody>
               </template>
@@ -127,7 +134,49 @@
     <v-row>
       <v-col>
         <v-card v-if="!creatingNewProject">
+          <v-dialog v-model="deletePromptDialog" max-width="512px">
+            <v-card>
+              <v-card-title
+                >Are you sure you want to delete prompt
+                {{ deletePromptId }}?</v-card-title
+              >
+              <v-card-actions>
+                <v-container>
+                  <v-row v-if="deletePromptError"
+                    ><v-col>
+                      <v-alert type="error"
+                        >Failed to delete prompt.
+                        {{ deletePromptErrorMessage }}</v-alert
+                      ></v-col
+                    ></v-row
+                  ><v-row
+                    ><v-col align="right">
+                      <v-btn text @click="cancelDeletePromptDialog"
+                        >Cancel</v-btn
+                      >
+                      <v-btn text @click="confirmDeletePromptDialog"
+                        >Confirm</v-btn
+                      >
+                    </v-col></v-row
+                  >
+                </v-container>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
           <v-card-title>Prompts</v-card-title>
+          <v-card-text>
+            <v-data-table :headers="promptsTableHeaders" :items="prompts">
+              <template v-slot:item.actions="{ item }">
+                <v-btn icon>
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn icon @click="openDeletePromptDialog(item.prompt_id)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </template>
+            </v-data-table>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -153,13 +202,57 @@ export default {
       randomize_prompt_order: false,
       allow_concurrent_sessions: false,
       active: false,
+      total_recordings_duration: 0,
     },
     projectDetailsBackup: {},
 
-    statisticsTableItems: [{ metric: "ID", metric_value: "vg" }],
+    promptsTableHeaders: [
+      { text: "ID", value: "prompt_id" },
+      { text: "Description", value: "description" },
+      { text: "Image", value: "image" },
+      { text: "Custom Instructions", value: "instructions" },
+      { text: "Created", value: "created_at" },
+      { text: "Last Edited", value: "last_edited_at" },
+      { text: "Actions", value: "actions", sortable: false, align: "center" },
+    ],
+    prompts: [],
+
+    deletePromptDialog: false,
+    deletePromptId: 0,
+    deletePromptError: false,
+    deletePromptErrorMessage: "",
   }),
 
   methods: {
+    openDeletePromptDialog(promptId) {
+      this.deletePromptError = false;
+      this.deletePromptId = promptId;
+      this.deletePromptDialog = true;
+    },
+    cancelDeletePromptDialog() {
+      this.deletePromptDialog = false;
+    },
+    confirmDeletePromptDialog() {
+      if (!this.deletePromptDialog) {
+        return;
+      }
+
+      this.deletingPrompt = true;
+      axios
+        .delete(`http://localhost:5000/api/prompts/${this.deletePromptId}`)
+        .then((response) => {
+          this.loadPrompts();
+
+          this.deletePromptDialog = false;
+          console.log(response.data);
+        })
+        .catch((error) => {
+          this.deletePromptError = true;
+          this.deletePromptErrorMessage = error;
+          console.log(error);
+        });
+    },
+
     startEditingProjectDetails() {
       this.projectDetailsBackup = JSON.parse(
         JSON.stringify(this.projectDetails)
@@ -178,7 +271,6 @@ export default {
       this.projectDetailsBeingSaved = true;
 
       if (this.creatingNewProject) {
-        console.log(JSON.stringify(this.projectDetails));
         axios
           .post(`http://localhost:5000/api/projects/`, this.projectDetails)
           .then((response) => {
@@ -216,6 +308,52 @@ export default {
           });
       }
     },
+
+    loadProjectDetails() {
+      axios
+        .get(
+          `http://localhost:5000/api/projects/${this.$route.params.projectId}`
+        )
+        .then((response) => {
+          this.projectDetails = response.data;
+          this.projectDetails.created_at = dateFns.format(
+            dateFns.parseJSON(this.projectDetails.created_at),
+            "dd.MM.yyyy hh:mm"
+          );
+          this.projectDetails.last_edited_at = dateFns.format(
+            dateFns.parseJSON(this.projectDetails.last_edited_at),
+            "dd.MM.yyyy hh:mm"
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    loadPrompts() {
+      axios
+        .get(
+          `http://localhost:5000/api/projects/${this.$route.params.projectId}/prompts`
+        )
+        .then((response) => {
+          this.prompts = response.data.map((item) => {
+            return {
+              ...item,
+              created_at: dateFns.format(
+                dateFns.parseJSON(item.created_at),
+                "dd.MM.yyyy hh:mm"
+              ),
+              last_edited_at: dateFns.format(
+                dateFns.parseJSON(item.last_edited_at),
+                "dd.MM.yyyy hh:mm"
+              ),
+            };
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
 
   created() {
@@ -227,20 +365,8 @@ export default {
 
   mounted() {
     if (!this.creatingNewProject) {
-      axios
-        .get(
-          `http://localhost:5000/api/projects/${this.$route.params.projectId}`
-        )
-        .then((response) => {
-          this.projectDetails = response.data;
-          this.projectDetails.created_at = dateFns.format(
-            dateFns.parseJSON(this.projectDetails.created_at),
-            "dd.MM.yyyy hh:mm"
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.loadProjectDetails();
+      this.loadPrompts();
     }
   },
 };

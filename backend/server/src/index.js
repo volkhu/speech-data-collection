@@ -7,6 +7,7 @@ app.use(express.json()); // for parsing json body content in requests
 
 app.use("/api/profiles", require("./routes/api/profiles"));
 app.use("/api/projects", require("./routes/api/projects"));
+app.use("/api/prompts", require("./routes/api/prompts"));
 app.use("/api/recordings", require("./routes/api/recordings"));
 app.use("/api/sessions", require("./routes/api/sessions"));
 

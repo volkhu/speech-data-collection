@@ -19,25 +19,22 @@ INSERT INTO project (name, active, description) VALUES (
 );
 
 -- Prompt test data
-INSERT INTO prompt (project_id, instructions, description) VALUES (
+INSERT INTO prompt (project_id, description) VALUES (
     1,
-    'Palun lugege järgnev tekst',
-    'The quick brown fox jumps over the lazy dog'
+    'Palun lugege järgnev tekst'
 );
 INSERT INTO prompt (project_id, instructions, description) VALUES (
     2,
     'Palun lugege järgnev peatükk',
-    'Praesent id pellentesque orci'
+    'Etiam malesuada consectetur elementum'
 );
-INSERT INTO prompt (project_id, instructions, description) VALUES (
+INSERT INTO prompt (project_id, description) VALUES (
     1,
-    'Please read the following text',
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+    'Please read the following text'
 );
-INSERT INTO prompt (project_id, instructions, description) VALUES (
+INSERT INTO prompt (project_id, description) VALUES (
     1,
-    'Please read the following text',
-    'Ut placerat finibus purus id dictum'
+    'Please read the following text'
 );
 INSERT INTO prompt (project_id, instructions, description) VALUES (
     1,
