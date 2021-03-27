@@ -44,6 +44,7 @@
             >
               <v-text-field
                 outlined
+                required
                 label="Name"
                 v-model="projectDetails.name"
               ></v-text-field>
@@ -134,6 +135,7 @@
     <v-row>
       <v-col>
         <v-card v-if="!creatingNewProject">
+          <!-- Delete Prompt confirmation dialog -->
           <v-dialog v-model="deletePromptDialog" max-width="512px">
             <v-card>
               <v-card-title
@@ -164,7 +166,72 @@
             </v-card>
           </v-dialog>
 
-          <v-card-title>Prompts</v-card-title>
+          <!-- New prompt dialog -->
+          <v-dialog persistent v-model="newPromptDialog" max-width="768px">
+            <v-card>
+              <v-card-title>New Prompt</v-card-title>
+              <v-card-text>
+                <form @submit.prevent="submitPromptDialog">
+                  <v-container>
+                    <v-row>
+                      <v-col
+                        ><v-textarea
+                          outlined
+                          required
+                          label="Description"
+                          hint="Usually the text shown to the user for reading. If uploading an image, this will not be shown to the user, but can still be used as a note about the image for administrators."
+                          persistent-hint
+                          v-model="newPromptData.description"
+                        ></v-textarea>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-file-input
+                          outlined
+                          hint="An image to be shown to the user to speak about instead of the description text."
+                          persistent-hint
+                          prepend-icon=""
+                          append-icon="mdi-camera"
+                          accept="image/*"
+                          label="Upload Image (optional)"
+                          show-size=""
+                          v-model="newPromptData.image"
+                        ></v-file-input>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col
+                        ><v-text-field
+                          outlined
+                          label="Custom Instructions (optional)"
+                          hint="By default the user will be told to read the prompt description text or describe the image. Optionally it is possible to replace such instructions with a custom message here that will be displayed to the user alongside the description/image."
+                          persistent-hint
+                          v-model="newPromptData.instructions"
+                        ></v-text-field
+                      ></v-col>
+                    </v-row>
+                    <v-row
+                      ><v-col align="right">
+                        <v-btn text @click="cancelNewPromptDialog"
+                          >Cancel</v-btn
+                        >
+                        <v-btn text type="submit">Save</v-btn>
+                      </v-col></v-row
+                    >
+                  </v-container>
+                </form>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+
+          <v-card-title
+            >Prompts
+            <v-spacer></v-spacer>
+            <v-btn color="primary" @click="newPromptDialog = true">
+              NEW PROMPT
+            </v-btn>
+          </v-card-title>
           <v-card-text>
             <v-data-table :headers="promptsTableHeaders" :items="prompts">
               <template v-slot:item.actions="{ item }">
@@ -221,9 +288,36 @@ export default {
     deletePromptId: 0,
     deletePromptError: false,
     deletePromptErrorMessage: "",
+
+    newPromptData: {},
+    newPromptDialog: false,
+    newPromptError: false,
+    newPromptErrorMessage: "",
   }),
 
   methods: {
+    cancelNewPromptDialog() {
+      this.newPromptDialog = false;
+      this.newPromptData = {};
+    },
+
+    submitPromptDialog() {
+      this.newPromptData.project_id = this.$route.params.projectId;
+
+      axios
+        .post(`http://localhost:5000/api/prompts/`, this.newPromptData)
+        .then((response) => {
+          this.loadPrompts();
+          this.newPromptData = {};
+          this.newPromptDialog = false;
+        })
+        .catch((error) => {
+          this.deletePromptError = true;
+          this.deletePromptErrorMessage = error;
+          console.log(error);
+        });
+    },
+
     openDeletePromptDialog(promptId) {
       this.deletePromptError = false;
       this.deletePromptId = promptId;

@@ -6,7 +6,9 @@ const fs = require("fs");
 
 // APP: Get random prompt
 router.get("/rprompt", (req, res) => {
-  db.any("SELECT * FROM prompt WHERE project_id = $1", [req.query.pid])
+  db.any("SELECT * FROM prompt WHERE deleted = FALSE AND project_id = $1", [
+    req.query.pid,
+  ])
     .then((data) => {
       if (data && data.length) {
         chosenPrompt = data[Math.floor(Math.random() * data.length)];

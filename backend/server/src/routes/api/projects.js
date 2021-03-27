@@ -88,9 +88,10 @@ router.get("/:projectId", (req, res) => {
 
 // ADMIN: Get project with specified ID
 router.get("/:projectId/prompts", (req, res) => {
-  db.any("SELECT * FROM prompt WHERE deleted = FALSE AND project_id = $1", [
-    req.params.projectId,
-  ])
+  db.any(
+    "SELECT * FROM prompt WHERE deleted = FALSE AND project_id = $1 ORDER BY prompt_id ASC",
+    [req.params.projectId]
+  )
     .then((data) => {
       if (data === null) {
         res.sendStatus(204);
