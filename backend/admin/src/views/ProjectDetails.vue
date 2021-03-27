@@ -169,7 +169,8 @@
           <!-- New prompt dialog -->
           <v-dialog persistent v-model="newPromptDialog" max-width="768px">
             <v-card>
-              <v-card-title>New Prompt</v-card-title>
+              <v-card-title v-if="editedPromptId">Edit Prompt</v-card-title>
+              <v-card-title v-if="!editedPromptId">New Prompt</v-card-title>
               <v-card-text>
                 <form @submit.prevent="submitPromptDialog">
                   <v-container>
@@ -196,7 +197,7 @@
                           accept="image/*"
                           label="Upload Image (optional)"
                           show-size=""
-                          v-model="newPromptData.image"
+                          v-model="newPromptData.image_data"
                         ></v-file-input>
                       </v-col>
                     </v-row>
@@ -210,6 +211,14 @@
                           v-model="newPromptData.instructions"
                         ></v-text-field
                       ></v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-alert type="error" v-if="newPromptError"
+                          >Failed to save prompt.
+                          {{ newPromptErrorMessage }}</v-alert
+                        >
+                      </v-col>
                     </v-row>
                     <v-row
                       ><v-col align="right">
@@ -228,14 +237,14 @@
           <v-card-title
             >Prompts
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="newPromptDialog = true">
+            <v-btn color="primary" @click="openNewPromptDialog">
               NEW PROMPT
             </v-btn>
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="promptsTableHeaders" :items="prompts">
               <template v-slot:item.actions="{ item }">
-                <v-btn icon>
+                <v-btn icon @click="openEditPromptDialog(item.prompt_id)">
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
                 <v-btn icon @click="openDeletePromptDialog(item.prompt_id)">
@@ -289,6 +298,7 @@ export default {
     deletePromptError: false,
     deletePromptErrorMessage: "",
 
+    editedPromptId: 0,
     newPromptData: {},
     newPromptDialog: false,
     newPromptError: false,
@@ -296,26 +306,66 @@ export default {
   }),
 
   methods: {
+    getPromptById(promptId) {
+      return this.prompts.find((item) => item.prompt_id === promptId);
+    },
+
+    openEditPromptDialog(promptId) {
+      this.newPromptData = JSON.parse(
+        JSON.stringify(this.getPromptById(promptId))
+      );
+      this.editedPromptId = promptId;
+      this.newPromptDialog = true;
+    },
+
+    openNewPromptDialog() {
+      this.editedPromptId = 0;
+      this.newPromptDialog = true;
+      this.newPromptData = {};
+      this.newPromptError = false;
+    },
+
     cancelNewPromptDialog() {
       this.newPromptDialog = false;
       this.newPromptData = {};
+      this.newPromptError = false;
     },
 
     submitPromptDialog() {
-      this.newPromptData.project_id = this.$route.params.projectId;
+      if (this.editedPromptId) {
+        // update existing prompt
+        axios
+          .put(
+            `http://localhost:5000/api/prompts/${this.editedPromptId}`,
+            this.newPromptData
+          )
+          .then((response) => {
+            this.loadPrompts();
+            this.newPromptData = {};
+            this.newPromptDialog = false;
+          })
+          .catch((error) => {
+            this.newPromptError = true;
+            this.newPromptErrorMessage = error;
+            console.log(error);
+          });
+      } else {
+        // new prompt
+        this.newPromptData.project_id = this.$route.params.projectId;
 
-      axios
-        .post(`http://localhost:5000/api/prompts/`, this.newPromptData)
-        .then((response) => {
-          this.loadPrompts();
-          this.newPromptData = {};
-          this.newPromptDialog = false;
-        })
-        .catch((error) => {
-          this.deletePromptError = true;
-          this.deletePromptErrorMessage = error;
-          console.log(error);
-        });
+        axios
+          .post(`http://localhost:5000/api/prompts/`, this.newPromptData)
+          .then((response) => {
+            this.loadPrompts();
+            this.newPromptData = {};
+            this.newPromptDialog = false;
+          })
+          .catch((error) => {
+            this.newPromptError = true;
+            this.newPromptErrorMessage = error;
+            console.log(error);
+          });
+      }
     },
 
     openDeletePromptDialog(promptId) {

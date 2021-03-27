@@ -16,6 +16,26 @@ router.delete("/:promptId", (req, res) => {
     });
 });
 
+// ADMIN: Update prompt with specified ID
+router.put("/:promptId", (req, res) => {
+  db.none(
+    "UPDATE prompt SET description = $1, image = $2, instructions = $3, last_edited_at = NOW() WHERE prompt_id = $4 AND deleted = FALSE",
+    [
+      req.body.description,
+      req.body.image ? true : false,
+      req.body.instructions,
+      req.params.promptId,
+    ]
+  )
+    .then((data) => {
+      res.sendStatus(200);
+    })
+    .catch((error) => {
+      console.log("ERROR: ", error);
+      res.sendStatus(500);
+    });
+});
+
 // ADMIN: Add prompt to specified project
 router.post("/", (req, res) => {
   console.log(req.body);
