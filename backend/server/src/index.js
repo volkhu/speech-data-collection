@@ -3,7 +3,7 @@ const express = require("express");
 
 const app = express();
 
-app.use(express.json()); // for parsing json body content in requests
+app.use(express.json({ limit: 16e6 })); // for parsing json body content in requests, set limit to 16 MB
 
 app.use("/api/profiles", require("./routes/api/profiles"));
 app.use("/api/projects", require("./routes/api/projects"));

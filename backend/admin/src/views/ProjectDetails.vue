@@ -166,7 +166,7 @@
             </v-card>
           </v-dialog>
 
-          <!-- New prompt dialog -->
+          <!-- New/edit prompt dialog -->
           <v-dialog persistent v-model="newPromptDialog" max-width="768px">
             <v-card>
               <v-card-title v-if="editedPromptId">Edit Prompt</v-card-title>
@@ -194,11 +194,18 @@
                           persistent-hint
                           prepend-icon=""
                           append-icon="mdi-camera"
-                          accept="image/*"
+                          accept="image/jpeg"
                           label="Upload Image (optional)"
+                          ref="promptImageUpload"
+                          v-model="fileUploadModel"
                           show-size=""
-                          v-model="newPromptData.image_data"
+                          @change="onPromptImageChanged"
                         ></v-file-input>
+                        <v-img
+                          v-if="newPromptImage"
+                          contain
+                          :src="newPromptImage"
+                        ></v-img>
                       </v-col>
                     </v-row>
                     <v-row>
@@ -303,9 +310,27 @@ export default {
     newPromptDialog: false,
     newPromptError: false,
     newPromptErrorMessage: "",
+    newPromptImage: "",
+    fileUploadModel: null,
   }),
 
   methods: {
+    onPromptImageChanged(file) {
+      if (file == null) {
+        this.newPromptImage = "";
+        return;
+      }
+
+      // construct callback for filereader
+      const fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        this.newPromptImage = event.target.result;
+      };
+
+      // start loading the file
+      fileReader.readAsDataURL(file);
+    },
+
     getPromptById(promptId) {
       return this.prompts.find((item) => item.prompt_id === promptId);
     },
@@ -316,6 +341,8 @@ export default {
       );
       this.editedPromptId = promptId;
       this.newPromptDialog = true;
+      this.newPromptImage = "";
+      this.fileUploadModel = null;
     },
 
     openNewPromptDialog() {
@@ -323,15 +350,25 @@ export default {
       this.newPromptDialog = true;
       this.newPromptData = {};
       this.newPromptError = false;
+      this.newPromptImage = "";
+      this.fileUploadModel = null;
     },
 
     cancelNewPromptDialog() {
       this.newPromptDialog = false;
       this.newPromptData = {};
       this.newPromptError = false;
+      this.newPromptImage = "";
     },
 
     submitPromptDialog() {
+      if (this.newPromptImage) {
+        this.newPromptData.image = true;
+        this.newPromptData.image_data = this.newPromptImage;
+      }
+
+      console.log(this.newPromptData);
+
       if (this.editedPromptId) {
         // update existing prompt
         axios

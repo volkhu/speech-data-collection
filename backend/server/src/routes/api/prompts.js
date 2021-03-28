@@ -1,6 +1,8 @@
 const express = require("express");
 const db = require("../../db/db");
 const router = express.Router();
+const path = require("path");
+const fs = require("fs");
 
 // ADMIN: Delete prompt with specified ID
 router.delete("/:promptId", (req, res) => {
@@ -22,12 +24,16 @@ router.put("/:promptId", (req, res) => {
     "UPDATE prompt SET description = $1, image = $2, instructions = $3, last_edited_at = NOW() WHERE prompt_id = $4 AND deleted = FALSE",
     [
       req.body.description,
-      req.body.image ? true : false,
+      req.body.image,
       req.body.instructions,
       req.params.promptId,
     ]
   )
     .then((data) => {
+      if (req.body.image) {
+        savePromptImage(req.params.promptId, req.body.image_data);
+      }
+
       res.sendStatus(200);
     })
     .catch((error) => {
@@ -38,18 +44,20 @@ router.put("/:promptId", (req, res) => {
 
 // ADMIN: Add prompt to specified project
 router.post("/", (req, res) => {
-  console.log(req.body);
-
   db.one(
     "INSERT INTO prompt (project_id, description, image, instructions) VALUES ($1, $2, $3, $4) RETURNING prompt_id",
     [
       req.body.project_id,
       req.body.description,
-      req.body.image ? true : false,
+      req.body.image,
       req.body.instructions,
     ]
   )
     .then((data) => {
+      if (req.body.image) {
+        savePromptImage(data.prompt_id, req.body.image_data);
+      }
+
       res.sendStatus(200);
     })
     .catch((error) => {
@@ -57,5 +65,26 @@ router.post("/", (req, res) => {
       res.sendStatus(500);
     });
 });
+
+const savePromptImage = (promptId, imageData) => {
+  const fileDir = path.join(
+    __dirname,
+    "../../../files/prompt_images/",
+    `${promptId}.jpg`
+  );
+  console.log(fileDir);
+
+  try {
+    const innerImageData = imageData.split(",")[1];
+    fs.writeFileSync(fileDir, innerImageData, {
+      encoding: "base64",
+    });
+  } catch (err) {
+    console.error(err);
+  }
+
+  console.log("Has image");
+  return;
+};
 
 module.exports = router;
