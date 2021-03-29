@@ -380,6 +380,7 @@ export default {
             this.loadPrompts();
             this.newPromptData = {};
             this.newPromptDialog = false;
+            this.newPromptError = false;
           })
           .catch((error) => {
             this.newPromptError = true;

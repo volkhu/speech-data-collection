@@ -46,6 +46,11 @@ export default {
         route: "/",
       },
       {
+        title: "Login",
+        icon: "mdi-login",
+        route: "/login",
+      },
+      {
         title: "Projects",
         icon: "mdi-format-list-bulleted",
         route: "/projects",
