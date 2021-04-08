@@ -8,7 +8,12 @@
       <v-spacer></v-spacer>
     </v-app-bar>
 
-    <v-navigation-drawer app clipped v-model="showNavigationDrawer">
+    <v-navigation-drawer
+      app
+      clipped
+      v-model="showNavigationDrawer"
+      :width="325"
+    >
       <v-list dense nav>
         <v-list-item
           link
@@ -21,6 +26,15 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-spacer></v-spacer>
+        <v-list-item link @click="logoutNow" v-if="$store.state.isAuthorized">
+          <v-list-item-icon>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Logout, {{ username }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -37,18 +51,47 @@
 export default {
   name: "App",
 
+  computed: {
+    navigationDrawerItems() {
+      return this.$store.state.isAuthorized
+        ? this.navigationDrawerItemsLoggedIn
+        : this.navigationDrawerItemsLoggedOut;
+    },
+
+    username() {
+      if (this.$store.state.isAuthorized) {
+        return this.$gAuth.GoogleAuth.currentUser.get().Qs.zt;
+        //console.log(this.$gAuth.GoogleAuth.currentUser.get());
+      }
+    },
+  },
+
+  data: {
+    navBarWidth: 325,
+  },
+
+  methods: {
+    async logoutNow() {
+      try {
+        // fix up later
+        await this.$gAuth.signOut();
+        this.$store.commit("setLoggedOut");
+        this.$router.replace({ name: "Login" });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  },
+
   data: () => ({
+    disableAppBar: false,
+    disableNavigationDrawer: false,
     showNavigationDrawer: true,
-    navigationDrawerItems: [
+    navigationDrawerItemsLoggedIn: [
       {
         title: "Home",
         icon: "mdi-home",
         route: "/",
-      },
-      {
-        title: "Login",
-        icon: "mdi-login",
-        route: "/login",
       },
       {
         title: "Projects",
@@ -61,6 +104,36 @@ export default {
         route: "/users",
       },
     ],
+    navigationDrawerItemsLoggedOut: [
+      {
+        title: "Home",
+        icon: "mdi-home",
+        route: "/",
+      },
+      {
+        title: "Login",
+        icon: "mdi-login",
+        route: "/login",
+      },
+    ],
   }),
+
+  created() {
+    // test from docs, remove later
+    let that = this;
+    let checkGauthLoad = setInterval(function() {
+      that.$gAuth.isInit;
+
+      if (that.$gAuth.isInit) {
+        if (that.$gAuth.isAuthorized) {
+          that.$store.commit("setLoggedIn");
+        } else {
+          that.$store.commit("setLoggedOut");
+        }
+      }
+
+      if (that.isInit) clearInterval(checkGauthLoad);
+    }, 100);
+  },
 };
 </script>

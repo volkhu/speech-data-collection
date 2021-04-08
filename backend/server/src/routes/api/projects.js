@@ -1,6 +1,9 @@
 const express = require("express");
 const db = require("../../db/db");
 const router = express.Router();
+const path = require("path");
+const fs = require("fs");
+const JSZip = require("jszip");
 
 // APP: Get all projects that can be participated in
 // ADMIN: Get all projects and some associated stats
@@ -96,6 +99,28 @@ router.get("/:projectId/prompts", (req, res) => {
       if (data === null) {
         res.sendStatus(204);
       } else {
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].image) {
+            const fileDir = path.join(
+              __dirname,
+              "../../../files/prompt_images/",
+              `${data[i].prompt_id}.jpg`
+            );
+            console.log(fileDir);
+
+            try {
+              const imageData = fs.readFileSync(fileDir, {
+                encoding: "base64",
+              });
+              data[i].image_data = "data:image/jpeg;base64," + imageData;
+            } catch (err) {
+              console.error(err);
+            }
+
+            //console.log(data[i]);
+          }
+        }
+
         res.status(200).json(data);
       }
     })
@@ -103,6 +128,45 @@ router.get("/:projectId/prompts", (req, res) => {
       console.log("ERROR: ", error);
       res.sendStatus(500);
     });
+});
+
+router.get("/:projectId/downloadRecordings", (req, res) => {
+  const zip = new JSZip();
+  const zipFileName = `project_${req.params.projectId}_recordings.zip`;
+
+  db.any(
+    "SELECT * FROM recording INNER JOIN session USING (session_id) WHERE session.project_id = $1",
+    [req.params.projectId]
+  ).then((data) => {
+    data.forEach((item) => {
+      const audioFilename = `project_${item.project_id}_profile_${item.profile_id}_session_${item.session_id}_prompt_${item.prompt_id}.wav`;
+      const sourceAudioFilePath = path.join(
+        __dirname,
+        "../../../files/audio/",
+        `project_${item.project_id}/profile_${item.profile_id}/session_${item.session_id}/`,
+        audioFilename
+      );
+      const zippedAudioFilePath = path.join(
+        `profile_${item.profile_id}/session_${item.session_id}/`,
+        audioFilename
+      );
+
+      // TODO: swap out for file reading code after other things are fixed
+      zip.file(zippedAudioFilePath, require("crypto").randomBytes(4096));
+
+      console.log(audioFilename);
+      console.log(sourceAudioFilePath);
+      console.log(zippedAudioFilePath);
+      console.log(item);
+    });
+
+    zip.generateAsync({ type: "nodebuffer" }).then((zipFileContent) => {
+      res.set("Content-Type", "application/zip");
+      res.set("Content-Disposition", `filename="${zipFileName}"`);
+      res.set("Content-Length", zipFileContent.length);
+      res.end(zipFileContent);
+    });
+  });
 });
 
 module.exports = router;

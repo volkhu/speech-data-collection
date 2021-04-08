@@ -2,39 +2,18 @@
   <v-container fluid fill-height>
     <v-row>
       <v-spacer></v-spacer>
-      <v-col align="center" justify="center">
+      <v-col align="center">
         <v-card>
           <v-card-title>Login</v-card-title>
+          <v-card-subtitle align="left"
+            >Please choose your login method.</v-card-subtitle
+          >
           <v-card-text>
-            <form @submit.prevent="submitLoginForm">
-              <v-container>
-                <v-row>
-                  <v-col
-                    ><v-text-field
-                      outlined
-                      label="E-mail"
-                      hint="The e-mail address you used to register an account on this site."
-                      persistent-hint
-                    ></v-text-field
-                  ></v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      outlined
-                      type="password"
-                      label="Password"
-                      hint="The password you used to create an account on this site."
-                      persistent-hint
-                    ></v-text-field> </v-col
-                ></v-row>
-                <v-row
-                  ><v-col align="right">
-                    <v-btn color="primary" type="submit">Login</v-btn>
-                  </v-col></v-row
-                >
-              </v-container>
-            </form>
+            <button @click="loginWithGoogle">
+              <img
+                src="../assets/google/btn_google_signin_dark_normal_web.png"
+              />
+            </button>
           </v-card-text>
         </v-card>
       </v-col>
@@ -46,8 +25,24 @@
 <script>
 export default {
   methods: {
-    submitLoginForm() {
-      console.log("submitLoginForm");
+    async loginWithGoogle() {
+      console.log("loginWithGoogle");
+      //const authCode = await this.$gAuth.getAuthCode();
+      //console.log(authCode);
+
+      try {
+        const googleUser = await this.$gAuth.signIn();
+        if (!googleUser) {
+          return null;
+        }
+
+        this.$store.commit("setLoggedIn");
+        this.$router.replace({ name: "Home" });
+      } catch (error) {
+        //on fail do something
+        console.error(error);
+        return null;
+      }
     },
   },
 };

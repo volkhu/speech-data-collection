@@ -27,6 +27,11 @@ const routes = [
     props: true,
     component: () => import("../views/ProjectDetails.vue"),
   },
+  {
+    path: "/users",
+    name: "Users",
+    component: () => import("../views/Users.vue"),
+  },
 ];
 
 const router = new VueRouter({

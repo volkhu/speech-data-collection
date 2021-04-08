@@ -53,7 +53,7 @@ router.post("/", (req, res) => {
       "../../../files/audio/",
       `project_${session.project_id}/profile_${session.profile_id}/session_${session.session_id}/`
     );
-    const fileName = `prompt_${prompt.prompt_id}_rec_${recording.recording_id}.wav`;
+    const fileName = `project_${session.project_id}_prompt_${prompt.prompt_id}_rec_${recording.recording_id}.wav`;
     const filePath = path.join(fileDir, fileName);
     //console.log(filePath);
 

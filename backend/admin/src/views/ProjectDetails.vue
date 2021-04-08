@@ -96,12 +96,15 @@
                   </tr>
                   <tr>
                     <td>Created</td>
-                    <td>{{ projectDetails.created_at }}</td>
+                    <td>
+                      {{ projectDetails.created_at }} (example@gmail.com)
+                    </td>
                   </tr>
                   <tr>
                     <td>Last Edited</td>
                     <td>
                       {{ projectDetails.last_edited_at }}
+                      (example@gmail.com)
                     </td>
                   </tr>
                   <tr>
@@ -130,11 +133,104 @@
             </v-simple-table>
           </v-card-text>
         </v-card>
+        <br />
+        <v-card>
+          <v-card-title>Actions</v-card-title>
+          <v-card-text align="right">
+            <v-btn
+              color="primary"
+              class="mr-3"
+              @click="batchUploadPromptsClicked"
+            >
+              BATCH UPLOAD PROMPTS
+            </v-btn>
+
+            <v-btn
+              color="primary"
+              link
+              :href="recordingsDownloadUrl"
+              target="_blank"
+            >
+              DOWNLOAD RECORDINGS
+            </v-btn>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
         <v-card v-if="!creatingNewProject">
+          <!-- Batch Upload Prompts dialog -->
+          <v-dialog v-model="showBatchUploadPrompts" max-width="768px">
+            <v-card>
+              <v-card-title>Batch Upload Prompts</v-card-title>
+              <v-card-subtitle align="left" class="pt-1"
+                >Here you can upload a text file where each row will be treated
+                as a separate prompt description text and added to the
+                database.</v-card-subtitle
+              >
+              <v-card-actions>
+                <v-container>
+                  <v-row
+                    ><v-col>
+                      <v-file-input
+                        outlined
+                        hint="Upload a text file with a text prompt on each line."
+                        persistent-hint
+                        prepend-icon=""
+                        append-icon="mdi-text"
+                        accept=".txt"
+                        label="Upload Text File (.txt)"
+                        v-model="batchUploadFilePickerModel"
+                        show-size=""
+                        @change="onBatchUploadFileChanged"
+                      ></v-file-input> </v-col
+                  ></v-row>
+                  <v-row>
+                    <v-col>
+                      <v-simple-table>
+                        <template v-slot:default>
+                          <thead>
+                            <tr>
+                              <th class="text-left">
+                                Prompt Description
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="item in batchUploadPreviewPrompts"
+                              :key="item"
+                            >
+                              <td>{{ item }}</td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                    </v-col>
+                  </v-row>
+                  <v-row v-if="batchUploadError"
+                    ><v-col>
+                      <v-alert type="error"
+                        >Batch upload failed.
+                        {{ batchUploadErrorMessage }}</v-alert
+                      ></v-col
+                    ></v-row
+                  ><v-row
+                    ><v-col align="right">
+                      <v-btn text @click="cancelBatchUploadDialog"
+                        >Cancel</v-btn
+                      >
+                      <v-btn text @click="confirmBatchUploadDialog"
+                        >Confirm</v-btn
+                      >
+                    </v-col></v-row
+                  >
+                </v-container>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
           <!-- Delete Prompt confirmation dialog -->
           <v-dialog v-model="deletePromptDialog" max-width="512px">
             <v-card>
@@ -250,6 +346,15 @@
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="promptsTableHeaders" :items="prompts">
+              <template v-slot:item.image="{ item }">
+                <v-img
+                  v-if="item.image"
+                  contain
+                  max-height="50"
+                  max-width="200"
+                  :src="item.image_data"
+                ></v-img>
+              </template>
               <template v-slot:item.actions="{ item }">
                 <v-btn icon @click="openEditPromptDialog(item.prompt_id)">
                   <v-icon>mdi-pencil</v-icon>
@@ -312,9 +417,62 @@ export default {
     newPromptErrorMessage: "",
     newPromptImage: "",
     fileUploadModel: null,
+
+    recordingsDownloadUrl: "",
+
+    showBatchUploadPrompts: false,
+    batchUploadError: false,
+    batchUploadErrorMessage: "",
+    batchUploadFilePickerModel: null,
+    batchUploadPreviewPrompts: [],
   }),
 
   methods: {
+    cancelBatchUploadDialog() {
+      this.showBatchUploadPrompts = false;
+    },
+
+    confirmBatchUploadDialog() {
+      this.batchUploadPreviewPrompts.forEach((item) => {
+        axios
+          .post(`http://localhost:5000/api/prompts/`, {
+            project_id: this.$route.params.projectId,
+            description: item,
+          })
+          .then((response) => {
+            console.log(response);
+            this.loadPrompts();
+            this.showBatchUploadPrompts = false;
+          })
+          .catch((error) => {
+            this.batchUploadError = true;
+            this.batchUploadErrorMessage = error;
+          });
+      });
+    },
+
+    batchUploadPromptsClicked() {
+      this.batchUploadError = false;
+      this.batchUploadFilePickerModel = null;
+      this.showBatchUploadPrompts = true;
+    },
+
+    onBatchUploadFileChanged(file) {
+      if (file == null) {
+        return;
+      }
+
+      // construct callback for filereader
+      const fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        this.batchUploadPreviewPrompts = event.target.result.split("\n");
+        console.log(this.batchUploadPreviewPrompts);
+      };
+
+      // start loading the file
+      fileReader.readAsText(file);
+    },
+
     onPromptImageChanged(file) {
       if (file == null) {
         this.newPromptImage = "";
@@ -341,7 +499,7 @@ export default {
       );
       this.editedPromptId = promptId;
       this.newPromptDialog = true;
-      this.newPromptImage = "";
+      this.newPromptImage = this.newPromptData.image_data;
       this.fileUploadModel = null;
     },
 
@@ -492,6 +650,8 @@ export default {
     },
 
     loadProjectDetails() {
+      this.recordingsDownloadUrl = `http://localhost:5000/api/projects/${this.$route.params.projectId}/downloadRecordings`;
+
       axios
         .get(
           `http://localhost:5000/api/projects/${this.$route.params.projectId}`

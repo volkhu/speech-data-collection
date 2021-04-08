@@ -76,6 +76,7 @@ const savePromptImage = (promptId, imageData) => {
 
   try {
     const innerImageData = imageData.split(",")[1];
+
     fs.writeFileSync(fileDir, innerImageData, {
       encoding: "base64",
     });
