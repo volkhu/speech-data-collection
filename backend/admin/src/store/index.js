@@ -5,16 +5,44 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    isAuthorized: false,
+    isGoogleApiInitialized: false,
+    isLoggedIn: false,
+    isAdministrator: false,
+    myUsername: null,
+
+    globalSnackbarMessage: "",
+    isGlobalSnackbarShown: false,
   },
   mutations: {
-    setLoggedIn(state) {
-      state.isAuthorized = true;
+    setIsGoogleApiInitialized(state, value) {
+      state.isGoogleApiInitialized = value;
     },
-    setLoggedOut(state) {
-      state.isAuthorized = false;
+
+    setIsLoggedIn(state, value) {
+      state.isLoggedIn = value;
+    },
+
+    setIsAdministrator(state, value) {
+      state.isAdministrator = value;
+    },
+
+    setMyUsername(state, username) {
+      state.myUsername = username;
+    },
+
+    setGlobalSnackbarMessage(state, value) {
+      state.globalSnackbarMessage = value;
+    },
+
+    setIsGlobalSnackbarShown(state, value) {
+      state.isGlobalSnackbarShown = value;
     },
   },
-  actions: {},
+  actions: {
+    showGlobalSnackbar(context, message) {
+      context.commit("setGlobalSnackbarMessage", message);
+      context.commit("setIsGlobalSnackbarShown", true);
+    },
+  },
   modules: {},
 });

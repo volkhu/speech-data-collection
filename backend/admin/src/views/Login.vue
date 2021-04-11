@@ -6,7 +6,7 @@
         <v-card>
           <v-card-title>Login</v-card-title>
           <v-card-subtitle align="left"
-            >Please choose your login method.</v-card-subtitle
+            >Please select your preferred login method.</v-card-subtitle
           >
           <v-card-text>
             <button @click="loginWithGoogle">
@@ -23,8 +23,16 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
+  data: () => ({
+    loginSuccessSnackbarShown: false,
+  }),
+
   methods: {
+    ...mapActions(["showGlobalSnackbar"]),
+
     async loginWithGoogle() {
       console.log("loginWithGoogle");
       //const authCode = await this.$gAuth.getAuthCode();
@@ -36,7 +44,10 @@ export default {
           return null;
         }
 
-        this.$store.commit("setLoggedIn");
+        this.showGlobalSnackbar("You are now logged in.");
+
+        this.$store.commit("setIsLoggedIn", true);
+        //this.$store.commit("setIsAdministrator", true);
         this.$router.replace({ name: "Home" });
       } catch (error) {
         //on fail do something

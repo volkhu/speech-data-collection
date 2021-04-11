@@ -1,139 +1,65 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark dense clipped-left>
-      <v-app-bar-nav-icon
-        @click.stop="showNavigationDrawer = !showNavigationDrawer"
-      ></v-app-bar-nav-icon>
-      <v-toolbar-title>Admin Dashboard</v-toolbar-title>
-      <v-spacer></v-spacer>
-    </v-app-bar>
+    <!-- Loading icon -->
+    <AppLoadingIndicator v-if="!isGoogleApiInitialized" />
 
-    <v-navigation-drawer
-      app
-      clipped
-      v-model="showNavigationDrawer"
-      :width="325"
-    >
-      <v-list dense nav>
-        <v-list-item
-          link
-          v-for="item in navigationDrawerItems"
-          :key="item.title"
-          :to="item.route"
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-spacer></v-spacer>
-        <v-list-item link @click="logoutNow" v-if="$store.state.isAuthorized">
-          <v-list-item-icon>
-            <v-icon>mdi-logout</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Logout, {{ username }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <!-- Global frame around the app (title bar, nav bar, etc.) including the app content itself -->
+    <AppFrame v-if="isGoogleApiInitialized" />
 
-    <v-main>
-      <!-- Use full path of the route as a key to reload components if they route to themselves -->
-      <router-view :key="$route.fullPath"></router-view>
-    </v-main>
+    <!-- Global snackbar message -->
+    <v-snackbar timeout="2000" v-model="isGlobalSnackbarShown">
+      {{ globalSnackbarMessage }}
+    </v-snackbar>
   </v-app>
 </template>
 
 <script>
+import { mapState } from "vuex";
+import AppLoadingIndicator from "./components/AppLoadingIndicator";
+import AppFrame from "./components/AppFrame";
+
 export default {
   name: "App",
 
   computed: {
-    navigationDrawerItems() {
-      return this.$store.state.isAuthorized
-        ? this.navigationDrawerItemsLoggedIn
-        : this.navigationDrawerItemsLoggedOut;
-    },
-
-    username() {
-      if (this.$store.state.isAuthorized) {
-        return this.$gAuth.GoogleAuth.currentUser.get().Qs.zt;
-        //console.log(this.$gAuth.GoogleAuth.currentUser.get());
-      }
+    ...mapState(["isGoogleApiInitialized", "globalSnackbarMessage"]),
+    isGlobalSnackbarShown: {
+      set(value) {
+        this.$store.commit("setIsGlobalSnackbarShown", value);
+      },
+      get() {
+        return this.$store.state.isGlobalSnackbarShown;
+      },
     },
   },
 
-  data: {
-    navBarWidth: 325,
+  components: {
+    AppLoadingIndicator,
+    AppFrame,
   },
 
   methods: {
-    async logoutNow() {
-      try {
-        // fix up later
-        await this.$gAuth.signOut();
-        this.$store.commit("setLoggedOut");
-        this.$router.replace({ name: "Login" });
-      } catch (error) {
-        console.error(error);
-      }
+    waitForGoogleApiToLoad() {
+      const checkInterval = setInterval(() => {
+        if (this.$gAuth.isInit) {
+          this.$store.commit("setIsGoogleApiInitialized", true);
+
+          if (this.$gAuth.isAuthorized) {
+            this.$store.commit("setIsLoggedIn", true);
+            this.$store.commit(
+              "setMyUsername",
+              this.$gAuth.GoogleAuth.currentUser.get().Qs.zt
+            );
+          }
+
+          clearInterval(checkInterval);
+        }
+      }, 100);
     },
   },
 
-  data: () => ({
-    disableAppBar: false,
-    disableNavigationDrawer: false,
-    showNavigationDrawer: true,
-    navigationDrawerItemsLoggedIn: [
-      {
-        title: "Home",
-        icon: "mdi-home",
-        route: "/",
-      },
-      {
-        title: "Projects",
-        icon: "mdi-format-list-bulleted",
-        route: "/projects",
-      },
-      {
-        title: "Users",
-        icon: "mdi-account-supervisor",
-        route: "/users",
-      },
-    ],
-    navigationDrawerItemsLoggedOut: [
-      {
-        title: "Home",
-        icon: "mdi-home",
-        route: "/",
-      },
-      {
-        title: "Login",
-        icon: "mdi-login",
-        route: "/login",
-      },
-    ],
-  }),
-
   created() {
-    // test from docs, remove later
-    let that = this;
-    let checkGauthLoad = setInterval(function() {
-      that.$gAuth.isInit;
-
-      if (that.$gAuth.isInit) {
-        if (that.$gAuth.isAuthorized) {
-          that.$store.commit("setLoggedIn");
-        } else {
-          that.$store.commit("setLoggedOut");
-        }
-      }
-
-      if (that.isInit) clearInterval(checkGauthLoad);
-    }, 100);
+    this.waitForGoogleApiToLoad();
   },
 };
 </script>
