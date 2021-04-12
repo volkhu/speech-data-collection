@@ -6,6 +6,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    // init
+    appReady: false,
+
     // login
     myAccountToken: null,
     myAccountData: null,
@@ -14,7 +17,17 @@ export default new Vuex.Store({
     globalSnackbarMessage: "",
     isGlobalSnackbarShown: false,
   },
+  getters: {
+    isLoggedIn: (state) => {
+      return state.myAccountData != null;
+    },
+  },
   mutations: {
+    // init
+    setAppReady(state) {
+      state.appReady = true;
+    },
+
     // login
     setMyAccountToken(state, accountToken) {
       state.myAccountToken = accountToken;
@@ -32,9 +45,25 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    showGlobalSnackbar(context, message) {
-      context.commit("setGlobalSnackbarMessage", message);
-      context.commit("setIsGlobalSnackbarShown", true);
+    // wait for Google API to load and check login status for the first time after
+    initApp(context) {
+      return new Promise((resolve, reject) => {
+        const checkInterval = setInterval(() => {
+          if (this._vm.$gAuth.isInit) {
+            clearInterval(checkInterval);
+
+            context
+              .dispatch("updateLoginStatus")
+              .then(() => {
+                resolve();
+                context.commit("setAppReady");
+              })
+              .catch((error) => {
+                reject();
+              });
+          }
+        }, 100);
+      });
     },
 
     async updateLoginStatus(context) {
@@ -57,6 +86,11 @@ export default new Vuex.Store({
       } catch (error) {
         console.log("updateLoginStatus error: " + error);
       }
+    },
+
+    showGlobalSnackbar(context, message) {
+      context.commit("setGlobalSnackbarMessage", message);
+      context.commit("setIsGlobalSnackbarShown", true);
     },
   },
   modules: {},

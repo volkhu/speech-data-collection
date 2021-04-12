@@ -22,7 +22,7 @@ export default {
   name: "App",
 
   computed: {
-    ...mapState(["globalSnackbarMessage"]),
+    ...mapState(["appReady", "globalSnackbarMessage"]),
     isGlobalSnackbarShown: {
       set(value) {
         this.$store.commit("setIsGlobalSnackbarShown", value);
@@ -36,28 +36,6 @@ export default {
   components: {
     AppLoadingIndicator,
     AppFrame,
-  },
-
-  data: () => ({
-    appReady: false,
-  }),
-
-  methods: {
-    waitForGoogleApiToLoad() {
-      const checkInterval = setInterval(() => {
-        if (this.$gAuth.isInit) {
-          this.$store.dispatch("updateLoginStatus").then(() => {
-            this.appReady = true;
-          });
-
-          clearInterval(checkInterval);
-        }
-      }, 100);
-    },
-  },
-
-  created() {
-    this.waitForGoogleApiToLoad();
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid fill-height>
     <!-- Top app bar with title and hamburger menu button -->
     <v-app-bar app color="primary" dark dense clipped-left>
       <v-app-bar-nav-icon @click="toggleNavigationDrawer"></v-app-bar-nav-icon>
@@ -11,7 +11,7 @@
     <v-navigation-drawer app clipped width="325" v-model="showNavigationDrawer">
       <v-list dense nav>
         <!-- Home -->
-        <v-list-item link to="/">
+        <v-list-item link to="/" v-if="myAccountData">
           <v-list-item-icon>
             <v-icon>mdi-home</v-icon>
           </v-list-item-icon>

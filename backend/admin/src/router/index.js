@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-import Projects from "../views/Projects.vue";
+import store from "../store";
 
 Vue.use(VueRouter);
 
@@ -38,6 +38,45 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+// make sure that store init promise has been resolved,
+// and data such as login status will be loaded before any navigation will occur
+const storeInitApp = store.dispatch("initApp");
+router.beforeEach(async (to, from, next) => {
+  await storeInitApp;
+  next();
+});
+
+// navigation guards
+router.beforeEach((to, from, next) => {
+  if (store.getters.isLoggedIn) {
+    // logged in, redirect to home if on login
+    if (to.name === "Login") {
+      next({ name: "Home" });
+      return;
+    }
+
+    // logged in, but no access granted, redirect to home if not already there
+    if (to.name !== "Home" && !store.state.myAccountData.has_admin_access) {
+      next({ name: "Home" });
+      return;
+    }
+
+    // redirect to home if on user management and not superuser
+    if (to.name === "Users" && !store.state.myAccountData.is_superuser) {
+      next({ name: "Home" });
+      return;
+    }
+  } else {
+    // not logged in, redirect to login if not already there
+    if (to.name !== "Login") {
+      next({ name: "Login" });
+      return;
+    }
+  }
+
+  next();
 });
 
 export default router;
