@@ -21,7 +21,11 @@
         </v-list-item>
 
         <!-- Projects -->
-        <v-list-item link to="/projects" v-if="isAdministrator">
+        <v-list-item
+          link
+          to="/projects"
+          v-if="myAccountData && myAccountData.has_admin_access"
+        >
           <v-list-item-icon>
             <v-icon>mdi-format-list-bulleted</v-icon>
           </v-list-item-icon>
@@ -31,7 +35,11 @@
         </v-list-item>
 
         <!-- Users -->
-        <v-list-item link to="/users" v-if="isAdministrator">
+        <v-list-item
+          link
+          to="/users"
+          v-if="myAccountData && myAccountData.is_superuser"
+        >
           <v-list-item-icon>
             <v-icon>mdi-account-supervisor</v-icon>
           </v-list-item-icon>
@@ -41,7 +49,7 @@
         </v-list-item>
 
         <!-- Login -->
-        <v-list-item link to="/login" v-if="!isLoggedIn">
+        <v-list-item link to="/login" v-if="!myAccountData">
           <v-list-item-icon>
             <v-icon>mdi-login</v-icon>
           </v-list-item-icon>
@@ -51,12 +59,14 @@
         </v-list-item>
 
         <!-- Logout -->
-        <v-list-item link @click="showLogoutDialog = true" v-if="isLoggedIn">
+        <v-list-item link @click="showLogoutDialog = true" v-if="myAccountData">
           <v-list-item-icon>
             <v-icon>mdi-logout</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Logout, {{ myUsername }}</v-list-item-title>
+            <v-list-item-title
+              >Logout, {{ myAccountData.email }}</v-list-item-title
+            >
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -82,7 +92,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["isLoggedIn", "isAdministrator", "myUsername"]),
+    ...mapState(["myAccountData"]),
   },
 
   methods: {

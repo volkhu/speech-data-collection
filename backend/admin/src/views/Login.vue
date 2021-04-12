@@ -31,7 +31,7 @@ export default {
   }),
 
   computed: {
-    ...mapState(["myUsername"]),
+    ...mapState(["myAccountData"]),
   },
 
   methods: {
@@ -46,7 +46,7 @@ export default {
           this.$router.replace({ name: "Home" });
 
           this.showGlobalSnackbar(
-            `You are now logged in as ${this.myUsername}.`
+            `You are now logged in as ${this.myAccountData.email}.`
           );
         }
       } catch (error) {

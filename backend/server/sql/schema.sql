@@ -4,14 +4,15 @@ DROP TABLE IF EXISTS session;
 DROP TABLE IF EXISTS prompt;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS profile;
+DROP TABLE IF EXISTS account;
 
 -- Create tables
-CREATE TABLE administrator (
-    administrator_id SERIAL PRIMARY KEY,
+CREATE TABLE account (
+    account_id SERIAL PRIMARY KEY,
     google_id VARCHAR(64) NOT NULL UNIQUE,
     email VARCHAR(254) NOT NULL,
-    access_granted BOOLEAN NOT NULL DEFAULT FALSE,
-    superuser BOOLEAN NOT NULL DEFAULT FALSE
+    has_admin_access BOOLEAN NOT NULL DEFAULT FALSE,
+    is_superuser BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE profile (

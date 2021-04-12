@@ -7,12 +7,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     // login
-    isLoggedIn: false,
-    isAdministrator: false,
-    myUsername: null,
-
-    myToken: null,
-    myUserData: null,
+    myAccountToken: null,
+    myAccountData: null,
 
     // global notification
     globalSnackbarMessage: "",
@@ -20,20 +16,11 @@ export default new Vuex.Store({
   },
   mutations: {
     // login
-    setIsLoggedIn(state, value) {
-      state.isLoggedIn = value;
+    setMyAccountToken(state, accountToken) {
+      state.myAccountToken = accountToken;
     },
-    setIsAdministrator(state, value) {
-      state.isAdministrator = value;
-    },
-    setMyUsername(state, username) {
-      state.myUsername = username;
-    },
-    setMyToken(state, token) {
-      state.myToken = token;
-    },
-    myUserData(state, userData) {
-      state.myUserData = userData;
+    setMyAccountData(state, accountData) {
+      state.myAccountData = accountData;
     },
 
     // global notification
@@ -51,26 +38,24 @@ export default new Vuex.Store({
     },
 
     async updateLoginStatus(context) {
-      const gAuth = this._vm.$gAuth;
-      const gUser = gAuth.GoogleAuth.currentUser.get();
+      try {
+        const gAuth = this._vm.$gAuth;
+        const gUser = gAuth.GoogleAuth.currentUser.get();
 
-      if (gAuth.isAuthorized) {
-        context.commit("setMyToken", gUser.getAuthResponse().id_token);
-        console.log("myToken: " + context.state.myToken);
+        if (gAuth.isAuthorized) {
+          // logged in, get google ID token
+          context.commit("setMyAccountToken", gUser.getAuthResponse().id_token);
 
-        const userData = await axios.get("/administrators/me");
-        console.log(userData);
-
-        const email = gUser.getBasicProfile().getEmail();
-
-        context.commit("setIsLoggedIn", true);
-        context.commit("setMyUsername", email);
-        context.commit("setMyToken", null);
-      } else {
-        context.commit("setIsLoggedIn", false);
-        context.commit("setIsAdministrator", false);
-        context.commit("setMyUsername", null);
-        context.commit("setMyToken", null);
+          // get info about my account from endpoint
+          const accountDataResponse = await axios.get("/accounts/me");
+          context.commit("setMyAccountData", accountDataResponse.data);
+        } else {
+          // logged out, reset fields
+          context.commit("setMyAccountToken", null);
+          context.commit("setMyAccountData", null);
+        }
+      } catch (error) {
+        console.log("updateLoginStatus error: " + error);
       }
     },
   },
