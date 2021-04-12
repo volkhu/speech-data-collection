@@ -50,8 +50,7 @@ export default {
           );
         }
       } catch (error) {
-        console.error(error);
-        return null;
+        console.error("login error: " + error);
       }
     },
   },

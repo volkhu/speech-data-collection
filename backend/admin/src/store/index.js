@@ -69,6 +69,7 @@ export default new Vuex.Store({
     async updateLoginStatus(context) {
       try {
         const gAuth = this._vm.$gAuth;
+        if (!gAuth.isInit) return;
         const gUser = gAuth.GoogleAuth.currentUser.get();
 
         if (gAuth.isAuthorized) {

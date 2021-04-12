@@ -44,7 +44,12 @@ const router = new VueRouter({
 // and data such as login status will be loaded before any navigation will occur
 const storeInitApp = store.dispatch("initApp");
 router.beforeEach(async (to, from, next) => {
-  await storeInitApp;
+  try {
+    await storeInitApp;
+  } catch (error) {
+    console.log("storeInitApp error: " + error);
+  }
+
   next();
 });
 

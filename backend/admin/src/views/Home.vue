@@ -4,7 +4,7 @@
       <v-col>
         <v-card>
           <!-- Welcome for new unconfirmed users -->
-          <div v-if="!myAccountData.has_admin_access">
+          <div v-if="myAccountData && !myAccountData.has_admin_access">
             <v-card-title
               ><v-icon class="mr-2">mdi-timer-sand-empty</v-icon>Please
               wait</v-card-title
@@ -16,7 +16,7 @@
           </div>
 
           <!-- Welcome for users with admin access -->
-          <div v-if="myAccountData.has_admin_access">
+          <div v-if="myAccountData && myAccountData.has_admin_access">
             <v-card-title>Welcome</v-card-title>
             <v-card-text
               >This is the Speech App Admin Dashboard. Here you can manage
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "Home",
@@ -40,6 +40,31 @@ export default {
 
   computed: {
     ...mapState(["myAccountData"]),
+  },
+
+  data: () => ({
+    refreshAccountStatusTimer: null,
+  }),
+
+  methods: {
+    ...mapActions(["updateLoginStatus"]),
+  },
+
+  created() {
+    // poll for changes in account status if waiting for access
+    if (this.myAccountData && !this.myAccountData.has_admin_access) {
+      this.refreshAccountStatusTimer = setInterval(() => {
+        this.updateLoginStatus().then(() => {
+          if (this.myAccountData && this.myAccountData.has_admin_access) {
+            clearInterval(this.refreshAccountStatusTimer);
+          }
+        });
+      }, 30000);
+    }
+  },
+
+  beforeDestroy() {
+    clearInterval(this.refreshAccountStatusTimer);
   },
 };
 </script>
