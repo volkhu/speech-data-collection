@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height>
+  <v-container fluid>
     <!-- Top app bar with title and hamburger menu button -->
     <v-app-bar app color="primary" dark dense clipped-left>
       <v-app-bar-nav-icon @click="toggleNavigationDrawer"></v-app-bar-nav-icon>
