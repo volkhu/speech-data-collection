@@ -3,9 +3,11 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
+import axios from "axios";
 
 Vue.config.productionTip = false;
 
+// Google auth API
 import GAuth from "vue-google-oauth2";
 const gauthOption = {
   clientId:
@@ -15,6 +17,14 @@ const gauthOption = {
   fetch_basic_profile: false,
 };
 Vue.use(GAuth, gauthOption);
+
+// Axios request interceptor to include tokens with HTTP(S) requests
+axios.interceptors.request.use((req) => {
+  req.headers.Authorization = store.state.myToken;
+  return req;
+});
+axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
+console.log(axios.defaults.baseURL);
 
 new Vue({
   router,

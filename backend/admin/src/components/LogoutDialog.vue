@@ -39,8 +39,7 @@ export default {
       this.$gAuth.signOut().then(() => {
         this.closeDialog();
 
-        this.$store.commit("setIsLoggedIn", false);
-        this.$store.commit("setIsAdministrator", false);
+        this.$store.dispatch("updateLoginStatus");
         this.$router.replace({ name: "Login" });
 
         this.showGlobalSnackbar("You are now logged out.");

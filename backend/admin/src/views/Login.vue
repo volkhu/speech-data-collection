@@ -23,34 +23,33 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   data: () => ({
     loginSuccessSnackbarShown: false,
   }),
 
+  computed: {
+    ...mapState(["myUsername"]),
+  },
+
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
     async loginWithGoogle() {
-      console.log("loginWithGoogle");
-      //const authCode = await this.$gAuth.getAuthCode();
-      //console.log(authCode);
-
       try {
-        const googleUser = await this.$gAuth.signIn();
-        if (!googleUser) {
-          return null;
+        const gUser = await this.$gAuth.signIn();
+
+        if (gUser) {
+          await this.$store.dispatch("updateLoginStatus");
+          this.$router.replace({ name: "Home" });
+
+          this.showGlobalSnackbar(
+            `You are now logged in as ${this.myUsername}.`
+          );
         }
-
-        this.showGlobalSnackbar("You are now logged in.");
-
-        this.$store.commit("setIsLoggedIn", true);
-        //this.$store.commit("setIsAdministrator", true);
-        this.$router.replace({ name: "Home" });
       } catch (error) {
-        //on fail do something
         console.error(error);
         return null;
       }

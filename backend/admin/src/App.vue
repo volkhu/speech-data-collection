@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <!-- Loading icon -->
-    <AppLoadingIndicator v-if="!isGoogleApiInitialized" />
+    <AppLoadingIndicator v-if="!appReady" />
 
     <!-- Global frame around the app (title bar, nav bar, etc.) including the app content itself -->
-    <AppFrame v-if="isGoogleApiInitialized" />
+    <AppFrame v-if="appReady" />
 
     <!-- Global snackbar message -->
     <v-snackbar timeout="2000" v-model="isGlobalSnackbarShown">
@@ -22,7 +22,7 @@ export default {
   name: "App",
 
   computed: {
-    ...mapState(["isGoogleApiInitialized", "globalSnackbarMessage"]),
+    ...mapState(["globalSnackbarMessage"]),
     isGlobalSnackbarShown: {
       set(value) {
         this.$store.commit("setIsGlobalSnackbarShown", value);
@@ -38,19 +38,17 @@ export default {
     AppFrame,
   },
 
+  data: () => ({
+    appReady: false,
+  }),
+
   methods: {
     waitForGoogleApiToLoad() {
       const checkInterval = setInterval(() => {
         if (this.$gAuth.isInit) {
-          this.$store.commit("setIsGoogleApiInitialized", true);
-
-          if (this.$gAuth.isAuthorized) {
-            this.$store.commit("setIsLoggedIn", true);
-            this.$store.commit(
-              "setMyUsername",
-              this.$gAuth.GoogleAuth.currentUser.get().Qs.zt
-            );
-          }
+          this.$store.dispatch("updateLoginStatus").then(() => {
+            this.appReady = true;
+          });
 
           clearInterval(checkInterval);
         }

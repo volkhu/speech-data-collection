@@ -6,6 +6,14 @@ DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS profile;
 
 -- Create tables
+CREATE TABLE administrator (
+    administrator_id SERIAL PRIMARY KEY,
+    google_id VARCHAR(64) NOT NULL UNIQUE,
+    email VARCHAR(254) NOT NULL,
+    access_granted BOOLEAN NOT NULL DEFAULT FALSE,
+    superuser BOOLEAN NOT NULL DEFAULT FALSE
+);
+
 CREATE TABLE profile (
     profile_id SERIAL PRIMARY KEY,
     device_id VARCHAR(64) NOT NULL UNIQUE,
