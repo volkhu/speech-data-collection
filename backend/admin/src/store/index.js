@@ -85,7 +85,7 @@ export default new Vuex.Store({
           context.commit("setMyAccountData", null);
         }
       } catch (error) {
-        console.log("updateLoginStatus error: " + error);
+        context.dispatch("showGlobalSnackbar", `Cannot login. ${error}.`);
       }
     },
 

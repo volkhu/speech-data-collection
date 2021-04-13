@@ -21,6 +21,8 @@
               ></v-text-field>
             </v-col>
           </v-row>
+
+          <!-- Accounts table -->
           <v-data-table
             :headers="accountsTableHeaders"
             :items="accountsTableItems"
@@ -31,12 +33,14 @@
               <v-switch
                 v-model="item.has_admin_access"
                 :disabled="!item.modifiable"
+                @change="updateAccount(item)"
               ></v-switch>
             </template>
             <template v-slot:item.is_superuser="{ item }">
               <v-switch
                 v-model="item.is_superuser"
                 :disabled="!item.modifiable"
+                @change="updateAccount(item)"
               ></v-switch>
             </template>
           </v-data-table>
@@ -47,12 +51,13 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import axios from "axios";
 
 export default {
   data: () => ({
     // accounts table
-    isAccountsTableLoading: false,
+    isAccountsTableLoading: true,
     accountsTableSearchQuery: "",
     accountsTableHeaders: [
       { text: "E-mail", value: "email", align: "start" },
@@ -61,18 +66,38 @@ export default {
     ],
     accountsTableItems: [],
 
-    // grant admin access confirmation dialog
-    isGrantAdminAccessDialogShown: false,
+    // change admin access confirmation dialog
+    isChangeAdminAccessDialogShown: false,
   }),
 
   methods: {
+    ...mapActions(["showGlobalSnackbar"]),
+
     async loadAccountsTableItems() {
+      this.isAccountsTableLoading = true;
+
       try {
         const accountsResponse = await axios.get("/accounts");
         this.accountsTableItems = accountsResponse.data;
       } catch (error) {
-        console.log("loadAccountsTableItems error: " + error);
+        this.showGlobalSnackbar(`Cannot load accounts. ${error}`);
       }
+
+      this.isAccountsTableLoading = false;
+    },
+
+    // update admin or superuser access flags on server side too
+    async updateAccount(item) {
+      item.modifiable = false;
+
+      try {
+        await axios.put("/accounts", item);
+      } catch (error) {
+        this.showGlobalSnackbar(`Cannot update account. ${error}`);
+        this.loadAccountsTableItems();
+      }
+
+      item.modifiable = true;
     },
   },
 

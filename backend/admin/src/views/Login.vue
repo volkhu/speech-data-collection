@@ -43,14 +43,17 @@ export default {
 
         if (gUser) {
           await this.$store.dispatch("updateLoginStatus");
-          this.$router.replace({ name: "Home" });
 
-          this.showGlobalSnackbar(
-            `You are now logged in as ${this.myAccountData.email}.`
-          );
+          if (this.myAccountData) {
+            this.$router.replace({ name: "Home" });
+
+            this.showGlobalSnackbar(
+              `You are now logged in as ${this.myAccountData.email}.`
+            );
+          }
         }
       } catch (error) {
-        console.error("login error: " + error);
+        this.showGlobalSnackbar(`Cannot login with Google. ${error}`);
       }
     },
   },
