@@ -7,8 +7,12 @@
             <v-col
               ><v-card-title>Accounts</v-card-title
               ><v-card-subtitle
-                >Manage accounts that are allowed to access the admin
-                dashboard.</v-card-subtitle
+                >Manage accounts that are allowed to access the admin dashboard.
+                If admin access is enabled for an account, they can access the
+                admin panel's features, except this account management page.
+                Only superusers can manage accounts. To grant access to a new
+                account, they must first sign in to this admin panel at least
+                once before their e-mail will appear here.</v-card-subtitle
               ></v-col
             >
             <v-spacer></v-spacer>
@@ -32,14 +36,14 @@
             <template v-slot:item.has_admin_access="{ item }">
               <v-switch
                 v-model="item.has_admin_access"
-                :disabled="!item.modifiable"
+                :disabled="!item.modifiable || item.is_superuser"
                 @change="updateAccount(item)"
               ></v-switch>
             </template>
             <template v-slot:item.is_superuser="{ item }">
               <v-switch
                 v-model="item.is_superuser"
-                :disabled="!item.modifiable"
+                :disabled="!item.modifiable || !item.has_admin_access"
                 @change="updateAccount(item)"
               ></v-switch>
             </template>
@@ -94,7 +98,7 @@ export default {
         await axios.put("/accounts", item);
       } catch (error) {
         this.showGlobalSnackbar(`Cannot update account. ${error}`);
-        this.loadAccountsTableItems();
+        this.loadAccountsTableItems(); // reload correct data from server
       }
 
       item.modifiable = true;
