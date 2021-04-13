@@ -37,14 +37,14 @@
         <!-- Users -->
         <v-list-item
           link
-          to="/users"
+          to="/accounts"
           v-if="myAccountData && myAccountData.is_superuser"
         >
           <v-list-item-icon>
             <v-icon>mdi-account-supervisor</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Users</v-list-item-title>
+            <v-list-item-title>Accounts</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 

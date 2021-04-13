@@ -17,7 +17,7 @@ const adminPanelAuthentication = async (req, res, next) => {
 
       // check account privileges in database
       let account = await db.oneOrNone(
-        "SELECT google_id, email, has_admin_access, is_superuser FROM account WHERE google_id = $1",
+        "SELECT account_id, google_id, email, has_admin_access, is_superuser FROM account WHERE google_id = $1",
         [googleId]
       );
 

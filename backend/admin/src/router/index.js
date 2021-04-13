@@ -28,9 +28,9 @@ const routes = [
     component: () => import("../views/ProjectDetails.vue"),
   },
   {
-    path: "/users",
-    name: "Users",
-    component: () => import("../views/Users.vue"),
+    path: "/accounts",
+    name: "Accounts",
+    component: () => import("../views/Accounts.vue"),
   },
 ];
 
@@ -68,8 +68,8 @@ router.beforeEach((to, from, next) => {
       return;
     }
 
-    // redirect to home if on user management and not superuser
-    if (to.name === "Users" && !store.state.myAccountData.is_superuser) {
+    // redirect to home if on account management and not superuser
+    if (to.name === "Accounts" && !store.state.myAccountData.is_superuser) {
       next({ name: "Home" });
       return;
     }
