@@ -18,19 +18,24 @@ const gauthOption = {
 };
 Vue.use(GAuth, gauthOption);
 
-// Axios request interceptor to include tokens with HTTP(S) requests
+// axios request interceptor to include tokens with HTTP(S) requests
 axios.interceptors.request.use((req) => {
   req.headers.Authorization = store.state.myAccountToken;
   console.log(store.state.myAccountToken);
   return req;
 });
 axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
-// maybe update login status if an unauthorized response were to be sent
-/*axios.interceptors.response.use((res) => res, (err) => {
-  if (err.response.status == 401) {
+// possibly update login status if an unauthorized response were to be sent
+/*axios.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response.status == 401) {
+      store.dispatch("updateLoginStatus");
+    }
 
+    throw err;
   }
-});*/
+);*/
 
 new Vue({
   router,
