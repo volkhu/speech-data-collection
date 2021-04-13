@@ -5,19 +5,34 @@ const path = require("path");
 const fs = require("fs");
 const JSZip = require("jszip");
 
-// APP: Get all projects that can be participated in
-// ADMIN: Get all projects and some associated stats
-router.get("/", (req, res) => {
-  db.any(
-    "SELECT project.*, (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings FROM project ORDER BY active DESC, project_id ASC;"
-  ) // TODO: show only active projects to app users
-    .then((data) => {
-      res.status(200).json(data);
-    })
-    .catch((error) => {
-      console.log("ERROR: ", error);
+// APP/ADMIN: Get a list of projects
+router.get("/", async (req, res) => {
+  if (req.adminPanelAccount && req.adminPanelAccount.has_admin_access) {
+    // admin, show all projects plus some statistics
+    try {
+      const projects = await db.any(
+        "SELECT project.*, \
+        (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
+        (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings \
+        FROM project ORDER BY active DESC, project_id ASC"
+      );
+      res.status(200).json(projects);
+    } catch (error) {
       res.sendStatus(500);
-    });
+    }
+  } else if (req.mobileAppProfile) {
+    // mobile app user, show only active projects
+    try {
+      const projects = await db.any(
+        "SELECT * FROM project WHERE active = TRUE ORDER BY name ASC"
+      );
+      res.status(200).json(projects);
+    } catch (error) {
+      res.sendStatus(500);
+    }
+  } else {
+    res.sendStatus(401);
+  }
 });
 
 // ADMIN: Update project details

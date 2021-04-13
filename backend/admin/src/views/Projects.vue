@@ -10,7 +10,7 @@
               <v-text-field
                 single-line
                 append-icon="mdi-magnify"
-                label="Search"
+                label="Search projects"
                 v-model="searchQuery"
               ></v-text-field>
             </v-col>
