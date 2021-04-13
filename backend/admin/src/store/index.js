@@ -9,13 +9,13 @@ export default new Vuex.Store({
     // init
     appReady: false,
 
+    // global notification
+    globalSnackbarMessage: null,
+    isGlobalSnackbarShown: false,
+
     // login
     myAccountToken: null,
     myAccountData: null,
-
-    // global notification
-    globalSnackbarMessage: "",
-    isGlobalSnackbarShown: false,
   },
   getters: {
     isLoggedIn: (state) => {
@@ -28,20 +28,20 @@ export default new Vuex.Store({
       state.appReady = true;
     },
 
-    // login
-    setMyAccountToken(state, accountToken) {
-      state.myAccountToken = accountToken;
-    },
-    setMyAccountData(state, accountData) {
-      state.myAccountData = accountData;
-    },
-
     // global notification
     setGlobalSnackbarMessage(state, value) {
       state.globalSnackbarMessage = value;
     },
     setIsGlobalSnackbarShown(state, value) {
       state.isGlobalSnackbarShown = value;
+    },
+
+    // login
+    setMyAccountToken(state, accountToken) {
+      state.myAccountToken = accountToken;
+    },
+    setMyAccountData(state, accountData) {
+      state.myAccountData = accountData;
     },
   },
   actions: {
@@ -66,6 +66,11 @@ export default new Vuex.Store({
       });
     },
 
+    showGlobalSnackbar(context, message) {
+      context.commit("setGlobalSnackbarMessage", message);
+      context.commit("setIsGlobalSnackbarShown", true);
+    },
+
     async updateLoginStatus(context) {
       try {
         const gAuth = this._vm.$gAuth;
@@ -87,11 +92,6 @@ export default new Vuex.Store({
       } catch (error) {
         context.dispatch("showGlobalSnackbar", `Cannot login. ${error}.`);
       }
-    },
-
-    showGlobalSnackbar(context, message) {
-      context.commit("setGlobalSnackbarMessage", message);
-      context.commit("setIsGlobalSnackbarShown", true);
     },
   },
   modules: {},

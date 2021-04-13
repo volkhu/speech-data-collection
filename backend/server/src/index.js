@@ -14,6 +14,7 @@ app.use("/api/prompts", require("./routes/api/prompts"));
 app.use("/api/recordings", require("./routes/api/recordings"));
 app.use("/api/sessions", require("./routes/api/sessions"));
 app.use("/api/accounts", require("./routes/api/accounts"));
+app.use("/api/settings", require("./routes/api/settings"));
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Express server running...");

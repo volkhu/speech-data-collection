@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex";
 const axios = require("axios");
 const dateFns = require("date-fns");
 
@@ -78,8 +79,6 @@ export default {
     ],
     projects: [],
   }),
-
-  methods: {},
 
   mounted() {
     axios

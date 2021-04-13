@@ -64,14 +64,11 @@ export default {
     isAccountsTableLoading: true,
     accountsTableSearchQuery: "",
     accountsTableHeaders: [
-      { text: "E-mail", value: "email", align: "start" },
-      { text: "Has Admin Access", value: "has_admin_access" },
-      { text: "Is Superuser", value: "is_superuser" },
+      { text: "E-mail", value: "email", sortable: false },
+      { text: "Has Admin Access", value: "has_admin_access", sortable: false },
+      { text: "Is Superuser", value: "is_superuser", sortable: false },
     ],
     accountsTableItems: [],
-
-    // change admin access confirmation dialog
-    isChangeAdminAccessDialogShown: false,
   }),
 
   methods: {

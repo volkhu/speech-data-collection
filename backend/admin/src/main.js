@@ -25,7 +25,12 @@ axios.interceptors.request.use((req) => {
   return req;
 });
 axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
-console.log(axios.defaults.baseURL);
+// maybe update login status if an unauthorized response were to be sent
+/*axios.interceptors.response.use((res) => res, (err) => {
+  if (err.response.status == 401) {
+
+  }
+});*/
 
 new Vue({
   router,

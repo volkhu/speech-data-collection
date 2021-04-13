@@ -5,8 +5,14 @@ DROP TABLE IF EXISTS prompt;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS profile;
 DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS settings;
 
 -- Create tables
+CREATE TABLE settings (
+    mobile_app_terms TEXT
+);
+INSERT INTO settings (mobile_app_terms) VALUES ('');
+
 CREATE TABLE account (
     account_id SERIAL PRIMARY KEY,
     google_id VARCHAR(64) NOT NULL UNIQUE,

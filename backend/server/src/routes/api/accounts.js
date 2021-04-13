@@ -1,6 +1,5 @@
 const express = require("express");
 const db = require("../../db/db");
-const passport = require("passport");
 const router = express.Router();
 
 // ADMIN PANEL: Get data about my account, such as whether administrator rights have been granted
@@ -22,7 +21,7 @@ router.get("/", async (req, res) => {
 
   try {
     let accounts = await db.manyOrNone(
-      "SELECT account_id, email, has_admin_access, is_superuser FROM account ORDER BY is_superuser DESC, has_admin_access DESC"
+      "SELECT account_id, email, has_admin_access, is_superuser FROM account ORDER BY is_superuser DESC, has_admin_access DESC, email ASC"
     );
 
     // tell the client which rows can be modified
@@ -70,6 +69,7 @@ router.put("/", async (req, res) => {
       [req.body.has_admin_access, req.body.is_superuser, updatedAccountId]
     );
   } catch (error) {
+    console.log(error);
     res.sendStatus(500);
     return;
   }

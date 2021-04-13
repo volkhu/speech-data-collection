@@ -8,7 +8,12 @@
     </v-app-bar>
 
     <!-- Main navigation menu -->
-    <v-navigation-drawer app clipped width="325" v-model="showNavigationDrawer">
+    <v-navigation-drawer
+      app
+      clipped
+      :width="navigationDrawerWidth"
+      v-model="showNavigationDrawer"
+    >
       <v-list dense nav>
         <!-- Home -->
         <v-list-item link to="/" v-if="myAccountData">
@@ -34,7 +39,21 @@
           </v-list-item-content>
         </v-list-item>
 
-        <!-- Users -->
+        <!-- Settings -->
+        <v-list-item
+          link
+          to="/settings"
+          v-if="myAccountData && myAccountData.has_admin_access"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Settings</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!-- Accounts -->
         <v-list-item
           link
           to="/accounts"
@@ -102,6 +121,7 @@ export default {
   },
 
   data: () => ({
+    navigationDrawerWidth: 350,
     showNavigationDrawer: true,
     showLogoutDialog: false,
   }),
