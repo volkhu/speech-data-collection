@@ -59,7 +59,7 @@ export default {
             clearInterval(this.refreshAccountStatusTimer);
           }
         });
-      }, 30000);
+      }, 10000);
     }
   },
 

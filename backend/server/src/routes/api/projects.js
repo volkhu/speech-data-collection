@@ -37,6 +37,11 @@ router.get("/", async (req, res) => {
 
 // ADMIN: Update project details
 router.put("/:projectId", (req, res) => {
+  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
+    res.sendStatus(401);
+    return;
+  }
+
   db.none(
     "UPDATE project SET name = $1, description = $2, randomize_prompt_order = $3, allow_concurrent_sessions = $4, active = $5 WHERE project_id = $6",
     [
@@ -59,6 +64,11 @@ router.put("/:projectId", (req, res) => {
 
 // ADMIN: Create new project
 router.post("/", (req, res) => {
+  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
+    res.sendStatus(401);
+    return;
+  }
+
   console.log(req.body);
 
   if (!req.body.name) {
@@ -71,9 +81,11 @@ router.post("/", (req, res) => {
     [
       req.body.name,
       req.body.description,
-      req.body.randomize_prompt_order,
-      req.body.allow_concurrent_sessions,
-      req.body.active,
+      req.body.randomize_prompt_order ? req.body.randomize_prompt_order : false,
+      req.body.allow_concurrent_sessions
+        ? req.body.allow_concurrent_sessions
+        : false,
+      req.body.active ? req.body.active : false,
     ]
   )
     .then((data) => {
@@ -95,6 +107,10 @@ router.get("/:projectId", (req, res) => {
       if (data === null) {
         res.sendStatus(204);
       } else {
+        if (data.total_recordings_duration == null) {
+          data.total_recordings_duration = 0.0;
+        }
+
         res.status(200).json(data);
       }
     })
@@ -106,6 +122,11 @@ router.get("/:projectId", (req, res) => {
 
 // ADMIN: Get project with specified ID
 router.get("/:projectId/prompts", (req, res) => {
+  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
+    res.sendStatus(401);
+    return;
+  }
+
   db.any(
     "SELECT * FROM prompt WHERE deleted = FALSE AND project_id = $1 ORDER BY prompt_id ASC",
     [req.params.projectId]

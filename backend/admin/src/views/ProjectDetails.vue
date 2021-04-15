@@ -1,86 +1,135 @@
 <template>
   <v-container fluid>
+    <!-- Edit project dialog -->
+    <v-dialog max-width="768px" v-model="isEditedProjectDialogShown" persistent>
+      <v-card>
+        <v-card-title>Edit Project</v-card-title>
+        <v-card-subtitle align="left" class="pt-1"
+          >Edit this speech data collection project.</v-card-subtitle
+        >
+        <form
+          @submit.prevent="saveEditedProject"
+          :disabled="savingEditedProject"
+        >
+          <v-card-text>
+            <v-text-field
+              outlined
+              required
+              label="Name"
+              persistent-hint
+              hint="Name to identify the project. This will be shown to the users and is required."
+              v-model="editedProjectData.name"
+            ></v-text-field>
+            <v-textarea
+              outlined
+              label="Description"
+              persistent-hint
+              hint="A short description about the project to the users."
+              v-model="editedProjectData.description"
+            ></v-textarea>
+            <v-checkbox
+              label="Randomize prompt order"
+              persistent-hint
+              hint="Whether the prompts will be displayed to users in a random order."
+              v-model="editedProjectData.randomize_prompt_order"
+            >
+            </v-checkbox>
+            <v-checkbox
+              label="Allow repeating sessions"
+              persistent-hint
+              hint="Whether users can record all prompts and thus complete the project multiple times."
+              v-model="editedProjectData.allow_concurrent_sessions"
+            >
+            </v-checkbox>
+            <v-switch
+              outlined
+              label="Active"
+              v-model="editedProjectData.active"
+              persistent-hint
+              hint="Whether the project can be seen by the users. This can be set later after setting up the prompts."
+            >
+            </v-switch>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="isEditedProjectDialogShown = false"
+              >Cancel</v-btn
+            >
+            <v-btn text type="submit">Save</v-btn>
+          </v-card-actions>
+        </form>
+      </v-card>
+    </v-dialog>
+
     <v-row>
       <v-col>
         <v-card>
-          <v-card-title
-            ><p v-if="creatingNewProject">Create New Project</p>
-            <p v-if="!creatingNewProject">Project Properties</p>
+          <v-card-title>Project</v-card-title>
+          <v-card-text>
+            <v-simple-table>
+              <template v-slot:default>
+                <tbody>
+                  <tr>
+                    <td>Name</td>
+                    <td>{{ projectDetails.name }}</td>
+                  </tr>
+                  <tr>
+                    <td>Description</td>
+                    <td>
+                      {{ projectDetails.description }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Randomize prompt order</td>
+                    <td>
+                      <v-checkbox
+                        disabled
+                        v-model="projectDetails.randomize_prompt_order"
+                      ></v-checkbox>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Allow repeated sessions</td>
+                    <td>
+                      <v-checkbox
+                        disabled
+                        v-model="projectDetails.allow_concurrent_sessions"
+                      ></v-checkbox>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Active</td>
+                    <td>
+                      <v-checkbox
+                        disabled
+                        v-model="projectDetails.active"
+                      ></v-checkbox>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card-text>
+          <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-              icon
-              v-if="!projectDetailsBeingEdited"
-              @click="startEditingProjectDetails()"
-            >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              v-if="
-                projectDetailsBeingEdited &&
-                  !projectDetailsBeingSaved &&
-                  !creatingNewProject
-              "
-              @click="cancelEditingProjectDetails()"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              v-if="projectDetailsBeingEdited && !projectDetailsBeingSaved"
-              @click="stopEditingProjectDetails()"
-            >
-              <v-icon>mdi-check</v-icon>
-            </v-btn>
-            <v-progress-circular
-              indeterminate
               color="primary"
-              v-if="projectDetailsBeingSaved"
-            ></v-progress-circular
-          ></v-card-title>
-          <v-card-text>
-            <v-form
-              :disabled="!projectDetailsBeingEdited || projectDetailsBeingSaved"
-            >
-              <v-text-field
-                outlined
-                required
-                label="Name"
-                v-model="projectDetails.name"
-              ></v-text-field>
-              <v-textarea
-                outlined
-                label="Description"
-                v-model="projectDetails.description"
-              ></v-textarea>
-              <v-checkbox
-                label="Randomize prompt order"
-                v-model="projectDetails.randomize_prompt_order"
-              >
-              </v-checkbox>
-              <v-checkbox
-                label="Allow repeating sessions"
-                v-model="projectDetails.allow_concurrent_sessions"
-              >
-              </v-checkbox>
-              <v-switch outlined label="Active" v-model="projectDetails.active">
-              </v-switch>
-            </v-form>
-            <v-alert
-              type="success"
-              v-if="
-                projectDetailsSavingAttempted && projectDetailsSavingSuccess
+              @click="
+                editedProjectData = JSON.parse(JSON.stringify(projectDetails));
+                isEditedProjectDialogShown = true;
               "
-              >Details successfully saved.</v-alert
             >
-            <v-alert
-              type="error"
-              v-if="
-                projectDetailsSavingAttempted && !projectDetailsSavingSuccess
-              "
-              >Failed to save details. {{ editingFailureMessage }}</v-alert
+              EDIT DETAILS
+            </v-btn>
+            <v-btn
+              color="primary"
+              link
+              :href="recordingsDownloadUrl"
+              target="_blank"
             >
-          </v-card-text>
+              DOWNLOAD RECORDINGS
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
       <v-col v-if="!creatingNewProject">
@@ -97,14 +146,7 @@
                   <tr>
                     <td>Created</td>
                     <td>
-                      {{ projectDetails.created_at }} (example@gmail.com)
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Last Edited</td>
-                    <td>
-                      {{ projectDetails.last_edited_at }}
-                      (example@gmail.com)
+                      {{ projectDetails.created_at }}
                     </td>
                   </tr>
                   <tr>
@@ -133,35 +175,17 @@
             </v-simple-table>
           </v-card-text>
         </v-card>
-        <br />
-        <v-card>
-          <v-card-title>Actions</v-card-title>
-          <v-card-text align="right">
-            <v-btn
-              color="primary"
-              class="mr-3"
-              @click="batchUploadPromptsClicked"
-            >
-              BATCH UPLOAD PROMPTS
-            </v-btn>
-
-            <v-btn
-              color="primary"
-              link
-              :href="recordingsDownloadUrl"
-              target="_blank"
-            >
-              DOWNLOAD RECORDINGS
-            </v-btn>
-          </v-card-text>
-        </v-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
         <v-card v-if="!creatingNewProject">
           <!-- Batch Upload Prompts dialog -->
-          <v-dialog v-model="showBatchUploadPrompts" max-width="768px">
+          <v-dialog
+            v-model="showBatchUploadPrompts"
+            max-width="768px"
+            persistent
+          >
             <v-card>
               <v-card-title>Batch Upload Prompts</v-card-title>
               <v-card-subtitle align="left" class="pt-1"
@@ -188,6 +212,7 @@
                   ></v-row>
                   <v-row>
                     <v-col>
+                      Preview
                       <v-simple-table>
                         <template v-slot:default>
                           <thead>
@@ -340,6 +365,13 @@
           <v-card-title
             >Prompts
             <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              @click="batchUploadPromptsClicked"
+              class="mr-2"
+            >
+              BATCH UPLOAD PROMPTS
+            </v-btn>
             <v-btn color="primary" @click="openNewPromptDialog">
               NEW PROMPT
             </v-btn>
@@ -374,6 +406,7 @@
 <script>
 const axios = require("axios");
 const dateFns = require("date-fns");
+import { mapActions, mapState } from "vuex";
 
 export default {
   computed: {},
@@ -425,17 +458,41 @@ export default {
     batchUploadErrorMessage: "",
     batchUploadFilePickerModel: null,
     batchUploadPreviewPrompts: [],
+
+    isEditedProjectDialogShown: false,
+    savingEditedProject: false,
+    editedProjectData: {},
   }),
 
   methods: {
+    ...mapActions(["showGlobalSnackbar"]),
+
     cancelBatchUploadDialog() {
       this.showBatchUploadPrompts = false;
+    },
+
+    async saveEditedProject() {
+      this.savingEditedProject = true;
+
+      try {
+        await axios.put(
+          `/projects/${this.$route.params.projectId}`,
+          this.editedProjectData
+        );
+        this.isEditedProjectDialogShown = false;
+        this.loadProjectDetails();
+        this.showGlobalSnackbar("Project details saved.");
+      } catch (error) {
+        this.showGlobalSnackbar(`Cannot save project details. ${error}`);
+      }
+
+      this.savingEditedProject = false;
     },
 
     confirmBatchUploadDialog() {
       this.batchUploadPreviewPrompts.forEach((item) => {
         axios
-          .post(`http://localhost:5000/api/prompts/`, {
+          .post(`/prompts/`, {
             project_id: this.$route.params.projectId,
             description: item,
           })
@@ -454,6 +511,7 @@ export default {
     batchUploadPromptsClicked() {
       this.batchUploadError = false;
       this.batchUploadFilePickerModel = null;
+      this.batchUploadPreviewPrompts = [];
       this.showBatchUploadPrompts = true;
     },
 
@@ -530,10 +588,7 @@ export default {
       if (this.editedPromptId) {
         // update existing prompt
         axios
-          .put(
-            `http://localhost:5000/api/prompts/${this.editedPromptId}`,
-            this.newPromptData
-          )
+          .put(`/prompts/${this.editedPromptId}`, this.newPromptData)
           .then((response) => {
             this.loadPrompts();
             this.newPromptData = {};
@@ -550,7 +605,7 @@ export default {
         this.newPromptData.project_id = this.$route.params.projectId;
 
         axios
-          .post(`http://localhost:5000/api/prompts/`, this.newPromptData)
+          .post(`/prompts/`, this.newPromptData)
           .then((response) => {
             this.loadPrompts();
             this.newPromptData = {};
@@ -579,7 +634,7 @@ export default {
 
       this.deletingPrompt = true;
       axios
-        .delete(`http://localhost:5000/api/prompts/${this.deletePromptId}`)
+        .delete(`/prompts/${this.deletePromptId}`)
         .then((response) => {
           this.loadPrompts();
 
@@ -612,7 +667,7 @@ export default {
 
       if (this.creatingNewProject) {
         axios
-          .post(`http://localhost:5000/api/projects/`, this.projectDetails)
+          .post(`/projects/`, this.projectDetails)
           .then((response) => {
             this.projectDetailsBeingSaved = false;
             this.projectDetailsSavingAttempted = true;
@@ -631,10 +686,7 @@ export default {
           });
       } else {
         axios
-          .put(
-            `http://localhost:5000/api/projects/${this.$route.params.projectId}`,
-            this.projectDetails
-          )
+          .put(`/projects/${this.$route.params.projectId}`, this.projectDetails)
           .then((response) => {
             this.projectDetailsBeingSaved = false;
             this.projectDetailsSavingAttempted = true;
@@ -650,13 +702,12 @@ export default {
     },
 
     loadProjectDetails() {
-      this.recordingsDownloadUrl = `http://localhost:5000/api/projects/${this.$route.params.projectId}/downloadRecordings`;
+      this.recordingsDownloadUrl = `${process.env.VUE_APP_ENDPOINT_BASE_URL}/projects/${this.$route.params.projectId}/downloadRecordings`;
 
       axios
-        .get(
-          `http://localhost:5000/api/projects/${this.$route.params.projectId}`
-        )
+        .get(`/projects/${this.$route.params.projectId}`)
         .then((response) => {
+          console.log(JSON.stringify(response));
           this.projectDetails = response.data;
           this.projectDetails.created_at = dateFns.format(
             dateFns.parseJSON(this.projectDetails.created_at),
@@ -674,9 +725,7 @@ export default {
 
     loadPrompts() {
       axios
-        .get(
-          `http://localhost:5000/api/projects/${this.$route.params.projectId}/prompts`
-        )
+        .get(`/projects/${this.$route.params.projectId}/prompts`)
         .then((response) => {
           this.prompts = response.data.map((item) => {
             return {

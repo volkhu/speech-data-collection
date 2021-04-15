@@ -25,6 +25,7 @@ axios.interceptors.request.use((req) => {
   return req;
 });
 axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
+console.log(axios.defaults.baseURL);
 // possibly update login status if an unauthorized response were to be sent
 /*axios.interceptors.response.use(
   (res) => res,

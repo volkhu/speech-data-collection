@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 
 // create express app
 const app = express();
@@ -15,6 +16,11 @@ app.use("/api/recordings", require("./routes/api/recordings"));
 app.use("/api/sessions", require("./routes/api/sessions"));
 app.use("/api/accounts", require("./routes/api/accounts"));
 app.use("/api/settings", require("./routes/api/settings"));
+
+app.use(express.static(path.resolve("/home/user/test/public")));
+app.get(/.*/, (req, res) =>
+  res.sendFile(path.resolve("/home/user/test/public/index.html"))
+);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Express server running...");
