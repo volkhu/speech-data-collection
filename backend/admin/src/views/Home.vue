@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-card>
-          <!-- Welcome for new unconfirmed users -->
+          <!-- Welcome message for new unconfirmed users -->
           <div v-if="myAccountData && !myAccountData.has_admin_access">
             <v-card-title
               ><v-icon class="mr-2">mdi-timer-sand-empty</v-icon>Please
@@ -15,7 +15,7 @@
             </v-card-text>
           </div>
 
-          <!-- Welcome for users with admin access -->
+          <!-- Welcome message for users with admin access -->
           <div v-if="myAccountData && myAccountData.has_admin_access">
             <v-card-title>Welcome</v-card-title>
             <v-card-text

@@ -10,8 +10,7 @@ Vue.config.productionTip = false;
 // Google auth API
 import GAuth from "vue-google-oauth2";
 const gauthOption = {
-  clientId:
-    "286927702746-a7t53zmiqkk4e4xmewumxfzgkbdpb6ad.apps.googleusercontent.com",
+  clientId: process.env.VUE_APP_GOOGLE_CLIENT_ID,
   scope: "email",
   prompt: "select_account",
   fetch_basic_profile: false,
