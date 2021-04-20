@@ -34,13 +34,13 @@ router.put("/:promptId", (req, res) => {
     "UPDATE prompt SET description = $1, image = $2, instructions = $3, last_edited_at = NOW() WHERE prompt_id = $4 AND deleted = FALSE",
     [
       req.body.description,
-      req.body.image ? true : false,
+      req.body.image_data ? true : false,
       req.body.instructions,
       req.params.promptId,
     ]
   )
     .then((data) => {
-      if (req.body.image) {
+      if (req.body.image_data) {
         savePromptImage(req.params.promptId, req.body.image_data);
       }
 
@@ -64,12 +64,12 @@ router.post("/", (req, res) => {
     [
       req.body.project_id,
       req.body.description,
-      req.body.image ? true : false,
+      req.body.image_data ? true : false,
       req.body.instructions,
     ]
   )
     .then((data) => {
-      if (req.body.image) {
+      if (req.body.image_data) {
         savePromptImage(data.prompt_id, req.body.image_data);
       }
 

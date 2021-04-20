@@ -5,7 +5,7 @@
       :promptDetails="deletedPromptDetails"
       :isShown="isDeletePromptDialogShown"
       @update:isShown="isDeletePromptDialogShown = $event"
-      @promptDeleted="loadPromptsTableItems"
+      @promptDeleted="onPromptsChanged"
     />
 
     <!-- Batch upload prompts dialog -->
@@ -13,7 +13,15 @@
       :projectId="projectId"
       :isShown="isBatchUploadPromptsDialogShown"
       @update:isShown="isBatchUploadPromptsDialogShown = $event"
-      @batchPromptsUploaded="loadPromptsTableItems"
+      @batchPromptsUploaded="onPromptsChanged"
+    />
+
+    <!-- New/edit prompt dialog -->
+    <new-edit-prompt-dialog
+      :isShown="isNewEditPromptDialogShown"
+      @update:isShown="isNewEditPromptDialogShown = $event"
+      v-model="newEditedPromptDetails"
+      @promptSaved="onPromptsChanged"
     />
 
     <v-card-title
@@ -22,7 +30,7 @@
       <v-btn color="primary" class="mr-2" @click="openBatchUploadPromptsDialog">
         BATCH UPLOAD PROMPTS
       </v-btn>
-      <v-btn color="primary">
+      <v-btn color="primary" @click="openNewPromptDialog">
         NEW PROMPT
       </v-btn>
     </v-card-title>
@@ -33,17 +41,23 @@
         :items="promptsTableItems"
         :items-per-page="promptsTableItemsPerPage"
       >
-        <template v-slot:item.image="{ item }">
+        <template v-slot:item.image_data="{ item }">
           <v-img
-            v-if="item.image"
+            v-if="item.image_data"
             contain
             max-height="50"
             max-width="200"
             :src="item.image_data"
           ></v-img>
         </template>
+        <template v-slot:item.created_at="{ item }">
+          {{ formatDateTime(item.created_at) }}
+        </template>
+        <template v-slot:item.last_edited_at="{ item }">
+          {{ formatDateTime(item.last_edited_at) }}
+        </template>
         <template v-slot:item.actions="{ item }">
-          <v-btn icon>
+          <v-btn icon @click="openEditPromptDialog(item)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
           <v-btn icon @click="openDeletePromptDialog(item)">
@@ -60,6 +74,8 @@ import axios from "axios";
 import { mapActions } from "vuex";
 import DeletePromptDialog from "./DeletePromptDialog";
 import BatchUploadPromptsDialog from "./BatchUploadPromptsDialog";
+import NewEditPromptDialog from "./NewEditPromptDialog.vue";
+import datetime from "@/mixins/datetime";
 
 export default {
   props: ["projectId"],
@@ -70,7 +86,7 @@ export default {
     promptsTableHeaders: [
       { text: "ID", value: "prompt_id" },
       { text: "Description", value: "description" },
-      { text: "Image", value: "image" },
+      { text: "Image", value: "image_data" },
       { text: "Custom Instructions", value: "instructions" },
       { text: "Created", value: "created_at" },
       { text: "Last Edited", value: "last_edited_at" },
@@ -85,11 +101,16 @@ export default {
 
     // batch upload prompts dialog
     isBatchUploadPromptsDialogShown: false,
+
+    // new/edit prompt dialog
+    isNewEditPromptDialogShown: false,
+    newEditedPromptDetails: {},
   }),
 
   components: {
     DeletePromptDialog,
     BatchUploadPromptsDialog,
+    NewEditPromptDialog,
   },
 
   methods: {
@@ -102,6 +123,21 @@ export default {
 
     openBatchUploadPromptsDialog() {
       this.isBatchUploadPromptsDialogShown = true;
+    },
+
+    openNewPromptDialog() {
+      this.newEditedPromptDetails = { project_id: this.projectId };
+      this.isNewEditPromptDialogShown = true;
+    },
+
+    openEditPromptDialog(item) {
+      this.newEditedPromptDetails = JSON.parse(JSON.stringify(item));
+      this.isNewEditPromptDialogShown = true;
+    },
+
+    onPromptsChanged() {
+      this.loadPromptsTableItems();
+      this.$emit("promptsChanged");
     },
 
     async loadPromptsTableItems() {
@@ -119,6 +155,8 @@ export default {
       this.isPromptsTableLoading = false;
     },
   },
+
+  mixins: [datetime],
 
   mounted() {
     this.loadPromptsTableItems();

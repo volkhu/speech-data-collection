@@ -45,11 +45,11 @@ CREATE TABLE project (
 CREATE TABLE prompt (
     prompt_id SERIAL PRIMARY KEY,
     project_id INTEGER NOT NULL,
-    description TEXT NOT NULL,
     image BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    description TEXT,
     instructions VARCHAR(255),
     FOREIGN KEY (project_id) REFERENCES project (project_id)
 );

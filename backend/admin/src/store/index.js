@@ -14,7 +14,6 @@ export default new Vuex.Store({
     isGlobalSnackbarShown: false,
 
     // login
-    myAccountToken: null,
     myAccountData: null,
   },
   getters: {
@@ -37,9 +36,6 @@ export default new Vuex.Store({
     },
 
     // login
-    setMyAccountToken(state, accountToken) {
-      state.myAccountToken = accountToken;
-    },
     setMyAccountData(state, accountData) {
       state.myAccountData = accountData;
     },
@@ -76,16 +72,11 @@ export default new Vuex.Store({
         const gAuth = this._vm.$gAuth;
 
         if (gAuth.isInit && gAuth.isAuthorized) {
-          // logged in, get google ID token
-          const gUser = gAuth.GoogleAuth.currentUser.get();
-          context.commit("setMyAccountToken", gUser.getAuthResponse().id_token);
-
-          // get info about my account from endpoint
+          // logged into Google, get info about my account from endpoint
           const accountDataResponse = await axios.get("/accounts/me");
           context.commit("setMyAccountData", accountDataResponse.data);
         } else {
-          // logged out, reset fields
-          context.commit("setMyAccountToken", null);
+          // logged out, reset account data
           context.commit("setMyAccountData", null);
         }
       } catch (error) {

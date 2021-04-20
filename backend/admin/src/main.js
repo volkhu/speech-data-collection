@@ -17,29 +17,23 @@ const gauthOption = {
 };
 Vue.use(GAuth, gauthOption);
 
-// axios request interceptor to include tokens with HTTP(S) requests
-axios.interceptors.request.use((req) => {
-  req.headers.Authorization = store.state.myAccountToken;
-  //console.log(store.state.myAccountToken);
-  return req;
-});
-axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
-console.log(axios.defaults.baseURL);
-// possibly update login status if an unauthorized response were to be sent
-/*axios.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response.status == 401) {
-      store.dispatch("updateLoginStatus");
-    }
-
-    throw err;
-  }
-);*/
-
-new Vue({
+var vm = new Vue({
   router,
   store,
   vuetify,
   render: (h) => h(App),
 }).$mount("#app");
+
+// axios request interceptor to include tokens with HTTP(S) requests
+axios.interceptors.request.use((req) => {
+  const gAuth = vm.$gAuth;
+
+  if (gAuth.isInit && gAuth.isAuthorized) {
+    req.headers.Authorization = gAuth.GoogleAuth.currentUser
+      .get()
+      .getAuthResponse().id_token;
+  }
+
+  return req;
+});
+axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
