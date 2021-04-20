@@ -8,10 +8,18 @@
       @promptDeleted="loadPromptsTableItems"
     />
 
+    <!-- Batch upload prompts dialog -->
+    <batch-upload-prompts-dialog
+      :projectId="projectId"
+      :isShown="isBatchUploadPromptsDialogShown"
+      @update:isShown="isBatchUploadPromptsDialogShown = $event"
+      @batchPromptsUploaded="loadPromptsTableItems"
+    />
+
     <v-card-title
       >Prompts
       <v-spacer></v-spacer>
-      <v-btn color="primary" class="mr-2">
+      <v-btn color="primary" class="mr-2" @click="openBatchUploadPromptsDialog">
         BATCH UPLOAD PROMPTS
       </v-btn>
       <v-btn color="primary">
@@ -51,11 +59,13 @@
 import axios from "axios";
 import { mapActions } from "vuex";
 import DeletePromptDialog from "./DeletePromptDialog";
+import BatchUploadPromptsDialog from "./BatchUploadPromptsDialog";
 
 export default {
   props: ["projectId"],
 
   data: () => ({
+    // prompts table
     isPromptsTableLoading: true,
     promptsTableHeaders: [
       { text: "ID", value: "prompt_id" },
@@ -69,12 +79,17 @@ export default {
     promptsTableItems: [],
     promptsTableItemsPerPage: 15,
 
+    // delete prompt dialog
     isDeletePromptDialogShown: false,
     deletedPromptDetails: {},
+
+    // batch upload prompts dialog
+    isBatchUploadPromptsDialogShown: false,
   }),
 
   components: {
     DeletePromptDialog,
+    BatchUploadPromptsDialog,
   },
 
   methods: {
@@ -83,6 +98,10 @@ export default {
     openDeletePromptDialog(item) {
       this.deletedPromptDetails = JSON.parse(JSON.stringify(item));
       this.isDeletePromptDialogShown = true;
+    },
+
+    openBatchUploadPromptsDialog() {
+      this.isBatchUploadPromptsDialogShown = true;
     },
 
     async loadPromptsTableItems() {

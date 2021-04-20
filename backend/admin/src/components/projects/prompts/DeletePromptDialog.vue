@@ -3,7 +3,8 @@
     <v-card>
       <v-card-title>Are you sure you want to delete this prompt?</v-card-title>
       <v-card-subtitle class="pt-2">
-        This action cannot be undone.</v-card-subtitle
+        Existing recordings associated with this prompt will be
+        unaffected.</v-card-subtitle
       >
       <v-card-text>
         <v-simple-table>
