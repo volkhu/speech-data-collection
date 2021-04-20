@@ -78,7 +78,11 @@
         </v-list-item>
 
         <!-- Logout -->
-        <v-list-item link @click="showLogoutDialog = true" v-if="myAccountData">
+        <v-list-item
+          link
+          @click="isLogoutDialogShown = true"
+          v-if="myAccountData"
+        >
           <v-list-item-icon>
             <v-icon>mdi-logout</v-icon>
           </v-list-item-icon>
@@ -91,7 +95,10 @@
       </v-list>
     </v-navigation-drawer>
 
-    <LogoutDialog v-bind:isShown.sync="showLogoutDialog" />
+    <logout-dialog
+      :isShown="isLogoutDialogShown"
+      @update:isShown="isLogoutDialogShown = $event"
+    />
 
     <!-- Main app content -->
     <v-main>
@@ -123,7 +130,7 @@ export default {
   data: () => ({
     navigationDrawerWidth: 350,
     showNavigationDrawer: true,
-    showLogoutDialog: false,
+    isLogoutDialogShown: false,
   }),
 };
 </script>

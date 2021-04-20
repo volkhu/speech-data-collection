@@ -26,10 +26,6 @@
 import { mapActions, mapState } from "vuex";
 
 export default {
-  data: () => ({
-    loginSuccessSnackbarShown: false,
-  }),
-
   computed: {
     ...mapState(["myAccountData"]),
   },
@@ -53,7 +49,7 @@ export default {
           }
         }
       } catch (error) {
-        this.showGlobalSnackbar(`Cannot login with Google. ${error}`);
+        this.showGlobalSnackbar("Login with Google cancelled.");
       }
     },
   },

@@ -1,17 +1,13 @@
 <template>
   <div>
-    <v-dialog
-      max-width="512px"
-      :value="isShown"
-      @input="$emit('update:isShown', $event)"
-    >
+    <v-dialog max-width="512px" :value="isShown" @input="setIsShown($event)">
       <v-card>
         <v-card-title>Are you sure you want to log out?</v-card-title>
         <v-card-actions>
           <v-container>
             <v-row
               ><v-col align="right">
-                <v-btn text @click="closeDialog">Cancel</v-btn>
+                <v-btn text @click="setIsShown(false)">Cancel</v-btn>
                 <v-btn text @click="logout">Confirm</v-btn>
               </v-col></v-row
             >
@@ -31,19 +27,22 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
-    closeDialog() {
-      this.$emit("update:isShown", false);
+    setIsShown(value) {
+      this.$emit("update:isShown", value);
     },
 
-    logout() {
-      this.$gAuth.signOut().then(() => {
-        this.closeDialog();
+    async logout() {
+      try {
+        await this.$gAuth.signOut();
+        await this.$store.dispatch("updateLoginStatus");
 
-        this.$store.dispatch("updateLoginStatus");
+        this.setIsShown(false);
         this.$router.replace({ name: "Login" });
 
         this.showGlobalSnackbar("You are now logged out.");
-      });
+      } catch (error) {
+        this.showGlobalSnackbar(`Cannot log out. ${error}`);
+      }
     },
   },
 };

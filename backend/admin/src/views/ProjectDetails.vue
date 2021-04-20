@@ -1,65 +1,12 @@
 <template>
   <v-container fluid>
-    <!-- Edit project dialog -->
-    <v-dialog max-width="768px" v-model="isEditedProjectDialogShown" persistent>
-      <v-card>
-        <v-card-title>Edit Project</v-card-title>
-        <v-card-subtitle align="left" class="pt-1"
-          >Edit this speech data collection project.</v-card-subtitle
-        >
-        <form
-          @submit.prevent="saveEditedProject"
-          :disabled="savingEditedProject"
-        >
-          <v-card-text>
-            <v-text-field
-              outlined
-              required
-              label="Name"
-              persistent-hint
-              hint="Name to identify the project. This will be shown to the users and is required."
-              v-model="editedProjectData.name"
-            ></v-text-field>
-            <v-textarea
-              outlined
-              label="Description"
-              persistent-hint
-              hint="A short description about the project to the users."
-              v-model="editedProjectData.description"
-            ></v-textarea>
-            <v-checkbox
-              label="Randomize prompt order"
-              persistent-hint
-              hint="Whether the prompts will be displayed to users in a random order."
-              v-model="editedProjectData.randomize_prompt_order"
-            >
-            </v-checkbox>
-            <v-checkbox
-              label="Allow repeating sessions"
-              persistent-hint
-              hint="Whether users can record all prompts and thus complete the project multiple times."
-              v-model="editedProjectData.allow_concurrent_sessions"
-            >
-            </v-checkbox>
-            <v-switch
-              outlined
-              label="Active"
-              v-model="editedProjectData.active"
-              persistent-hint
-              hint="Whether the project can be seen by the users. This can be set later after setting up the prompts."
-            >
-            </v-switch>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="isEditedProjectDialogShown = false"
-              >Cancel</v-btn
-            >
-            <v-btn text type="submit">Save</v-btn>
-          </v-card-actions>
-        </form>
-      </v-card>
-    </v-dialog>
+    <!-- Edit project details dialog -->
+    <new-edit-project-dialog
+      :isShown="isEditProjectDetailsDialogShown"
+      @update:isShown="isEditProjectDetailsDialogShown = $event"
+      v-model="editProjectDetailsDialogData"
+      @projectDetailsSaved="loadProjectDetails"
+    />
 
     <v-row>
       <v-col>
@@ -112,13 +59,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              color="primary"
-              @click="
-                editedProjectData = JSON.parse(JSON.stringify(projectDetails));
-                isEditedProjectDialogShown = true;
-              "
-            >
+            <v-btn color="primary" @click="openEditProjectDetailsDialog">
               EDIT DETAILS
             </v-btn>
             <v-btn
@@ -404,14 +345,18 @@
 </template>
 
 <script>
-const axios = require("axios");
+import axios from "axios";
 const dateFns = require("date-fns");
 import { mapActions, mapState } from "vuex";
+import NewEditProjectDialog from "@/components/projects/NewEditProjectDialog";
 
 export default {
   computed: {},
 
   data: () => ({
+    isEditProjectDetailsDialogShown: false,
+    editProjectDetailsDialogData: {},
+
     creatingNewProject: false,
     projectDetailsBeingEdited: false,
     projectDetailsSavingAttempted: false,
@@ -464,8 +409,22 @@ export default {
     editedProjectData: {},
   }),
 
+  components: {
+    NewEditProjectDialog,
+  },
+
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
+
+    openEditProjectDetailsDialog() {
+      this.editProjectDetailsDialogData = JSON.parse(
+        JSON.stringify(this.projectDetails)
+      );
+      console.log(JSON.stringify(this.projectDetails));
+      console.log(JSON.stringify(this.editProjectDetailsDialogData));
+
+      this.isEditProjectDetailsDialogShown = true;
+    },
 
     cancelBatchUploadDialog() {
       this.showBatchUploadPrompts = false;

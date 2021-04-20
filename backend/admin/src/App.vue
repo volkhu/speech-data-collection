@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <!-- Loading icon -->
-    <AppLoadingIndicator v-if="!appReady" />
+    <app-loading-indicator v-if="!appReady" />
 
     <!-- Global frame around the app (title bar, nav bar, etc.) including the app content itself -->
-    <AppFrame v-if="appReady" />
+    <app-frame v-if="appReady" />
 
     <!-- Global snackbar message -->
     <v-snackbar timeout="2000" v-model="isGlobalSnackbarShown">
@@ -23,10 +23,12 @@ export default {
 
   computed: {
     ...mapState(["appReady", "globalSnackbarMessage"]),
+
     isGlobalSnackbarShown: {
       set(value) {
         this.$store.commit("setIsGlobalSnackbarShown", value);
       },
+
       get() {
         return this.$store.state.isGlobalSnackbarShown;
       },
