@@ -35,14 +35,14 @@
             :headers="projectsTableHeaders"
             :items="projectsTableItems"
             :search="projectsTableSearchQuery"
-            v-bind:loading="isProjectsTableLoading"
+            :loading="isProjectsTableLoading"
           >
             <template v-slot:item.created_at="{ item }">
               {{ formatDateTime(item.created_at) }}
             </template>
             <template v-slot:item.active="{ item }">
               <v-simple-checkbox
-                v-model="item.active"
+                :value="item.active"
                 disabled
               ></v-simple-checkbox>
             </template>
@@ -67,7 +67,7 @@
 <script>
 import axios from "axios";
 import { mapActions } from "vuex";
-import datetime from "@/misc/datetime";
+import datetime from "@/mixins/datetime";
 import NewEditProjectDialog from "@/components/projects/NewEditProjectDialog";
 
 export default {
@@ -75,7 +75,7 @@ export default {
     isProjectsTableLoading: true,
     projectsTableSearchQuery: "",
     projectsTableHeaders: [
-      { text: "ID", value: "project_id", width: "4%" },
+      { text: "ID", value: "project_id" },
       { text: "Name", value: "name", align: "start" },
       { text: "Description", value: "description", width: "40%" },
       { text: "Created", value: "created_at" },

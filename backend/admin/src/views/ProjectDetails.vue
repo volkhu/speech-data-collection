@@ -9,116 +9,52 @@
     />
 
     <v-row>
+      <!-- Project details card -->
       <v-col>
         <v-card>
-          <v-card-title>Project</v-card-title>
-          <v-card-text>
-            <v-simple-table>
-              <template v-slot:default>
-                <tbody>
-                  <tr>
-                    <td>Name</td>
-                    <td>{{ projectDetails.name }}</td>
-                  </tr>
-                  <tr>
-                    <td>Description</td>
-                    <td>
-                      {{ projectDetails.description }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Randomize prompt order</td>
-                    <td>
-                      <v-checkbox
-                        disabled
-                        v-model="projectDetails.randomize_prompt_order"
-                      ></v-checkbox>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Allow repeated sessions</td>
-                    <td>
-                      <v-checkbox
-                        disabled
-                        v-model="projectDetails.allow_concurrent_sessions"
-                      ></v-checkbox>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Active</td>
-                    <td>
-                      <v-checkbox
-                        disabled
-                        v-model="projectDetails.active"
-                      ></v-checkbox>
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
+          <v-card-title
+            >Project Details<v-spacer></v-spacer>
             <v-btn color="primary" @click="openEditProjectDetailsDialog">
               EDIT DETAILS
             </v-btn>
-            <v-btn
+          </v-card-title>
+          <v-card-text
+            ><project-details-table :projectDetails="projectDetails"
+          /></v-card-text>
+          <v-progress-linear
+            indeterminate
+            v-show="loadingProjectDetails"
+          ></v-progress-linear>
+        </v-card>
+      </v-col>
+
+      <!-- Project statistics card -->
+      <v-col>
+        <v-card>
+          <v-card-title
+            >Statistics<v-spacer></v-spacer
+            ><v-btn
               color="primary"
               link
               :href="recordingsDownloadUrl"
               target="_blank"
             >
               DOWNLOAD RECORDINGS
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-      <v-col v-if="!creatingNewProject">
-        <v-card>
-          <v-card-title>Statistics</v-card-title>
-          <v-card-text>
-            <v-simple-table>
-              <template v-slot:default>
-                <tbody>
-                  <tr>
-                    <td>Project ID</td>
-                    <td>{{ projectDetails.project_id }}</td>
-                  </tr>
-                  <tr>
-                    <td>Created</td>
-                    <td>
-                      {{ projectDetails.created_at }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Prompts</td>
-                    <td>{{ prompts.length }}</td>
-                  </tr>
-                  <tr>
-                    <td>Participants</td>
-                    <td>{{ projectDetails.num_participants }}</td>
-                  </tr>
-                  <tr>
-                    <td>Sessions</td>
-                    <td>{{ projectDetails.num_sessions }}</td>
-                  </tr>
-                  <tr>
-                    <td>Recordings</td>
-                    <td>
-                      {{ projectDetails.num_recordings }} ({{
-                        projectDetails.total_recordings_duration.toFixed(2)
-                      }}
-                      seconds in total)
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card-text>
+            </v-btn></v-card-title
+          >
+          <v-card-text
+            ><project-statistics-table :projectDetails="projectDetails"
+          /></v-card-text>
+          <v-progress-linear
+            indeterminate
+            v-show="loadingProjectDetails"
+          ></v-progress-linear>
         </v-card>
       </v-col>
     </v-row>
+
     <v-row>
+      <!-- Prompts card -->
       <v-col>
         <v-card v-if="!creatingNewProject">
           <!-- Batch Upload Prompts dialog -->
@@ -303,6 +239,8 @@
             </v-card>
           </v-dialog>
 
+          <prompts-card :projectId="projectId" />
+
           <v-card-title
             >Prompts
             <v-spacer></v-spacer>
@@ -346,14 +284,18 @@
 
 <script>
 import axios from "axios";
-const dateFns = require("date-fns");
 import { mapActions, mapState } from "vuex";
+import datetime from "@/mixins/datetime";
 import NewEditProjectDialog from "@/components/projects/NewEditProjectDialog";
+import ProjectDetailsTable from "@/components/projects/ProjectDetailsTable";
+import ProjectStatisticsTable from "@/components/projects/ProjectStatisticsTable";
+import PromptsCard from "@/components/projects/prompts/PromptsCard";
 
 export default {
   computed: {},
 
   data: () => ({
+    projectId: 0,
     isEditProjectDetailsDialogShown: false,
     editProjectDetailsDialogData: {},
 
@@ -371,6 +313,7 @@ export default {
       total_recordings_duration: 0,
     },
     projectDetailsBackup: {},
+    loadingProjectDetails: true,
 
     promptsTableHeaders: [
       { text: "ID", value: "prompt_id" },
@@ -411,6 +354,9 @@ export default {
 
   components: {
     NewEditProjectDialog,
+    ProjectDetailsTable,
+    ProjectStatisticsTable,
+    PromptsCard,
   },
 
   methods: {
@@ -660,26 +606,20 @@ export default {
       }
     },
 
-    loadProjectDetails() {
+    async loadProjectDetails() {
+      this.loadingProjectDetails = true;
       this.recordingsDownloadUrl = `${process.env.VUE_APP_ENDPOINT_BASE_URL}/projects/${this.$route.params.projectId}/downloadRecordings`;
 
-      axios
-        .get(`/projects/${this.$route.params.projectId}`)
-        .then((response) => {
-          console.log(JSON.stringify(response));
-          this.projectDetails = response.data;
-          this.projectDetails.created_at = dateFns.format(
-            dateFns.parseJSON(this.projectDetails.created_at),
-            "dd.MM.yyyy hh:mm"
-          );
-          this.projectDetails.last_edited_at = dateFns.format(
-            dateFns.parseJSON(this.projectDetails.last_edited_at),
-            "dd.MM.yyyy hh:mm"
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      try {
+        const projectDetailsResponse = await axios.get(
+          `/projects/${this.$route.params.projectId}`
+        );
+        this.projectDetails = projectDetailsResponse.data;
+      } catch (error) {
+        this.showGlobalSnackbar(`Cannot load project details. ${error}`);
+      }
+
+      this.loadingProjectDetails = false;
     },
 
     loadPrompts() {
@@ -689,14 +629,6 @@ export default {
           this.prompts = response.data.map((item) => {
             return {
               ...item,
-              created_at: dateFns.format(
-                dateFns.parseJSON(item.created_at),
-                "dd.MM.yyyy hh:mm"
-              ),
-              last_edited_at: dateFns.format(
-                dateFns.parseJSON(item.last_edited_at),
-                "dd.MM.yyyy hh:mm"
-              ),
             };
           });
         })
@@ -706,11 +638,10 @@ export default {
     },
   },
 
+  mixins: [datetime],
+
   created() {
-    if (this.$route.params.projectId === "new") {
-      this.creatingNewProject = true;
-      this.projectDetailsBeingEdited = true;
-    }
+    this.projectId = this.$route.params.projectId;
   },
 
   mounted() {
