@@ -1,5 +1,13 @@
 <template>
   <v-card>
+    <!-- Delete prompt confirmation dialog -->
+    <delete-prompt-dialog
+      :promptDetails="deletedPromptDetails"
+      :isShown="isDeletePromptDialogShown"
+      @update:isShown="isDeletePromptDialogShown = $event"
+      @promptDeleted="loadPromptsTableItems"
+    />
+
     <v-card-title
       >Prompts
       <v-spacer></v-spacer>
@@ -30,7 +38,7 @@
           <v-btn icon>
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-          <v-btn icon>
+          <v-btn icon @click="openDeletePromptDialog(item)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </template>
@@ -42,6 +50,7 @@
 <script>
 import axios from "axios";
 import { mapActions } from "vuex";
+import DeletePromptDialog from "./DeletePromptDialog";
 
 export default {
   props: ["projectId"],
@@ -59,10 +68,22 @@ export default {
     ],
     promptsTableItems: [],
     promptsTableItemsPerPage: 15,
+
+    isDeletePromptDialogShown: false,
+    deletedPromptDetails: {},
   }),
+
+  components: {
+    DeletePromptDialog,
+  },
 
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
+
+    openDeletePromptDialog(item) {
+      this.deletedPromptDetails = JSON.parse(JSON.stringify(item));
+      this.isDeletePromptDialogShown = true;
+    },
 
     async loadPromptsTableItems() {
       this.isPromptsTableLoading = true;

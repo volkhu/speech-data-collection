@@ -4,14 +4,9 @@
       <v-card>
         <v-card-title>Are you sure you want to log out?</v-card-title>
         <v-card-actions>
-          <v-container>
-            <v-row
-              ><v-col align="right">
-                <v-btn text @click="setIsShown(false)">Cancel</v-btn>
-                <v-btn text @click="logout">Confirm</v-btn>
-              </v-col></v-row
-            >
-          </v-container>
+          <v-spacer></v-spacer>
+          <v-btn text @click="setIsShown(false)">Cancel</v-btn>
+          <v-btn text @click="logout">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

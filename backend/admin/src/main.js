@@ -20,7 +20,7 @@ Vue.use(GAuth, gauthOption);
 // axios request interceptor to include tokens with HTTP(S) requests
 axios.interceptors.request.use((req) => {
   req.headers.Authorization = store.state.myAccountToken;
-  console.log(store.state.myAccountToken);
+  //console.log(store.state.myAccountToken);
   return req;
 });
 axios.defaults.baseURL = process.env.VUE_APP_ENDPOINT_BASE_URL;
