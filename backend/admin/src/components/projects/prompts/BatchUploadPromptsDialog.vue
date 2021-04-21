@@ -114,7 +114,7 @@ export default {
       const nonEmptyLines = fileString
         .split("\n")
         .map((line) => line.trim())
-        .filter((line) => line.trim().length);
+        .filter((line) => line.length);
 
       this.previewPrompts = nonEmptyLines;
     },
