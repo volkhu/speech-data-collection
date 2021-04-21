@@ -111,9 +111,12 @@ export default {
     },
 
     updatePreviewPromptsFromFileString(fileString) {
-      this.previewPrompts = fileString
+      const nonEmptyLines = fileString
         .split("\n")
+        .map((line) => line.trim())
         .filter((line) => line.trim().length);
+
+      this.previewPrompts = nonEmptyLines;
     },
 
     async batchUploadPrompts() {
