@@ -24,7 +24,9 @@ app.use("/api/settings", require("./routes/api/settings"));
 // serve static front-end files
 const publicDir = path.resolve(__dirname, "../public");
 app.use(express.static(publicDir));
-app.get(/.*/, (req, res) => res.sendFile("index.html", { root: publicDir }));
+app.get(/\/admin\/.*/, (req, res) =>
+  res.sendFile("admin/index.html", { root: publicDir })
+);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Express server running...");

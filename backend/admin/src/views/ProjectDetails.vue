@@ -33,12 +33,7 @@
         <v-card>
           <v-card-title
             >Statistics<v-spacer></v-spacer
-            ><v-btn
-              color="primary"
-              link
-              :href="recordingsDownloadUrl"
-              target="_blank"
-            >
+            ><v-btn color="primary" link :href="recordingsDownloadUrl" download>
               DOWNLOAD RECORDINGS
             </v-btn></v-card-title
           >

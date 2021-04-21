@@ -85,9 +85,9 @@ export default {
     isPromptsTableLoading: true,
     promptsTableHeaders: [
       { text: "ID", value: "prompt_id" },
-      { text: "Description", value: "description" },
-      { text: "Image", value: "image_data" },
-      { text: "Custom Instructions", value: "instructions" },
+      { text: "Prompt Text (optional)", value: "description" },
+      { text: "Image (optional)", value: "image_data" },
+      { text: "Custom Instructions (optional)", value: "instructions" },
       { text: "Created", value: "created_at" },
       { text: "Last Edited", value: "last_edited_at" },
       { text: "Actions", value: "actions", sortable: false, align: "center" },

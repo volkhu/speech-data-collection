@@ -1,4 +1,5 @@
 node_modules
 files
 .env
-public
+public/admin
+public/assets
