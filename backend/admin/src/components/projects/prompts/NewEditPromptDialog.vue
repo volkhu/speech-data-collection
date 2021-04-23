@@ -37,7 +37,7 @@
             prepend-icon=""
             append-icon="mdi-camera"
             accept="image/jpeg"
-            label="Prompt Image (optional)"
+            label="Prompt Image (.jpg) (optional)"
             ref="promptImageUpload"
             v-model="imageFilePicker"
             @change="onImageFileChange"

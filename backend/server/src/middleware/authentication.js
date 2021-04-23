@@ -17,24 +17,31 @@ const adminPanelAuthentication = async (req, res, next) => {
 
       // check account privileges in database
       let account = await db.oneOrNone(
-        "SELECT account_id, google_id, email, has_admin_access, is_superuser FROM account WHERE google_id = $1",
+        "SELECT account_id, google_id, email, has_admin_access, is_superuser \
+        FROM account \
+        WHERE google_id = $1",
         [googleId]
       );
 
       if (!account) {
         // give admin and superuser rights if this is the first account
         const numAccounts = await db.one(
-          "SELECT COUNT(*) AS count FROM account"
+          "SELECT COUNT(*) AS count \
+          FROM account"
         );
         const isFirstAccount = numAccounts.count == 0;
 
-        // create a new account if one does not exist with this Google ID
+        // create a new account since one does not exist with this Google ID
         await db.none(
-          "INSERT INTO account (google_id, email, has_admin_access, is_superuser) VALUES ($1, $2, $3, $4)",
+          "INSERT INTO account (google_id, email, has_admin_access, is_superuser) \
+          VALUES ($1, $2, $3, $4)",
           [googleId, email, isFirstAccount, isFirstAccount]
         );
+
         account = await db.one(
-          "SELECT google_id, email, has_admin_access, is_superuser FROM account WHERE google_id = $1",
+          "SELECT google_id, email, has_admin_access, is_superuser \
+          FROM account \
+          WHERE google_id = $1",
           [googleId]
         );
       }
@@ -55,7 +62,9 @@ const mobileAppAuthentication = async (req, res, next) => {
   if (deviceId) {
     try {
       const profile = await db.one(
-        "SELECT profile_id, created_at, year_of_birth, gender, native_language, dialect FROM profile WHERE device_id = $1",
+        "SELECT device_id, profile_id, created_at, year_of_birth, gender, native_language, dialect \
+        FROM profile \
+        WHERE device_id = $1",
         [deviceId]
       );
 

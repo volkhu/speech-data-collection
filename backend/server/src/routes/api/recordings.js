@@ -6,7 +6,7 @@ const fs = require("fs");
 
 // APP: Upload a new recording associated with a given session
 router.post("/", (req, res) => {
-  if (!req.body.recorded_file || typeof req.body.recorded_file === String) {
+  if (!req.body.recorded_file) {
     res.status(400).json({ msg: "No recorded file provided." });
     return;
   }
@@ -38,8 +38,8 @@ router.post("/", (req, res) => {
 
     // insert recording into the database
     const recording = await t.oneOrNone(
-      "INSERT INTO recording (session_id, prompt_id) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING recording_id",
-      [session.session_id, req.body.prompt_id]
+      "INSERT INTO recording (session_id, prompt_id, duration_in_seconds) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING recording_id",
+      [session.session_id, req.body.prompt_id, req.body.duration_in_seconds]
     );
     console.log(recording);
     if (!recording) {

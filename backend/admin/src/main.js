@@ -17,6 +17,7 @@ const gauthOption = {
 };
 Vue.use(GAuth, gauthOption);
 
+// Vue instance
 var vm = new Vue({
   router,
   store,
@@ -24,7 +25,8 @@ var vm = new Vue({
   render: (h) => h(App),
 }).$mount("#app");
 
-// axios request interceptor to include tokens with HTTP(S) requests
+// axios configuration,
+// including a request interceptor to include authorization tokens with API requests
 axios.interceptors.request.use((req) => {
   const gAuth = vm.$gAuth;
 
