@@ -2,10 +2,10 @@ const express = require("express");
 const db = require("../../db/db");
 const router = express.Router();
 
-// ADMIN PANEL: get global settings
+// ADMIN PANEL: Get global settings related to the app.
 router.get("/", async (req, res) => {
   if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
 
@@ -13,25 +13,23 @@ router.get("/", async (req, res) => {
     const settings = await db.one("SELECT * FROM settings");
     res.status(200).json(settings);
   } catch (error) {
-    console.log(error);
     res.sendStatus(500);
   }
 });
 
-// ADMIN PANEL: update global settings
+// ADMIN PANEL: Update global settings related to the app.
 router.put("/", async (req, res) => {
   if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
 
   try {
-    await db.none("UPDATE settings SET mobile_app_terms = $1", [
+    await db.one("UPDATE settings SET mobile_app_terms = $1 RETURNING *", [
       req.body.mobile_app_terms,
     ]);
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.sendStatus(500);
   }
 });

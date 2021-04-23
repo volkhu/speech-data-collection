@@ -1,5 +1,5 @@
 const express = require("express");
-const { check, validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const db = require("../../db/db");
 const router = express.Router();
 
@@ -7,7 +7,7 @@ const router = express.Router();
 // Used to determine which pages should be accessible to the user.
 router.get("/me", async (req, res) => {
   if (!req.adminPanelAccount) {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
 
@@ -19,7 +19,7 @@ router.get("/me", async (req, res) => {
 // Used to get the list of accounts to grant privileges to.
 router.get("/", async (req, res) => {
   if (!req.adminPanelAccount || !req.adminPanelAccount.is_superuser) {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
 
@@ -50,41 +50,50 @@ router.get("/", async (req, res) => {
 router.put(
   "/",
   [
-    check("account_id").isInt(),
-    check("is_superuser").isBoolean(),
-    check("has_admin_access").isBoolean(),
+    body("account_id").isInt(),
+    body("is_superuser").isBoolean(),
+    body("has_admin_access").isBoolean(),
   ],
   async (req, res) => {
     if (!req.adminPanelAccount || !req.adminPanelAccount.is_superuser) {
-      res.sendStatus(401);
+      res.status(401).json({ msg: "Insufficient privileges." });
       return;
     }
 
     if (!validationResult(req).isEmpty()) {
-      res.sendStatus(400);
+      res.status(400).json({ msg: "Invalid input values." });
       return;
     }
 
     try {
-      // can't update their own account
       if (req.body.account_id === req.adminPanelAccount.account_id) {
-        res.sendStatus(400);
+        res
+          .status(400)
+          .json({ msg: "Updating your own account is not permitted." });
         return;
       }
 
-      // can't have a superuser without admin access
       if (req.body.is_superuser && !req.body.has_admin_access) {
-        res.sendStatus(400);
+        res.status(400).json({
+          msg: "Superuser account without admin privileges is not allowed.",
+        });
         return;
       }
 
       // update in database
-      await db.none(
+      const updatedAccount = await db.oneOrNone(
         "UPDATE account \
-      SET has_admin_access = $1, is_superuser = $2 \
-      WHERE account_id = $3",
+        SET has_admin_access = $1, is_superuser = $2 \
+        WHERE account_id = $3 RETURNING account_id",
         [req.body.has_admin_access, req.body.is_superuser, req.body.account_id]
       );
+
+      if (updatedAccount == null) {
+        res.status(400).json({
+          msg: "Invalid account ID.",
+        });
+        return;
+      }
     } catch (error) {
       res.sendStatus(500);
       return;
