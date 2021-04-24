@@ -17,7 +17,7 @@
             label="Custom Prompt Instructions (optional)"
             hint="By default the user will be told to read the prompt description text or describe the image. Optionally it is possible to replace such instructions with a custom message here that will be displayed to the user alongside the description/image."
             persistent-hint
-            :disabled="savingPrompt"
+            :disabled="formBusy"
             :value="value.instructions"
             @input="updateComponentValue('instructions', $event)"
           ></v-text-field>
@@ -26,7 +26,7 @@
             label="Prompt Text (optional)"
             hint="Usually the text shown to the user for reading. If uploading an image, this will not be shown to the user, but can still be used as a note about the image for administrators."
             persistent-hint
-            :disabled="savingPrompt"
+            :disabled="formBusy"
             :value="value.description"
             @input="updateComponentValue('description', $event)"
           ></v-textarea>
@@ -39,6 +39,7 @@
             accept="image/jpeg"
             label="Prompt Image (.jpg) (optional)"
             ref="promptImageUpload"
+            :disabled="formBusy"
             v-model="imageFilePicker"
             @change="onImageFileChange"
           ></v-file-input>
@@ -50,17 +51,14 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text :disabled="savingPrompt" @click="setIsShown(false)"
+          <v-btn text :disabled="formBusy" @click="setIsShown(false)"
             >Cancel</v-btn
           >
-          <v-btn text :disabled="savingPrompt" type="submit">{{
+          <v-btn text :disabled="formBusy" type="submit">{{
             submitButtonText
           }}</v-btn>
         </v-card-actions>
-        <v-progress-linear
-          indeterminate
-          v-show="savingPrompt"
-        ></v-progress-linear>
+        <v-progress-linear indeterminate v-show="formBusy"></v-progress-linear>
       </form>
     </v-card>
   </v-dialog>
@@ -74,7 +72,7 @@ export default {
   props: ["isShown", "value"],
 
   data: () => ({
-    savingPrompt: false,
+    formBusy: false,
     imageFilePicker: null,
   }),
 
@@ -124,14 +122,37 @@ export default {
       this.imageFilePicker = null;
     },
 
+    setBlankImagePicker() {
+      this.imageFilePicker = [{}];
+    },
+
     removeImage() {
       this.resetImagePicker();
       this.updateComponentValue("image_data", null);
     },
 
+    async loadPrompt() {
+      this.formBusy = true;
+
+      try {
+        const promptResponse = await axios.get(
+          `/prompts/${this.value.prompt_id}`
+        );
+        if (promptResponse.data.image) {
+          this.setBlankImagePicker();
+        }
+
+        this.$emit("input", { ...this.value, ...promptResponse.data });
+      } catch (error) {
+        this.showGlobalSnackbar(`Cannot load prompt. ${error}`);
+        this.setIsShown(false);
+      }
+
+      this.formBusy = false;
+    },
+
     async savePrompt() {
-      this.savingPrompt = true;
-      console.log(JSON.stringify(this.value));
+      this.formBusy = true;
 
       try {
         if (this.value.prompt_id) {
@@ -148,18 +169,22 @@ export default {
         this.showGlobalSnackbar(`Cannot save prompt. ${error}`);
       }
 
-      this.savingPrompt = false;
+      this.formBusy = false;
+    },
+
+    onShowDialog() {
+      this.resetImagePicker();
+
+      if (this.value.prompt_id) {
+        this.loadPrompt();
+      }
     },
   },
 
   watch: {
     isShown(value) {
       if (value) {
-        this.resetImagePicker();
-
-        if (this.value.image_data) {
-          this.imageFilePicker = "";
-        }
+        this.onShowDialog();
       }
     },
   },

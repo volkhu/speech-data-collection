@@ -124,4 +124,43 @@ router.post("/", (req, res) => {
     });
 });
 
+// ADMIN PANEL: Get a prompt with its full details and image
+router.get("/:promptId", [param("promptId").isInt()], async (req, res) => {
+  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
+    res.status(401).json({ msg: "Insufficient privileges." });
+    return;
+  }
+
+  if (!validationResult(req).isEmpty()) {
+    res.status(400).json({ msg: "Invalid input value types." });
+    return;
+  }
+
+  try {
+    const prompt = await db.oneOrNone(
+      "SELECT * FROM prompt \
+        WHERE prompt_id = $1 AND deleted = FALSE \
+        ORDER BY prompt_id ASC",
+      [req.params.promptId]
+    );
+
+    if (prompt === null) {
+      res.status(400).json({ msg: "Invalid prompt ID." });
+      return;
+    }
+
+    if (prompt.image) {
+      prompt.image_data = await filestore.getPromptImage(
+        prompt.prompt_id,
+        false
+      );
+    }
+
+    res.status(200).json(prompt);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
 module.exports = router;

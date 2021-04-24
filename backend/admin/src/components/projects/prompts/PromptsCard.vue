@@ -131,7 +131,7 @@ export default {
     },
 
     openEditPromptDialog(item) {
-      this.newEditedPromptDetails = JSON.parse(JSON.stringify(item));
+      this.newEditedPromptDetails = { prompt_id: item.prompt_id };
       this.isNewEditPromptDialogShown = true;
     },
 
