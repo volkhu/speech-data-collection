@@ -36,8 +36,8 @@
             persistent-hint
             prepend-icon=""
             append-icon="mdi-camera"
-            accept="image/jpeg"
-            label="Prompt Image (.jpg) (optional)"
+            accept="image/jpeg,image/png"
+            label="Prompt Image (.jpg, .png) (optional)"
             ref="promptImageUpload"
             :disabled="formBusy"
             v-model="imageFilePicker"
