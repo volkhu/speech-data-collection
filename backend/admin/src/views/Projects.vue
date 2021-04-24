@@ -2,34 +2,29 @@
   <v-container fluid>
     <!-- Create new project dialog -->
     <new-edit-project-dialog
-      :isShown="isNewProjectDialogShown"
-      @update:isShown="isNewProjectDialogShown = $event"
-      v-model="newProjectDialogData"
+      :isShown="isNewEditProjectDialogShown"
+      @update:isShown="isNewEditProjectDialogShown = $event"
+      v-model="newEditProjectDialogData"
       @projectDetailsSaved="loadProjectsTableItems"
     />
 
     <v-row>
       <v-col>
         <v-card>
-          <v-row no-gutters>
-            <v-col><v-card-title>Projects</v-card-title></v-col>
+          <v-card-title
+            >Projects
             <v-spacer></v-spacer>
-            <v-col cols="auto">
-              <v-text-field
-                single-line
-                append-icon="mdi-magnify"
-                label="Search projects"
-                v-model="projectsTableSearchQuery"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="auto"
-              ><v-card-title
-                ><v-btn color="primary" @click="openNewProjectDialog">
-                  NEW PROJECT
-                </v-btn></v-card-title
-              ></v-col
-            >
-          </v-row>
+            <v-text-field
+              single-line
+              append-icon="mdi-magnify"
+              label="Search projects"
+              v-model="projectsTableSearchQuery"
+              class="mr-4 mt-2 shrink"
+            ></v-text-field>
+            <v-btn color="primary" @click="openNewProjectDialog">
+              NEW PROJECT
+            </v-btn>
+          </v-card-title>
           <v-data-table
             :items-per-page="projectsTableItemsPerPage"
             :headers="projectsTableHeaders"
@@ -38,7 +33,12 @@
             :loading="isProjectsTableLoading"
           >
             <template v-slot:item.created_at="{ item }">
-              {{ formatDateTime(item.created_at) }}
+              {{ formatDateTime(item.created_at) }}<br />({{ item.created_by }})
+            </template>
+            <template v-slot:item.last_edited_at="{ item }">
+              {{ formatDateTime(item.last_edited_at) }}<br />({{
+                item.last_edited_by
+              }})
             </template>
             <template v-slot:item.active="{ item }">
               <v-simple-checkbox
@@ -46,7 +46,10 @@
                 disabled
               ></v-simple-checkbox>
             </template>
-            <template v-slot:item.view="{ item }">
+            <template v-slot:item.actions="{ item }">
+              <v-btn icon @click="openEditProjectDetailsDialog(item)">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
               <v-btn
                 icon
                 :to="{
@@ -76,19 +79,26 @@ export default {
     projectsTableSearchQuery: "",
     projectsTableHeaders: [
       { text: "ID", value: "project_id" },
-      { text: "Name", value: "name", align: "start" },
+      { text: "Name", value: "name" },
       { text: "Description", value: "description", width: "40%" },
       { text: "Created", value: "created_at" },
+      { text: "Edited", value: "last_edited_at" },
       { text: "Active", value: "active" },
       { text: "Prompts", value: "num_prompts" },
       { text: "Recordings", value: "num_recordings" },
-      { text: "Details", value: "view", sortable: false, align: "center" },
+      {
+        text: "Actions",
+        value: "actions",
+        sortable: false,
+        align: "center",
+        width: "10%",
+      },
     ],
     projectsTableItems: [],
     projectsTableItemsPerPage: 15,
 
-    isNewProjectDialogShown: false,
-    newProjectDialogData: {},
+    isNewEditProjectDialogShown: false,
+    newEditProjectDialogData: {},
   }),
 
   components: {
@@ -99,8 +109,14 @@ export default {
     ...mapActions(["showGlobalSnackbar"]),
 
     openNewProjectDialog() {
-      this.newProjectDialogData = {};
-      this.isNewProjectDialogShown = true;
+      this.newEditProjectDialogData = {};
+      this.isNewEditProjectDialogShown = true;
+    },
+
+    openEditProjectDetailsDialog(item) {
+      this.newEditProjectDialogData = JSON.parse(JSON.stringify(item));
+
+      this.isNewEditProjectDialogShown = true;
     },
 
     async loadProjectsTableItems() {

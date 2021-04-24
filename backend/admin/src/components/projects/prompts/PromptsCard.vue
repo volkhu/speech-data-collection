@@ -27,6 +27,13 @@
     <v-card-title
       >Prompts
       <v-spacer></v-spacer>
+      <v-text-field
+        single-line
+        append-icon="mdi-magnify"
+        label="Search prompts"
+        v-model="promptsTableSearchQuery"
+        class="mr-4 mt-2 shrink"
+      ></v-text-field>
       <v-btn color="primary" class="mr-2" @click="openBatchUploadPromptsDialog">
         BATCH UPLOAD PROMPTS
       </v-btn>
@@ -37,6 +44,7 @@
     <v-card-text>
       <v-data-table
         :loading="isPromptsTableLoading"
+        :search="promptsTableSearchQuery"
         :headers="promptsTableHeaders"
         :items="promptsTableItems"
         :items-per-page="promptsTableItemsPerPage"
@@ -51,10 +59,12 @@
           ></v-img>
         </template>
         <template v-slot:item.created_at="{ item }">
-          {{ formatDateTime(item.created_at) }}
+          {{ formatDateTime(item.created_at) }}<br />({{ item.created_by }})
         </template>
         <template v-slot:item.last_edited_at="{ item }">
-          {{ formatDateTime(item.last_edited_at) }}
+          {{ formatDateTime(item.last_edited_at) }}<br />({{
+            item.last_edited_by
+          }})
         </template>
         <template v-slot:item.actions="{ item }">
           <v-btn icon @click="openEditPromptDialog(item)">
@@ -83,13 +93,14 @@ export default {
   data: () => ({
     // prompts table
     isPromptsTableLoading: true,
+    promptsTableSearchQuery: "",
     promptsTableHeaders: [
       { text: "ID", value: "prompt_id" },
       { text: "Prompt Text (optional)", value: "description" },
-      { text: "Image (optional)", value: "thumbnail_data" },
       { text: "Custom Instructions (optional)", value: "instructions" },
+      { text: "Image (optional)", value: "thumbnail_data", align: "center" },
       { text: "Created", value: "created_at" },
-      { text: "Last Edited", value: "last_edited_at" },
+      { text: "Edited", value: "last_edited_at" },
       { text: "Actions", value: "actions", sortable: false, align: "center" },
     ],
     promptsTableItems: [],

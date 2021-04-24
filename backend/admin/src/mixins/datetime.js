@@ -6,7 +6,7 @@ export default {
       try {
         return dateFns.format(
           dateFns.parseJSON(dateTimeString),
-          "dd.MM.yyyy hh:mm"
+          "dd.MM.yyyy HH:mm"
         );
       } catch (error) {
         return "-";

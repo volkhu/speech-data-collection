@@ -138,10 +138,12 @@ export default {
         const promptResponse = await axios.get(
           `/prompts/${this.value.prompt_id}`
         );
+
         if (promptResponse.data.image) {
-          this.setBlankImagePicker();
+          this.setBlankImagePicker(); // show the clear button to user for removing the image
         }
 
+        // update value prop with loaded data
         this.$emit("input", { ...this.value, ...promptResponse.data });
       } catch (error) {
         this.showGlobalSnackbar(`Cannot load prompt. ${error}`);

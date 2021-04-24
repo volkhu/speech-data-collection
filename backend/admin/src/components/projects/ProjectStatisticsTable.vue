@@ -9,7 +9,17 @@
         <tr>
           <td>Created</td>
           <td>
-            {{ formatDateTime(projectDetails.created_at) }}
+            {{ formatDateTime(projectDetails.created_at) }} ({{
+              projectDetails.created_by
+            }})
+          </td>
+        </tr>
+        <tr>
+          <td>Edited</td>
+          <td>
+            {{ formatDateTime(projectDetails.last_edited_at) }} ({{
+              projectDetails.last_edited_by
+            }})
           </td>
         </tr>
         <tr>

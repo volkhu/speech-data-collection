@@ -21,7 +21,7 @@ router.delete("/:promptId", [param("promptId").isInt()], async (req, res) => {
       "UPDATE prompt \
       SET deleted = TRUE \
       WHERE prompt_id = $1 \
-      RETURNING prompt_id",
+      RETURNING prompt_id, project_id",
       [req.params.promptId]
     );
 
@@ -29,6 +29,11 @@ router.delete("/:promptId", [param("promptId").isInt()], async (req, res) => {
       res.status(400).json({ msg: "Invalid prompt ID." });
       return;
     }
+
+    await db.none(
+      "UPDATE project SET last_edited_at = NOW(), last_edited_by = $1 WHERE project_id = $2",
+      [req.adminPanelAccount.account_id, updatedPrompt.project_id]
+    );
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
@@ -52,7 +57,7 @@ router.put("/:promptId", [param("promptId").isInt()], async (req, res) => {
 
   try {
     const currentPrompt = await db.one(
-      "SELECT prompt_id FROM prompt WHERE prompt_id = $1 AND deleted = FALSE",
+      "SELECT prompt_id, project_id FROM prompt WHERE prompt_id = $1 AND deleted = FALSE",
       [req.params.promptId]
     );
 
@@ -86,6 +91,11 @@ router.put("/:promptId", [param("promptId").isInt()], async (req, res) => {
         req.params.promptId,
       ]
     );
+
+    await db.none(
+      "UPDATE project SET last_edited_at = NOW(), last_edited_by = $1 WHERE project_id = $2",
+      [req.adminPanelAccount.account_id, currentPrompt.project_id]
+    );
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
@@ -96,32 +106,52 @@ router.put("/:promptId", [param("promptId").isInt()], async (req, res) => {
 });
 
 // ADMIN: Add prompt to specified project
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
     res.sendStatus(401);
     return;
   }
 
-  db.one(
-    "INSERT INTO prompt (project_id, description, image, instructions) VALUES ($1, $2, $3, $4) RETURNING prompt_id",
-    [
-      req.body.project_id,
-      req.body.description,
-      req.body.image_data ? true : false,
-      req.body.instructions,
-    ]
-  )
-    .then((data) => {
-      if (req.body.image_data) {
-        savePromptImage(data.prompt_id, req.body.image_data);
-      }
+  try {
+    const addedPrompt = await db.one(
+      "INSERT INTO prompt \
+      (project_id, description, image, instructions, created_by, last_edited_by) \
+      VALUES ($1, $2, $3, $4, $5, $6) \
+      RETURNING prompt_id, project_id",
+      [
+        req.body.project_id,
+        req.body.description,
+        req.body.image_data ? true : false,
+        req.body.instructions,
+        req.adminPanelAccount.account_id,
+        req.adminPanelAccount.account_id,
+      ]
+    );
 
-      res.sendStatus(200);
-    })
-    .catch((error) => {
-      console.log("ERROR: ", error);
-      res.sendStatus(500);
-    });
+    await db.none(
+      "UPDATE project SET last_edited_at = NOW(), last_edited_by = $1 WHERE project_id = $2",
+      [req.adminPanelAccount.account_id, addedPrompt.project_id]
+    );
+
+    try {
+      await filestore.updatePromptImage(
+        addedPrompt.prompt_id,
+        req.body.image_data
+      );
+    } catch (fileError) {
+      console.warn(`File upload unsuccessful: ${fileError.message}`);
+      res
+        .status(500)
+        .json({ msg: `Unable to update image: ${fileError.message}` });
+      return;
+    }
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+    return;
+  }
+
+  res.sendStatus(200);
 });
 
 // ADMIN PANEL: Get a prompt with its full details and image
@@ -138,9 +168,10 @@ router.get("/:promptId", [param("promptId").isInt()], async (req, res) => {
 
   try {
     const prompt = await db.oneOrNone(
-      "SELECT * FROM prompt \
-        WHERE prompt_id = $1 AND deleted = FALSE \
-        ORDER BY prompt_id ASC",
+      "SELECT * \
+      FROM prompt \
+      WHERE prompt_id = $1 AND deleted = FALSE \
+      ORDER BY prompt_id ASC",
       [req.params.promptId]
     );
 

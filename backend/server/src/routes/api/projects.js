@@ -13,14 +13,19 @@ router.get("/", async (req, res) => {
     // admin, show all projects plus some statistics
     try {
       const projects = await db.any(
-        "SELECT project.*, \
+        "SELECT project_id, name, description, created_at, creator.email AS created_by, \
+        last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_concurrent_sessions, \
         (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
         (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings \
         FROM project \
+        INNER JOIN account AS creator ON created_by = creator.account_id \
+        INNER JOIN account AS editor ON last_edited_by = editor.account_id \
         ORDER BY active DESC, project_id ASC"
       );
+
       res.status(200).json(projects);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   } else if (req.mobileAppProfile) {
@@ -36,7 +41,7 @@ router.get("/", async (req, res) => {
       res.sendStatus(500);
     }
   } else {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
   }
 });
 
@@ -48,13 +53,17 @@ router.put("/:projectId", (req, res) => {
   }
 
   db.none(
-    "UPDATE project SET name = $1, description = $2, randomize_prompt_order = $3, allow_concurrent_sessions = $4, active = $5 WHERE project_id = $6",
+    "UPDATE project \
+    SET name = $1, description = $2, randomize_prompt_order = $3, allow_concurrent_sessions = $4, \
+    active = $5, last_edited_by = $6, last_edited_at = NOW() \
+    WHERE project_id = $7",
     [
       req.body.name,
       req.body.description,
       req.body.randomize_prompt_order,
       req.body.allow_concurrent_sessions,
       req.body.active,
+      req.adminPanelAccount.account_id,
       req.params.projectId,
     ]
   )
@@ -74,15 +83,15 @@ router.post("/", (req, res) => {
     return;
   }
 
-  console.log(req.body);
-
   if (!req.body.name) {
     res.sendStatus(400);
     return;
   }
 
   db.one(
-    "INSERT INTO project (name, description, randomize_prompt_order, allow_concurrent_sessions, active) VALUES ($1, $2, $3, $4, $5) RETURNING project_id",
+    "INSERT INTO project (name, description, randomize_prompt_order, allow_concurrent_sessions, active, created_by, last_edited_by) \
+    VALUES ($1, $2, $3, $4, $5, $6, $7) \
+    RETURNING project_id",
     [
       req.body.name,
       req.body.description,
@@ -91,6 +100,8 @@ router.post("/", (req, res) => {
         ? req.body.allow_concurrent_sessions
         : false,
       req.body.active ? req.body.active : false,
+      req.adminPanelAccount.account_id,
+      req.adminPanelAccount.account_id,
     ]
   )
     .then((data) => {
@@ -105,13 +116,17 @@ router.post("/", (req, res) => {
 // APP/ADMIN: Get project with specified ID
 router.get("/:projectId", (req, res) => {
   db.oneOrNone(
-    "SELECT project.*, \
+    "SELECT project_id, name, description, created_at, creator.email AS created_by, \
+    last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_concurrent_sessions, \
     (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
     (SELECT COUNT(*) FROM session WHERE session.project_id = project.project_id) AS num_sessions, \
     (SELECT COUNT(DISTINCT session.profile_id) FROM session WHERE session.project_id = project.project_id) AS num_participants, \
     (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings, \
     (SELECT SUM(duration_in_seconds) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS total_recordings_duration \
-    FROM project WHERE project_id = $1;",
+    FROM project \
+    INNER JOIN account AS creator ON created_by = creator.account_id \
+    INNER JOIN account AS editor ON last_edited_by = editor.account_id \
+    WHERE project_id = $1",
     [req.params.projectId]
   )
     .then((data) => {
@@ -148,7 +163,11 @@ router.get(
 
     try {
       const prompts = await db.any(
-        "SELECT * FROM prompt \
+        "SELECT prompt_id, description, instructions, image, created_at, creator.email AS created_by, \
+        last_edited_at, editor.email AS last_edited_by \
+        FROM prompt \
+        INNER JOIN account AS creator ON created_by = creator.account_id \
+        INNER JOIN account AS editor ON last_edited_by = editor.account_id \
         WHERE project_id = $1 AND deleted = FALSE \
         ORDER BY prompt_id ASC",
         [req.params.projectId]

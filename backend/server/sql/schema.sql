@@ -38,8 +38,12 @@ CREATE TABLE project (
     randomize_prompt_order BOOLEAN NOT NULL DEFAULT FALSE,
     allow_concurrent_sessions BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by INTEGER NOT NULL,
     last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    description TEXT
+    last_edited_by INTEGER NOT NULL,
+    description TEXT,
+    FOREIGN KEY (created_by) REFERENCES account (account_id),
+    FOREIGN KEY (last_edited_by) REFERENCES account (account_id)
 );
 
 CREATE TABLE prompt (
@@ -47,11 +51,15 @@ CREATE TABLE prompt (
     project_id INTEGER NOT NULL,
     image BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by INTEGER NOT NULL,
     last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_edited_by INTEGER NOT NULL,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     description TEXT,
     instructions VARCHAR(255),
-    FOREIGN KEY (project_id) REFERENCES project (project_id)
+    FOREIGN KEY (project_id) REFERENCES project (project_id),
+    FOREIGN KEY (created_by) REFERENCES account (account_id),
+    FOREIGN KEY (last_edited_by) REFERENCES account (account_id)
 );
 CREATE INDEX ixfk_prompt_project ON prompt (project_id);
 
