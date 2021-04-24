@@ -3,28 +3,27 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-row no-gutters>
-            <v-col
-              ><v-card-title>Accounts</v-card-title
-              ><v-card-subtitle
-                >Manage accounts that are allowed to access the admin dashboard.
-                If admin access is enabled for an account, they can access the
-                admin panel's features, except this account management page.
-                Only superusers can manage accounts. To grant access to a new
-                account, they must first sign in to this admin panel at least
-                once before their e-mail will appear here.</v-card-subtitle
-              ></v-col
-            >
+          <v-card-title
+            >Accounts
             <v-spacer></v-spacer>
-            <v-col cols="auto" class="mr-2">
-              <v-text-field
-                single-line
-                append-icon="mdi-magnify"
-                label="Search accounts"
-                v-model="accountsTableSearchQuery"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+            <v-text-field
+              single-line
+              append-icon="mdi-magnify"
+              label="Search accounts"
+              v-model="accountsTableSearchQuery"
+              class="shrink mr-2"
+            ></v-text-field>
+            <v-btn icon class="mb-2" @click="loadAccountsTableItems"
+              ><v-icon>mdi-refresh</v-icon></v-btn
+            ></v-card-title
+          ><v-card-subtitle
+            >Manage accounts that are allowed to access the admin dashboard. If
+            admin access is enabled for an account, they can access the admin
+            panel's features, except this account management page. Only
+            superusers can manage accounts. To grant access to a new account,
+            they must first sign in to this admin panel at least once before
+            their e-mail will appear here.</v-card-subtitle
+          >
 
           <!-- Accounts table -->
           <v-data-table

@@ -14,6 +14,9 @@
         <v-card>
           <v-card-title
             >Project Details<v-spacer></v-spacer>
+            <v-btn icon class="mr-2" @click="loadProjectDetails"
+              ><v-icon>mdi-refresh</v-icon></v-btn
+            >
             <v-btn color="primary" @click="openEditProjectDetailsDialog">
               EDIT DETAILS
             </v-btn>
@@ -32,7 +35,9 @@
       <v-col>
         <v-card>
           <v-card-title
-            >Statistics<v-spacer></v-spacer
+            >Statistics<v-spacer></v-spacer>
+            <v-btn icon class="mr-2" @click="loadProjectDetails"
+              ><v-icon>mdi-refresh</v-icon></v-btn
             ><v-btn color="primary" link :href="recordingsDownloadUrl" download>
               DOWNLOAD RECORDINGS
             </v-btn></v-card-title

@@ -19,8 +19,11 @@
               append-icon="mdi-magnify"
               label="Search projects"
               v-model="projectsTableSearchQuery"
-              class="mr-4 mt-2 shrink"
+              class="shrink mr-1 mt-2"
             ></v-text-field>
+            <v-btn icon class="mr-2" @click="loadProjectsTableItems"
+              ><v-icon>mdi-refresh</v-icon></v-btn
+            >
             <v-btn color="primary" @click="openNewProjectDialog">
               NEW PROJECT
             </v-btn>

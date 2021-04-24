@@ -3,7 +3,12 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-card-title>Settings</v-card-title
+          <v-card-title
+            >Settings
+            <v-spacer></v-spacer>
+            <v-btn icon class="mr-2" @click="loadSettings"
+              ><v-icon>mdi-refresh</v-icon></v-btn
+            > </v-card-title
           ><v-card-subtitle
             >Manage general settings of the accompanying Speech App mobile
             application.</v-card-subtitle

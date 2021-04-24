@@ -32,8 +32,11 @@
         append-icon="mdi-magnify"
         label="Search prompts"
         v-model="promptsTableSearchQuery"
-        class="mr-4 mt-2 shrink"
+        class="mr-1 mt-2 shrink"
       ></v-text-field>
+      <v-btn icon class="mr-2" @click="onPromptsChanged"
+        ><v-icon>mdi-refresh</v-icon></v-btn
+      >
       <v-btn color="primary" class="mr-2" @click="openBatchUploadPromptsDialog">
         BATCH UPLOAD PROMPTS
       </v-btn>
