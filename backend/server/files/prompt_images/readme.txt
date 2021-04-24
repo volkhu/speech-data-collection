@@ -1,0 +1,1 @@
+This folder is for storing prompt images and their thumbnails uploaded from the admin panel.

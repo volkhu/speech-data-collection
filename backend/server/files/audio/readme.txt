@@ -1,0 +1,1 @@
+This folder is for storing speech sample audio files and their metadata collected from mobile app users.
