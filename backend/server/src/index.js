@@ -6,7 +6,7 @@ const path = require("path");
 const app = express();
 // use a json body parser with extended request body size limit
 // set to 16 MB to allow prompt image uploads
-app.use(express.json({ limit: 16e6 }));
+app.use(express.json({ limit: 50e6 }));
 
 // API auth middleware
 app.use(require("./middleware/authentication").adminPanelAuthentication);
