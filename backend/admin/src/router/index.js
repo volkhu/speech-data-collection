@@ -26,6 +26,15 @@ const routes = [
     name: "Project Details",
     props: true,
     component: () => import("../views/ProjectDetails.vue"),
+    meta: {
+      extraBreadcrumbs: [
+        {
+          text: "Projects",
+          exact: true,
+          to: { name: "Projects" },
+        },
+      ],
+    },
   },
   {
     path: "/settings",

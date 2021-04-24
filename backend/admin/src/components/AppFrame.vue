@@ -102,6 +102,7 @@
 
     <!-- Main app content -->
     <v-main>
+      <navigation-breadcrumbs />
       <!-- Use full path of the route as a key to reload components if they route to themselves -->
       <router-view :key="$route.fullPath"></router-view>
     </v-main>
@@ -111,11 +112,19 @@
 <script>
 import { mapState } from "vuex";
 import LogoutDialog from "./LogoutDialog";
+import NavigationBreadcrumbs from "./NavigationBreadcrumbs";
 
 export default {
   components: {
     LogoutDialog,
+    NavigationBreadcrumbs,
   },
+
+  data: () => ({
+    navigationDrawerWidth: 350,
+    showNavigationDrawer: true,
+    isLogoutDialogShown: false,
+  }),
 
   computed: {
     ...mapState(["myAccountData"]),
@@ -126,12 +135,6 @@ export default {
       this.showNavigationDrawer = !this.showNavigationDrawer;
     },
   },
-
-  data: () => ({
-    navigationDrawerWidth: 350,
-    showNavigationDrawer: true,
-    isLogoutDialogShown: false,
-  }),
 };
 </script>
 
