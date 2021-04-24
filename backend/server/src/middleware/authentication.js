@@ -1,4 +1,4 @@
-const db = require("../db/db");
+const db = require("../config/db");
 const { OAuth2Client } = require("google-auth-library");
 
 // google ID token authentication strategy for admin panel accounts

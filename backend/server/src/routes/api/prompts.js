@@ -1,27 +1,36 @@
 const express = require("express");
-const { param, validationResult } = require("express-validator");
-const db = require("../../db/db");
+const { body, param, validationResult } = require("express-validator");
+const db = require("../../config/db");
+const filestore = require("../../config/filestore");
 const router = express.Router();
-const path = require("path");
-const fs = require("fs");
 
 // ADMIN PANEL: Delete prompt with specified ID.
 router.delete("/:promptId", [param("promptId").isInt()], async (req, res) => {
   if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
 
   if (!validationResult(req).isEmpty()) {
-    res.sendStatus(400);
+    res.status(400).json({ msg: "Invalid input value types." });
     return;
   }
 
   try {
-    await db.none("UPDATE prompt SET deleted = TRUE WHERE prompt_id = $1", [
-      req.params.promptId,
-    ]);
+    const updatedPrompt = await db.oneOrNone(
+      "UPDATE prompt \
+      SET deleted = TRUE \
+      WHERE prompt_id = $1 \
+      RETURNING prompt_id",
+      [req.params.promptId]
+    );
+
+    if (updatedPrompt === null) {
+      res.status(400).json({ msg: "Invalid prompt ID." });
+      return;
+    }
   } catch (error) {
+    console.error(error);
     res.sendStatus(500);
     return;
   }
@@ -32,33 +41,53 @@ router.delete("/:promptId", [param("promptId").isInt()], async (req, res) => {
 // ADMIN PANEL: Update prompt with specified ID.
 router.put("/:promptId", [param("promptId").isInt()], async (req, res) => {
   if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
+    res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
 
   if (!validationResult(req).isEmpty()) {
-    res.sendStatus(400);
+    res.status(400).json({ msg: "Invalid input value types." });
     return;
   }
 
   try {
-    const hasImage = req.body.image_data ? true : false;
-    await db.none(
+    const currentPrompt = await db.one(
+      "SELECT prompt_id FROM prompt WHERE prompt_id = $1 AND deleted = FALSE",
+      [req.params.promptId]
+    );
+
+    if (currentPrompt === null) {
+      res.status(400).json({ msg: "Invalid prompt ID." });
+      return;
+    }
+
+    try {
+      await filestore.updatePromptImage(
+        req.params.promptId,
+        req.body.image_data
+      );
+    } catch (fileError) {
+      console.warn(`File upload unsuccessful: ${fileError.message}`);
+      res
+        .status(500)
+        .json({ msg: `Unable to update image: ${fileError.message}` });
+      return;
+    }
+
+    await db.one(
       "UPDATE prompt \
       SET description = $1, image = $2, instructions = $3, last_edited_at = NOW() \
-      WHERE prompt_id = $4 AND deleted = FALSE",
+      WHERE prompt_id = $4 AND deleted = FALSE \
+      RETURNING prompt_id",
       [
         req.body.description,
-        hasImage,
+        req.body.image_data ? true : false,
         req.body.instructions,
         req.params.promptId,
       ]
     );
-
-    if (hasImage) {
-      savePromptImage(req.params.promptId, req.body.image_data);
-    }
   } catch (error) {
+    console.error(error);
     res.sendStatus(500);
     return;
   }
@@ -94,27 +123,5 @@ router.post("/", (req, res) => {
       res.sendStatus(500);
     });
 });
-
-const savePromptImage = (promptId, imageData) => {
-  const fileDir = path.join(
-    __dirname,
-    "../../../files/prompt_images/",
-    `${promptId}.jpg`
-  );
-  console.log(fileDir);
-
-  try {
-    const innerImageData = imageData.split(",")[1];
-
-    fs.writeFileSync(fileDir, innerImageData, {
-      encoding: "base64",
-    });
-  } catch (err) {
-    console.error(err);
-  }
-
-  console.log("Has image");
-  return;
-};
 
 module.exports = router;

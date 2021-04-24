@@ -1,5 +1,7 @@
 const express = require("express");
-const db = require("../../db/db");
+const { body, param, validationResult } = require("express-validator");
+const db = require("../../config/db");
+const filestore = require("../../config/filestore");
 const router = express.Router();
 const path = require("path");
 const fs = require("fs");
@@ -14,7 +16,8 @@ router.get("/", async (req, res) => {
         "SELECT project.*, \
         (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
         (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings \
-        FROM project ORDER BY active DESC, project_id ASC"
+        FROM project \
+        ORDER BY active DESC, project_id ASC"
       );
       res.status(200).json(projects);
     } catch (error) {
@@ -24,7 +27,9 @@ router.get("/", async (req, res) => {
     // mobile app user, show only active projects
     try {
       const projects = await db.any(
-        "SELECT * FROM project WHERE active = TRUE ORDER BY name ASC"
+        "SELECT * FROM project \
+        WHERE active = TRUE \
+        ORDER BY name ASC"
       );
       res.status(200).json(projects);
     } catch (error) {
@@ -100,7 +105,13 @@ router.post("/", (req, res) => {
 // APP/ADMIN: Get project with specified ID
 router.get("/:projectId", (req, res) => {
   db.oneOrNone(
-    "SELECT project.*, (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, (SELECT COUNT(*) FROM session WHERE session.project_id = project.project_id) AS num_sessions, (SELECT COUNT(DISTINCT session.profile_id) FROM session WHERE session.project_id = project.project_id) AS num_participants, (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings, (SELECT SUM(duration_in_seconds) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS total_recordings_duration FROM project WHERE project_id = $1;",
+    "SELECT project.*, \
+    (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
+    (SELECT COUNT(*) FROM session WHERE session.project_id = project.project_id) AS num_sessions, \
+    (SELECT COUNT(DISTINCT session.profile_id) FROM session WHERE session.project_id = project.project_id) AS num_participants, \
+    (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings, \
+    (SELECT SUM(duration_in_seconds) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS total_recordings_duration \
+    FROM project WHERE project_id = $1;",
     [req.params.projectId]
   )
     .then((data) => {
@@ -120,51 +131,45 @@ router.get("/:projectId", (req, res) => {
     });
 });
 
-// ADMIN: Get project with specified ID
-router.get("/:projectId/prompts", (req, res) => {
-  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
-    return;
-  }
+// ADMIN PANEL: Get prompts associated with a specific project.
+router.get(
+  "/:projectId/prompts",
+  [param("projectId").isInt()],
+  async (req, res) => {
+    if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
+      res.status(401).json({ msg: "Insufficient privileges." });
+      return;
+    }
 
-  db.any(
-    "SELECT * FROM prompt WHERE deleted = FALSE AND project_id = $1 ORDER BY prompt_id ASC",
-    [req.params.projectId]
-  )
-    .then((data) => {
-      if (data === null) {
-        res.sendStatus(204);
-      } else {
-        for (var i = 0; i < data.length; i++) {
-          if (data[i].image) {
-            const fileDir = path.join(
-              __dirname,
-              "../../../files/prompt_images/",
-              `${data[i].prompt_id}.jpg`
-            );
-            console.log(fileDir);
+    if (!validationResult(req).isEmpty()) {
+      res.status(400).json({ msg: "Invalid input value types." });
+      return;
+    }
 
-            try {
-              const imageData = fs.readFileSync(fileDir, {
-                encoding: "base64",
-              });
-              data[i].image_data = "data:image/jpeg;base64," + imageData;
-            } catch (err) {
-              console.error(err);
-            }
+    try {
+      const prompts = await db.any(
+        "SELECT * FROM prompt \
+        WHERE project_id = $1 AND deleted = FALSE \
+        ORDER BY prompt_id ASC",
+        [req.params.projectId]
+      );
 
-            //console.log(data[i]);
-          }
+      for (let prompt of prompts) {
+        if (prompt.image) {
+          prompt.thumbnail_data = await filestore.getPromptImage(
+            prompt.prompt_id,
+            true
+          );
         }
-
-        res.status(200).json(data);
       }
-    })
-    .catch((error) => {
-      console.log("ERROR: ", error);
+
+      res.status(200).json(prompts);
+    } catch (error) {
+      console.error(error);
       res.sendStatus(500);
-    });
-});
+    }
+  }
+);
 
 router.get("/:projectId/downloadRecordings", (req, res) => {
   const zip = new JSZip();

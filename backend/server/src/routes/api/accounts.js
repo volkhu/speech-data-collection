@@ -1,6 +1,6 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
-const db = require("../../db/db");
+const db = require("../../config/db");
 const router = express.Router();
 
 // ADMIN PANEL: Get data about my account, such as whether administrator rights have been granted.
@@ -41,6 +41,7 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(accounts);
   } catch (error) {
+    console.error(error);
     res.sendStatus(500);
   }
 });
@@ -61,7 +62,7 @@ router.put(
     }
 
     if (!validationResult(req).isEmpty()) {
-      res.status(400).json({ msg: "Invalid input values." });
+      res.status(400).json({ msg: "Invalid input value types." });
       return;
     }
 
@@ -88,13 +89,14 @@ router.put(
         [req.body.has_admin_access, req.body.is_superuser, req.body.account_id]
       );
 
-      if (updatedAccount == null) {
+      if (updatedAccount === null) {
         res.status(400).json({
           msg: "Invalid account ID.",
         });
         return;
       }
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
       return;
     }

@@ -41,13 +41,13 @@
         :items="promptsTableItems"
         :items-per-page="promptsTableItemsPerPage"
       >
-        <template v-slot:item.image_data="{ item }">
+        <template v-slot:item.thumbnail_data="{ item }">
           <v-img
-            v-if="item.image_data"
+            v-if="item.thumbnail_data"
             contain
             max-height="50"
             max-width="200"
-            :src="item.image_data"
+            :src="item.thumbnail_data"
           ></v-img>
         </template>
         <template v-slot:item.created_at="{ item }">
@@ -86,7 +86,7 @@ export default {
     promptsTableHeaders: [
       { text: "ID", value: "prompt_id" },
       { text: "Prompt Text (optional)", value: "description" },
-      { text: "Image (optional)", value: "image_data" },
+      { text: "Image (optional)", value: "thumbnail_data" },
       { text: "Custom Instructions (optional)", value: "instructions" },
       { text: "Created", value: "created_at" },
       { text: "Last Edited", value: "last_edited_at" },

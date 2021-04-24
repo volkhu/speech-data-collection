@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("../../db/db");
+const db = require("../../config/db");
 const router = express.Router();
 
 // ADMIN PANEL: Get global settings related to the app.
@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
     const settings = await db.one("SELECT * FROM settings");
     res.status(200).json(settings);
   } catch (error) {
+    console.log(error);
     res.sendStatus(500);
   }
 });
@@ -30,6 +31,7 @@ router.put("/", async (req, res) => {
     ]);
     res.sendStatus(200);
   } catch (error) {
+    console.error(error);
     res.sendStatus(500);
   }
 });
