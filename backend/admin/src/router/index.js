@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import store from "../store";
+import VueConfig from "../../vue.config";
 
 Vue.use(VueRouter);
 
@@ -95,6 +96,12 @@ router.beforeEach((to, from, next) => {
     }
   }
 
+  next();
+});
+
+// update page title on each navigation
+router.beforeEach((to, from, next) => {
+  document.title = `${to.name} | ${VueConfig.pages.index.title}`;
   next();
 });
 
