@@ -46,8 +46,23 @@ const adminPanelAuthentication = async (req, res, next) => {
     }
   }
 
+  // also helper functions to handle privileges on routes
+  req.isAdmin = isAdmin;
+  req.isSuperuser = isSuperuser;
   next();
 };
+
+function isAdmin() {
+  return this.adminPanelAccount && this.adminPanelAccount.has_admin_access;
+}
+
+function isSuperuser() {
+  return (
+    this.adminPanelAccount &&
+    this.adminPanelAccount.has_admin_access &&
+    this.adminPanelAccount.is_superuser
+  );
+}
 
 // device ID authentication strategy for mobile app clients
 const mobileAppAuthentication = async (req, res, next) => {

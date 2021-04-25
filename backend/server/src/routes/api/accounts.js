@@ -18,7 +18,7 @@ router.get("/me", async (req, res) => {
 // ADMIN PANEL: Get a list of all registered accounts. Only available to superusers.
 // Used to get the list of accounts to grant privileges to.
 router.get("/", async (req, res) => {
-  if (!req.adminPanelAccount || !req.adminPanelAccount.is_superuser) {
+  if (!req.isSuperuser()) {
     res.status(401).json({ msg: "Insufficient privileges." });
     return;
   }
