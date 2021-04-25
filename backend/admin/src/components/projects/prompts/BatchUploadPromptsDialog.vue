@@ -57,7 +57,11 @@
             :disabled="batchUploadingPrompts"
             >Cancel</v-btn
           >
-          <v-btn text type="submit" :disabled="batchUploadingPrompts"
+          <v-btn
+            text
+            type="submit"
+            :disabled="batchUploadingPrompts"
+            color="primary"
             >Confirm</v-btn
           >
         </v-card-actions>

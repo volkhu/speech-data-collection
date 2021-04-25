@@ -25,7 +25,11 @@
         <v-btn text @click="setIsShown(false)" :disabled="deletingPrompt"
           >Cancel</v-btn
         >
-        <v-btn text @click="deletePrompt" :disabled="deletingPrompt"
+        <v-btn
+          text
+          @click="deletePrompt"
+          :disabled="deletingPrompt"
+          color="primary"
           >Confirm</v-btn
         >
       </v-card-actions>

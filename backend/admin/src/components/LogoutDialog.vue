@@ -6,7 +6,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="setIsShown(false)">Cancel</v-btn>
-          <v-btn text @click="logout">Confirm</v-btn>
+          <v-btn text @click="logout" color="primary">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -54,7 +54,7 @@
           <v-btn text :disabled="formBusy" @click="setIsShown(false)"
             >Cancel</v-btn
           >
-          <v-btn text :disabled="formBusy" type="submit">{{
+          <v-btn text :disabled="formBusy" type="submit" color="primary">{{
             submitButtonText
           }}</v-btn>
         </v-card-actions>

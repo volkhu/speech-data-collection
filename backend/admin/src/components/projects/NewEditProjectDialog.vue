@@ -78,9 +78,13 @@
             @click="setIsShown(false)"
             >Cancel</v-btn
           >
-          <v-btn text :disabled="savingProjectDetails" type="submit">{{
-            submitButtonText
-          }}</v-btn>
+          <v-btn
+            text
+            :disabled="savingProjectDetails"
+            type="submit"
+            color="primary"
+            >{{ submitButtonText }}</v-btn
+          >
         </v-card-actions>
         <v-progress-linear
           indeterminate
