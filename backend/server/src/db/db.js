@@ -4,12 +4,13 @@ const pgPromise = require("pg-promise");
 
 // init pg-promise
 const queryDir = path.join(__dirname, "./sql/queries");
+const alwaysReloadQueries = true;
 const loadedQueries = {};
 const pgpConfig = {
   extend(obj, dc) {
     // add a function to db object to easily retrieve query files
     obj.getQuery = (queryName) => {
-      if (!loadedQueries[queryName]) {
+      if (!loadedQueries[queryName] || alwaysReloadQueries) {
         const queryPath = path.join(queryDir, queryName + ".sql");
         console.log("Loaded query file: " + queryPath);
         loadedQueries[queryName] = fs.readFileSync(queryPath).toString();

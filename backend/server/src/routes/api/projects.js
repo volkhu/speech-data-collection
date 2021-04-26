@@ -4,7 +4,6 @@ const db = require("../../db/db");
 const filestore = require("../../db/filestore");
 const router = express.Router();
 const path = require("path");
-const fs = require("fs");
 const JSZip = require("jszip");
 
 // APP/ADMIN: Get a list of projects

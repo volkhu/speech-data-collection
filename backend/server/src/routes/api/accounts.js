@@ -11,8 +11,14 @@ router.get("/me", async (req, res) => {
     return;
   }
 
-  // we can just send back the data in the request that the authorization middleware provided
-  res.status(200).json(req.adminPanelAccount);
+  // we can just send back the data from the request that the authorization middleware provided
+  res.status(200).json({
+    account_id: req.adminPanelAccount.account_id,
+    google_id: req.adminPanelAccount.google_id,
+    email: req.adminPanelAccount.email,
+    has_admin_access: req.adminPanelAccount.has_admin_access,
+    is_superuser: req.adminPanelAccount.is_superuser,
+  });
 });
 
 // ADMIN PANEL: Get a list of all registered accounts. Only available to superusers.
@@ -60,7 +66,7 @@ router.put(
     }
 
     if (!validationResult(req).isEmpty()) {
-      res.status(400).json({ msg: "Invalid input value types." });
+      res.status(400).json({ msg: "Invalid or missing input values." });
       return;
     }
 

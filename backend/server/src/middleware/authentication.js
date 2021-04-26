@@ -39,7 +39,7 @@ const adminPanelAuthentication = async (req, res, next) => {
 
       req.adminPanelAccount = account;
     } catch (error) {
-      // admin authentication failed
+      // admin authentication failed for erroneous reason
       console.error(error);
     }
   }
@@ -64,18 +64,22 @@ function isSuperuser() {
 
 // device ID authentication strategy for mobile app clients
 const mobileAppAuthentication = async (req, res, next) => {
-  const deviceId = req.headers["x-deviceid"];
+  req.deviceId = req.headers["x-deviceid"];
 
-  if (deviceId && deviceId.length) {
-    try {
-      const profile = await db.one(db.getQuery("authentication/find-profile"), {
-        device_id: deviceId,
-      });
+  try {
+    const profile = await db.oneOrNone(
+      db.getQuery("authentication/find-profile"),
+      {
+        device_id: req.deviceId,
+      }
+    );
 
+    if (profile) {
       req.mobileAppProfile = profile;
-    } catch (error) {
-      // mobile app authentication failed
     }
+  } catch (error) {
+    // mobile app authentication failed for erroneous reason
+    console.error(error);
   }
 
   next();
