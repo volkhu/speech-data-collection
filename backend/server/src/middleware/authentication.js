@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const db = require("../db/db");
 const { OAuth2Client } = require("google-auth-library");
 
 // google ID token authentication strategy for admin panel accounts
@@ -17,32 +17,30 @@ const adminPanelAuthentication = async (req, res, next) => {
 
       // get account from database with this Google ID
       let account = await db.oneOrNone(
-        "SELECT account_id, google_id, email, has_admin_access, is_superuser \
-        FROM account \
-        WHERE google_id = $1",
-        [googleId]
+        db.getQuery("authentication/find-account"),
+        { google_id: googleId }
       );
 
       if (!account) {
         // see if there are existing accounts already in the database since the first one should get superuser rights
         const numAccounts = await db.one(
-          "SELECT COUNT(*) AS count \
-          FROM account"
+          db.getQuery("authentication/count-accounts")
         );
         const isFirstAccount = numAccounts.count == 0;
 
         // create a new account since one does not exist with this Google ID
-        account = await db.one(
-          "INSERT INTO account (google_id, email, has_admin_access, is_superuser) \
-          VALUES ($1, $2, $3, $4) \
-          RETURNING account_id, google_id, email, has_admin_access, is_superuser",
-          [googleId, email, isFirstAccount, isFirstAccount]
-        );
+        account = await db.one(db.getQuery("authentication/create-account"), {
+          google_id: googleId,
+          email: email,
+          has_admin_access: isFirstAccount,
+          is_superuser: isFirstAccount,
+        });
       }
 
       req.adminPanelAccount = account;
     } catch (error) {
       // admin authentication failed
+      console.error(error);
     }
   }
 
@@ -70,12 +68,9 @@ const mobileAppAuthentication = async (req, res, next) => {
 
   if (deviceId && deviceId.length) {
     try {
-      const profile = await db.one(
-        "SELECT device_id, profile_id, created_at, year_of_birth, gender, native_language, dialect \
-        FROM profile \
-        WHERE device_id = $1",
-        [deviceId]
-      );
+      const profile = await db.one(db.getQuery("authentication/find-profile"), {
+        device_id: deviceId,
+      });
 
       req.mobileAppProfile = profile;
     } catch (error) {

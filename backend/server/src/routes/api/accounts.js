@@ -1,6 +1,6 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
-const db = require("../../config/db");
+const db = require("../../db/db");
 const router = express.Router();
 
 // ADMIN PANEL: Get data about my account, such as whether administrator rights have been granted.

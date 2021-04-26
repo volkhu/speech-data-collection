@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("../../config/db");
+const db = require("../../db/db");
 const router = express.Router();
 
 // APP: Get the profile on my device

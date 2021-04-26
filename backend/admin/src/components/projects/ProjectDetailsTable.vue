@@ -26,7 +26,7 @@
           <td>
             <v-simple-checkbox
               disabled
-              :value="projectDetails.allow_concurrent_sessions"
+              :value="projectDetails.allow_repeated_sessions"
             ></v-simple-checkbox>
           </td>
         </tr>

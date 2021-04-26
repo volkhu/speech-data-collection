@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const router = express.Router();
-const db = require("../../config/db");
+const db = require("../../db/db");
 const fs = require("fs");
 
 // APP: Upload a new recording associated with a given session

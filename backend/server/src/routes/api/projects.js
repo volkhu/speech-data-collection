@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, param, validationResult } = require("express-validator");
-const db = require("../../config/db");
-const filestore = require("../../config/filestore");
+const db = require("../../db/db");
+const filestore = require("../../db/filestore");
 const router = express.Router();
 const path = require("path");
 const fs = require("fs");
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
     try {
       const projects = await db.any(
         "SELECT project_id, name, description, created_at, creator.email AS created_by, \
-        last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_concurrent_sessions, \
+        last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_repeated_sessions, \
         (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
         (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings \
         FROM project \
@@ -54,14 +54,14 @@ router.put("/:projectId", (req, res) => {
 
   db.none(
     "UPDATE project \
-    SET name = $1, description = $2, randomize_prompt_order = $3, allow_concurrent_sessions = $4, \
+    SET name = $1, description = $2, randomize_prompt_order = $3, allow_repeated_sessions = $4, \
     active = $5, last_edited_by = $6, last_edited_at = NOW() \
     WHERE project_id = $7",
     [
       req.body.name,
       req.body.description,
       req.body.randomize_prompt_order,
-      req.body.allow_concurrent_sessions,
+      req.body.allow_repeated_sessions,
       req.body.active,
       req.adminPanelAccount.account_id,
       req.params.projectId,
@@ -89,15 +89,15 @@ router.post("/", (req, res) => {
   }
 
   db.one(
-    "INSERT INTO project (name, description, randomize_prompt_order, allow_concurrent_sessions, active, created_by, last_edited_by) \
+    "INSERT INTO project (name, description, randomize_prompt_order, allow_repeated_sessions, active, created_by, last_edited_by) \
     VALUES ($1, $2, $3, $4, $5, $6, $7) \
     RETURNING project_id",
     [
       req.body.name,
       req.body.description,
       req.body.randomize_prompt_order ? req.body.randomize_prompt_order : false,
-      req.body.allow_concurrent_sessions
-        ? req.body.allow_concurrent_sessions
+      req.body.allow_repeated_sessions
+        ? req.body.allow_repeated_sessions
         : false,
       req.body.active ? req.body.active : false,
       req.adminPanelAccount.account_id,
@@ -117,7 +117,7 @@ router.post("/", (req, res) => {
 router.get("/:projectId", (req, res) => {
   db.oneOrNone(
     "SELECT project_id, name, description, created_at, creator.email AS created_by, \
-    last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_concurrent_sessions, \
+    last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_repeated_sessions, \
     (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
     (SELECT COUNT(*) FROM session WHERE session.project_id = project.project_id) AS num_sessions, \
     (SELECT COUNT(DISTINCT session.profile_id) FROM session WHERE session.project_id = project.project_id) AS num_participants, \

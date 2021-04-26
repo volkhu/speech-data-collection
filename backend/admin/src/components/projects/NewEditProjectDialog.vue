@@ -50,10 +50,10 @@
             persistent-hint
             hint="If enabled, users will be able to repeat the recording session after completing the project."
             :disabled="savingProjectDetails"
-            :input-value="value.allow_concurrent_sessions"
+            :input-value="value.allow_repeated_sessions"
             @change="
               updateComponentValue(
-                'allow_concurrent_sessions',
+                'allow_repeated_sessions',
                 $event ? $event : false
               )
             "

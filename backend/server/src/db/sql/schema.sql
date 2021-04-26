@@ -36,7 +36,7 @@ CREATE TABLE project (
     name VARCHAR(64) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT FALSE,
     randomize_prompt_order BOOLEAN NOT NULL DEFAULT FALSE,
-    allow_concurrent_sessions BOOLEAN NOT NULL DEFAULT FALSE,
+    allow_repeated_sessions BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_by INTEGER NOT NULL,
     last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

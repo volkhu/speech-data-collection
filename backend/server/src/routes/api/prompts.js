@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, param, validationResult } = require("express-validator");
-const db = require("../../config/db");
-const filestore = require("../../config/filestore");
+const db = require("../../db/db");
+const filestore = require("../../db/filestore");
 const router = express.Router();
 
 // ADMIN PANEL: Delete prompt with specified ID.
