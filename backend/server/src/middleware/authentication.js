@@ -45,12 +45,12 @@ const adminPanelAuthentication = async (req, res, next) => {
   }
 
   // also helper functions to handle privileges on routes
-  req.isAdmin = isAdmin;
+  req.hasAdminAccess = hasAdminAccess;
   req.isSuperuser = isSuperuser;
   next();
 };
 
-function isAdmin() {
+function hasAdminAccess() {
   return this.adminPanelAccount && this.adminPanelAccount.has_admin_access;
 }
 

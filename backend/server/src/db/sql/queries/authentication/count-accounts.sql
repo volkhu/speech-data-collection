@@ -1,2 +1,2 @@
 SELECT COUNT(*) AS count
-FROM account
+FROM account;

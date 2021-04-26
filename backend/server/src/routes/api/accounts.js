@@ -25,14 +25,12 @@ router.get("/", async (req, res) => {
 
   try {
     let accounts = await db.manyOrNone(
-      "SELECT account_id, email, has_admin_access, is_superuser \
-      FROM account \
-      ORDER BY is_superuser DESC, has_admin_access DESC, email ASC"
+      db.getQuery("accounts/get-accounts-list")
     );
 
     // tell the client which rows can be modified
     accounts.forEach((item) => {
-      if (req.adminPanelAccount.account_id === item.account_id) {
+      if (req.adminPanelAccount.account_id == item.account_id) {
         item.modifiable = false; // can't remove rights from themselves
       } else {
         item.modifiable = true;
@@ -56,7 +54,7 @@ router.put(
     body("has_admin_access").isBoolean(),
   ],
   async (req, res) => {
-    if (!req.adminPanelAccount || !req.adminPanelAccount.is_superuser) {
+    if (!req.isSuperuser()) {
       res.status(401).json({ msg: "Insufficient privileges." });
       return;
     }
@@ -83,10 +81,12 @@ router.put(
 
       // update in database
       const updatedAccount = await db.oneOrNone(
-        "UPDATE account \
-        SET has_admin_access = $1, is_superuser = $2 \
-        WHERE account_id = $3 RETURNING account_id",
-        [req.body.has_admin_access, req.body.is_superuser, req.body.account_id]
+        db.getQuery("accounts/update-account-permissions"),
+        {
+          has_admin_access: req.body.has_admin_access,
+          is_superuser: req.body.is_superuser,
+          account_id: req.body.account_id,
+        }
       );
 
       if (updatedAccount === null) {
