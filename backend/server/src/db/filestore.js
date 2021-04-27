@@ -21,13 +21,7 @@ const updatePromptImage = async (promptId, imageData) => {
   const imagePath = getPromptImagePath(promptId);
   const thumbnailPath = getPromptThumbnailPath(promptId);
 
-  if (imageData == null) {
-    try {
-      // delete image if already exists and image data is null
-      fs.unlinkSync(imagePath);
-      fs.unlinkSync(thumbnailPath);
-    } catch {}
-  } else {
+  if (imageData) {
     // decode data URI type image
     const innerImageData = imageData.split(";base64,")[1];
     let imageBuffer = Buffer.from(innerImageData, "base64");
@@ -46,12 +40,19 @@ const updatePromptImage = async (promptId, imageData) => {
       thumbnailMaxDimensions,
       thumbnailPath
     );
+  } else {
+    try {
+      // delete image if already exists and image data is null
+      fs.unlinkSync(imagePath);
+      fs.unlinkSync(thumbnailPath);
+    } catch {}
   }
 };
 
 const saveRotatedResizedJpeg = async (imageBuffer, maxDimensions, filePath) => {
   await sharp(imageBuffer)
     .rotate() // apply any rotation from EXIF data
+    .flatten({ background: { r: 255, g: 255, b: 255 } }) // turn transparent into white
     .resize({
       width: maxDimensions,
       height: maxDimensions,

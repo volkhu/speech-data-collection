@@ -140,7 +140,11 @@ export default {
     },
 
     openNewPromptDialog() {
-      this.newEditedPromptDetails = { project_id: this.projectId };
+      this.newEditedPromptDetails = {
+        project_id: this.projectId,
+        description: "",
+        instructions: "",
+      };
       this.isNewEditPromptDialogShown = true;
     },
 

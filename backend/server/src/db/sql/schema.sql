@@ -55,8 +55,8 @@ CREATE TABLE prompt (
     last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_edited_by INTEGER NOT NULL,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    description TEXT,
-    instructions VARCHAR(255),
+    description TEXT NOT NULL,
+    instructions VARCHAR(255) NOT NULL,
     FOREIGN KEY (project_id) REFERENCES project (project_id),
     FOREIGN KEY (created_by) REFERENCES account (account_id),
     FOREIGN KEY (last_edited_by) REFERENCES account (account_id)

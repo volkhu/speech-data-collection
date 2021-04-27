@@ -193,9 +193,12 @@ router.get(
     }
 
     try {
-      const prompts = await db.any(db.getQuery("prompts/list-prompts-admin"), {
-        project_id: req.params.projectId,
-      });
+      const prompts = await db.any(
+        db.getQuery("projects/list-project-prompts"),
+        {
+          project_id: req.params.projectId,
+        }
+      );
 
       // load image thumbnails for every prompt that has them
       for (let prompt of prompts) {
