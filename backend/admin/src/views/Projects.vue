@@ -112,7 +112,13 @@ export default {
     ...mapActions(["showGlobalSnackbar"]),
 
     openNewProjectDialog() {
-      this.newEditProjectDialogData = {};
+      this.newEditProjectDialogData = {
+        name: "",
+        description: "",
+        randomize_prompt_order: false,
+        allow_repeated_sessions: false,
+        active: false,
+      };
       this.isNewEditProjectDialogShown = true;
     },
 

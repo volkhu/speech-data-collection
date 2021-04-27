@@ -4,6 +4,16 @@ const { OAuth2Client } = require("google-auth-library");
 // google ID token authentication strategy for admin panel accounts
 const gAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const adminPanelAuthentication = async (req, res, next) => {
+  // auth token can also be provided in a POST request body if headers
+  // cannot be sent directly, such as when requesting a file download
+  if (
+    !req.headers.authorization &&
+    req.method === "POST" &&
+    req.body.authorization
+  ) {
+    req.headers.authorization = req.body.authorization;
+  }
+
   if (req.headers.authorization && req.headers.authorization.length) {
     try {
       // verify client's Google account using the ID token in HTTP Authorization header
@@ -40,7 +50,9 @@ const adminPanelAuthentication = async (req, res, next) => {
       req.adminPanelAccount = account;
     } catch (error) {
       // admin authentication failed for erroneous reason
-      console.error(error);
+      console.error(
+        "Admin provided auth token but verification failed: " + error
+      );
     }
   }
 

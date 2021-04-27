@@ -14,6 +14,10 @@ export default {
     },
 
     formatSeconds(secondsNumber) {
+      if (secondsNumber == null) {
+        return "0.00";
+      }
+
       try {
         return secondsNumber.toFixed(2);
       } catch (error) {

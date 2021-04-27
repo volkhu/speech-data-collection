@@ -65,8 +65,9 @@ router.put(
       return;
     }
 
-    if (!validationResult(req).isEmpty()) {
-      res.status(400).json({ msg: "Invalid or missing input values." });
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
       return;
     }
 

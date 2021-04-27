@@ -38,9 +38,21 @@
             >Statistics<v-spacer></v-spacer>
             <v-btn icon class="mr-2" @click="loadProjectDetails"
               ><v-icon>mdi-refresh</v-icon></v-btn
-            ><v-btn color="primary" link :href="recordingsDownloadUrl" download>
-              DOWNLOAD RECORDINGS
-            </v-btn></v-card-title
+            >
+            <form
+              method="post"
+              :action="recordingsDownloadUrl"
+              @submit="downloadRecordingsButtonClicked"
+            >
+              <input
+                type="hidden"
+                name="authorization"
+                :value="downloadRecordingsAuthToken"
+              />
+              <v-btn color="primary" type="submit">
+                DOWNLOAD RECORDINGS
+              </v-btn>
+            </form></v-card-title
           >
           <v-card-text
             ><project-statistics-table :projectDetails="projectDetails"
@@ -87,6 +99,7 @@ export default {
     editProjectDetailsDialogData: {},
 
     recordingsDownloadUrl: "",
+    downloadRecordingsAuthToken: "",
   }),
 
   components: {
@@ -98,6 +111,19 @@ export default {
 
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
+
+    downloadRecordingsButtonClicked(event) {
+      if (this.$gAuth.isInit && this.$gAuth.isAuthorized) {
+        this.downloadRecordingsAuthToken = this.$gAuth.GoogleAuth.currentUser
+          .get()
+          .getAuthResponse().id_token;
+      } else {
+        this.showGlobalSnackbar(
+          `Cannot download recordings. Login token unavailable.`
+        );
+        event.preventDefault();
+      }
+    },
 
     openEditProjectDetailsDialog() {
       this.editProjectDetailsDialogData = JSON.parse(

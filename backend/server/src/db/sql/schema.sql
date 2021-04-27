@@ -26,7 +26,7 @@ CREATE TABLE profile (
     device_id VARCHAR(64) NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     year_of_birth INTEGER NOT NULL,
-    gender CHAR(1) NOT NULL,
+    gender VARCHAR(32) NOT NULL,
     native_language VARCHAR(64),
     dialect VARCHAR(64)
 );

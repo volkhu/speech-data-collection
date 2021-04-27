@@ -13,25 +13,24 @@ router.get("/", async (req, res) => {
       native_language: req.mobileAppProfile.native_language,
       dialect: req.mobileAppProfile.dialect,
     });
-
-    return;
+  } else {
+    res.status(404).json({ msg: "No profile exists with this device ID." });
   }
-
-  res.status(404).json({ msg: "No profile exists with this device ID." });
 });
 
 // APP: Create a profile on my device.
 router.post(
   "/",
-  [body("year_of_birth").isNumeric(), body("gender").isString()],
+  [body("year_of_birth").isInt(), body("gender").isString()],
   async (req, res) => {
     if (!req.deviceId) {
-      res.status(400).json({ msg: "Unsuitable device ID." });
+      res.status(400).json({ msg: "Invalid device ID." });
       return;
     }
 
-    if (!validationResult(req).isEmpty()) {
-      res.status(400).json({ msg: "Invalid or missing input values." });
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
       return;
     }
 
@@ -54,7 +53,7 @@ router.post(
         return;
       }
 
-      res.sendStatus(200);
+      res.status(200).json(createdProfile);
     } catch (error) {
       console.error(error);
       res.sendStatus(500);

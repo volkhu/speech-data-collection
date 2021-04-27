@@ -1,4 +1,5 @@
 const express = require("express");
+const { body, validationResult } = require("express-validator");
 const db = require("../../db/db");
 const router = express.Router();
 
@@ -19,9 +20,15 @@ router.get("/", async (req, res) => {
 });
 
 // ADMIN PANEL: Update global settings related to the app.
-router.put("/", async (req, res) => {
+router.put("/", [body("mobile_app_terms").isString()], async (req, res) => {
   if (!req.hasAdminAccess()) {
     res.status(401).json({ msg: "Insufficient privileges." });
+    return;
+  }
+
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    res.status(400).json(validationErrors);
     return;
   }
 

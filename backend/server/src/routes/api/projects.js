@@ -6,20 +6,13 @@ const router = express.Router();
 const path = require("path");
 const JSZip = require("jszip");
 
-// APP/ADMIN: Get a list of projects
+// APP/ADMIN PANEL: Get a list of projects.
 router.get("/", async (req, res) => {
-  if (req.adminPanelAccount && req.adminPanelAccount.has_admin_access) {
+  if (req.hasAdminAccess()) {
     // admin, show all projects plus some statistics
     try {
       const projects = await db.any(
-        "SELECT project_id, name, description, created_at, creator.email AS created_by, \
-        last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_repeated_sessions, \
-        (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
-        (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings \
-        FROM project \
-        INNER JOIN account AS creator ON created_by = creator.account_id \
-        INNER JOIN account AS editor ON last_edited_by = editor.account_id \
-        ORDER BY active DESC, project_id ASC"
+        db.getQuery("projects/list-projects-admin")
       );
 
       res.status(200).json(projects);
@@ -30,13 +23,10 @@ router.get("/", async (req, res) => {
   } else if (req.mobileAppProfile) {
     // mobile app user, show only active projects
     try {
-      const projects = await db.any(
-        "SELECT * FROM project \
-        WHERE active = TRUE \
-        ORDER BY name ASC"
-      );
+      const projects = await db.any(db.getQuery("projects/list-projects-app"));
       res.status(200).json(projects);
     } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   } else {
@@ -44,134 +34,170 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ADMIN: Update project details
-router.put("/:projectId", (req, res) => {
-  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
-    return;
-  }
-
-  db.none(
-    "UPDATE project \
-    SET name = $1, description = $2, randomize_prompt_order = $3, allow_repeated_sessions = $4, \
-    active = $5, last_edited_by = $6, last_edited_at = NOW() \
-    WHERE project_id = $7",
-    [
-      req.body.name,
-      req.body.description,
-      req.body.randomize_prompt_order,
-      req.body.allow_repeated_sessions,
-      req.body.active,
-      req.adminPanelAccount.account_id,
-      req.params.projectId,
-    ]
-  )
-    .then((data) => {
-      res.sendStatus(200);
-    })
-    .catch((error) => {
-      console.log("ERROR: ", error);
-      res.sendStatus(500);
-    });
-});
-
-// ADMIN: Create new project
-router.post("/", (req, res) => {
-  if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
-    res.sendStatus(401);
-    return;
-  }
-
-  if (!req.body.name) {
-    res.sendStatus(400);
-    return;
-  }
-
-  db.one(
-    "INSERT INTO project (name, description, randomize_prompt_order, allow_repeated_sessions, active, created_by, last_edited_by) \
-    VALUES ($1, $2, $3, $4, $5, $6, $7) \
-    RETURNING project_id",
-    [
-      req.body.name,
-      req.body.description,
-      req.body.randomize_prompt_order ? req.body.randomize_prompt_order : false,
-      req.body.allow_repeated_sessions
-        ? req.body.allow_repeated_sessions
-        : false,
-      req.body.active ? req.body.active : false,
-      req.adminPanelAccount.account_id,
-      req.adminPanelAccount.account_id,
-    ]
-  )
-    .then((data) => {
-      res.status(200).json(data);
-    })
-    .catch((error) => {
-      console.log("ERROR: ", error);
-      res.sendStatus(500);
-    });
-});
-
-// APP/ADMIN: Get project with specified ID
-router.get("/:projectId", (req, res) => {
-  db.oneOrNone(
-    "SELECT project_id, name, description, created_at, creator.email AS created_by, \
-    last_edited_at, editor.email AS last_edited_by, active, randomize_prompt_order, allow_repeated_sessions, \
-    (SELECT COUNT(*) FROM prompt WHERE prompt.deleted = FALSE AND prompt.project_id = project.project_id) AS num_prompts, \
-    (SELECT COUNT(*) FROM session WHERE session.project_id = project.project_id) AS num_sessions, \
-    (SELECT COUNT(DISTINCT session.profile_id) FROM session WHERE session.project_id = project.project_id) AS num_participants, \
-    (SELECT COUNT(*) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS num_recordings, \
-    (SELECT SUM(duration_in_seconds) FROM recording, session WHERE recording.session_id = session.session_id AND session.project_id = project.project_id) AS total_recordings_duration \
-    FROM project \
-    INNER JOIN account AS creator ON created_by = creator.account_id \
-    INNER JOIN account AS editor ON last_edited_by = editor.account_id \
-    WHERE project_id = $1",
-    [req.params.projectId]
-  )
-    .then((data) => {
-      if (data === null) {
-        res.sendStatus(204);
-      } else {
-        if (data.total_recordings_duration == null) {
-          data.total_recordings_duration = 0.0;
-        }
-
-        res.status(200).json(data);
-      }
-    })
-    .catch((error) => {
-      console.log("ERROR: ", error);
-      res.sendStatus(500);
-    });
-});
-
-// ADMIN PANEL: Get prompts associated with a specific project.
-router.get(
-  "/:projectId/prompts",
-  [param("projectId").isInt()],
+// ADMIN PANEL: Update project details.
+router.put(
+  "/:projectId",
+  [
+    param("projectId").isInt(),
+    body("name").isString(),
+    body("description").isString(),
+    body("randomize_prompt_order").isBoolean(),
+    body("allow_repeated_sessions").isBoolean(),
+    body("active").isBoolean(),
+  ],
   async (req, res) => {
-    if (!req.adminPanelAccount || !req.adminPanelAccount.has_admin_access) {
+    if (!req.hasAdminAccess()) {
       res.status(401).json({ msg: "Insufficient privileges." });
       return;
     }
 
-    if (!validationResult(req).isEmpty()) {
-      res.status(400).json({ msg: "Invalid input value types." });
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
       return;
     }
 
     try {
-      const prompts = await db.any(
-        "SELECT prompt_id, description, instructions, image, created_at, creator.email AS created_by, \
-        last_edited_at, editor.email AS last_edited_by \
-        FROM prompt \
-        INNER JOIN account AS creator ON created_by = creator.account_id \
-        INNER JOIN account AS editor ON last_edited_by = editor.account_id \
-        WHERE project_id = $1 AND deleted = FALSE \
-        ORDER BY prompt_id ASC",
-        [req.params.projectId]
+      const updatedProject = await db.oneOrNone(
+        db.getQuery("projects/update-project"),
+        {
+          name: req.body.name,
+          description: req.body.description,
+          randomize_prompt_order: req.body.randomize_prompt_order,
+          allow_repeated_sessions: req.body.allow_repeated_sessions,
+          active: req.body.active,
+          last_edited_by: req.adminPanelAccount.account_id,
+          project_id: req.params.projectId,
+        }
       );
 
+      if (!updatedProject) {
+        res.status(400).json({ msg: "Invalid project ID." });
+        return;
+      }
+
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+);
+
+// ADMIN PANEL: Create new project.
+router.post(
+  "/",
+  [
+    body("name").isString(),
+    body("description").isString(),
+    body("randomize_prompt_order").isBoolean(),
+    body("allow_repeated_sessions").isBoolean(),
+    body("active").isBoolean(),
+  ],
+  async (req, res) => {
+    if (!req.hasAdminAccess()) {
+      res.status(401).json({ msg: "Insufficient privileges." });
+      return;
+    }
+
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
+      return;
+    }
+
+    try {
+      const createdProject = await db.one(
+        db.getQuery("projects/create-project"),
+        {
+          name: req.body.name,
+          description: req.body.description,
+          randomize_prompt_order: req.body.randomize_prompt_order,
+          allow_repeated_sessions: req.body.allow_repeated_sessions,
+          active: req.body.active,
+          created_by: req.adminPanelAccount.account_id,
+          last_edited_by: req.adminPanelAccount.account_id,
+        }
+      );
+
+      res.status(200).json(createdProject);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+);
+
+// APP/ADMIN PANEL: Get project with specified ID
+router.get("/:projectId", [param("projectId").isInt()], async (req, res) => {
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    res.status(400).json(validationErrors);
+    return;
+  }
+
+  if (req.hasAdminAccess()) {
+    // admin, show more details plus some statistics
+    const project = await db.oneOrNone(
+      db.getQuery("projects/get-project-admin"),
+      {
+        project_id: req.params.projectId,
+      }
+    );
+
+    if (!project) {
+      res.status(400).json({ msg: "Invalid project ID." });
+      return;
+    }
+
+    res.status(200).json(project);
+  } else if (req.mobileAppProfile) {
+    // mobile app user, show only a few details about the project
+    try {
+      const project = await db.oneOrNone(
+        db.getQuery("projects/get-project-app"),
+        {
+          project_id: req.params.projectId,
+        }
+      );
+
+      if (!project) {
+        res.status(400).json({ msg: "Invalid project ID." });
+        return;
+      }
+
+      res.status(200).json(project);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  } else {
+    res.status(401).json({ msg: "Insufficient privileges." });
+  }
+});
+
+// ADMIN PANEL: Get prompts list associated with a specific project.
+router.get(
+  "/:projectId/prompts",
+  [param("projectId").isInt()],
+  async (req, res) => {
+    if (!req.hasAdminAccess()) {
+      res.status(401).json({ msg: "Insufficient privileges." });
+      return;
+    }
+
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
+      return;
+    }
+
+    try {
+      const prompts = await db.any(db.getQuery("prompts/list-prompts-admin"), {
+        project_id: req.params.projectId,
+      });
+
+      // load image thumbnails for every prompt that has them
       for (let prompt of prompts) {
         if (prompt.image) {
           prompt.thumbnail_data = await filestore.getPromptImage(
@@ -189,43 +215,83 @@ router.get(
   }
 );
 
-router.get("/:projectId/downloadRecordings", (req, res) => {
-  const zip = new JSZip();
-  const zipFileName = `project_${req.params.projectId}_recordings.zip`;
+// file download is handled via a POST request to pass auth token, since
+// setting headers is not practical
+router.post(
+  "/:projectId/downloadRecordings",
+  [param("projectId").isInt()],
+  async (req, res) => {
+    if (!req.hasAdminAccess()) {
+      res.status(401).json({ msg: "Insufficient privileges." });
+      return;
+    }
 
-  db.any(
-    "SELECT * FROM recording INNER JOIN session USING (session_id) WHERE session.project_id = $1",
-    [req.params.projectId]
-  ).then((data) => {
-    data.forEach((item) => {
-      const audioFilename = `project_${item.project_id}_profile_${item.profile_id}_session_${item.session_id}_prompt_${item.prompt_id}.wav`;
-      const sourceAudioFilePath = path.join(
-        __dirname,
-        "../../../files/audio/",
-        `project_${item.project_id}/profile_${item.profile_id}/session_${item.session_id}/`,
-        audioFilename
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
+      return;
+    }
+
+    try {
+      const zip = new JSZip();
+      const zipFileName = `project_${req.params.projectId}_recordings.zip`;
+
+      // add project details to zip
+      const projectDetails = await db.oneOrNone(
+        db.getQuery("projects/get-project-admin"),
+        {
+          project_id: req.params.projectId,
+        }
       );
-      const zippedAudioFilePath = path.join(
-        `profile_${item.profile_id}/session_${item.session_id}/`,
-        audioFilename
-      );
 
-      // TODO: swap out for file reading code after other things are fixed
-      zip.file(zippedAudioFilePath, require("crypto").randomBytes(4096));
+      if (!projectDetails) {
+        res.status(400).json({ msg: "Invalid project ID." });
+        return;
+      }
 
-      console.log(audioFilename);
-      console.log(sourceAudioFilePath);
-      console.log(zippedAudioFilePath);
-      console.log(item);
-    });
+      const projectDetailsFilePath = `project_${req.params.projectId}_details.json`;
+      zip.file(projectDetailsFilePath, JSON.stringify(projectDetails, null, 2));
 
-    zip.generateAsync({ type: "nodebuffer" }).then((zipFileContent) => {
+      // TODO: add recording file, profile data etc.
+
+      // pack and send zip file
+      zipFileContent = await zip.generateAsync({ type: "nodebuffer" });
       res.set("Content-Type", "application/zip");
       res.set("Content-Disposition", `filename="${zipFileName}"`);
       res.set("Content-Length", zipFileContent.length);
       res.end(zipFileContent);
-    });
-  });
-});
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+    /*
+    db.any(
+      "SELECT * FROM recording INNER JOIN session USING (session_id) WHERE session.project_id = $1",
+      [req.params.projectId]
+    ).then((data) => {
+      data.forEach((item) => {
+        const audioFilename = `project_${item.project_id}_profile_${item.profile_id}_session_${item.session_id}_prompt_${item.prompt_id}.wav`;
+        const sourceAudioFilePath = path.join(
+          __dirname,
+          "../../../files/audio/",
+          `project_${item.project_id}/profile_${item.profile_id}/session_${item.session_id}/`,
+          audioFilename
+        );
+        const zippedAudioFilePath = path.join(
+          `profile_${item.profile_id}/session_${item.session_id}/`,
+          audioFilename
+        );
+
+        // TODO: swap out for file reading code after other things are fixed
+        zip.file(zippedAudioFilePath, require("crypto").randomBytes(4096));
+
+        console.log(audioFilename);
+        console.log(sourceAudioFilePath);
+        console.log(zippedAudioFilePath);
+        console.log(item);
+      });
+    });*/
+  }
+);
 
 module.exports = router;

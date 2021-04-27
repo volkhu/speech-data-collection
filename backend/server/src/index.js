@@ -7,6 +7,8 @@ const app = express();
 // use a json body parser with extended request body size limit
 // set to 100 MB to allow large prompt image uploads
 app.use(express.json({ limit: 100e6 }));
+// accept HTML form data used for e.g. passing auth tokens to download URLs
+app.use(express.urlencoded({ extended: true }));
 
 // API auth middleware
 app.use(require("./middleware/authentication").adminPanelAuthentication);

@@ -6,10 +6,13 @@ const fs = require("fs");
 
 // APP: Upload a new recording associated with a given session
 router.post("/", (req, res) => {
+  console.log("app");
   if (!req.body.recorded_file) {
     res.status(400).json({ msg: "No recorded file provided." });
     return;
   }
+
+  console.log("app2");
 
   db.task(async (t) => {
     // check that a valid session exists and the user has access to it with their device
