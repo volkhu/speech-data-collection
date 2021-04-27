@@ -171,7 +171,7 @@ router.get("/:promptId", [param("promptId").isInt()], async (req, res) => {
   }
 
   try {
-    const prompt = await db.one(db.getQuery("prompts/get-prompt-details"), {
+    const prompt = await db.one(db.getQuery("prompts/get-prompt"), {
       prompt_id: req.params.promptId,
     });
 

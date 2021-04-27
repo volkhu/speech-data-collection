@@ -128,7 +128,7 @@ router.post(
   }
 );
 
-// APP/ADMIN PANEL: Get project with specified ID
+// APP/ADMIN PANEL: Get project details with specified ID
 router.get("/:projectId", [param("projectId").isInt()], async (req, res) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
@@ -294,6 +294,61 @@ router.post(
         console.log(item);
       });
     });*/
+  }
+);
+
+// APP: Get a new prompt to record for a specified project.
+router.get(
+  "/:projectId/prompt",
+  [param("projectId").isInt()],
+  async (req, res) => {
+    if (!req.mobileAppProfile) {
+      res.status(401).json({ msg: "Insufficient privileges." });
+      return;
+    }
+
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      res.status(400).json(validationErrors);
+      return;
+    }
+
+    try {
+      // see if we have an active session for this project
+      let session = await db.oneOrNone(
+        db.getQuery("sessions/get-active-session"),
+        {
+          profile_id: req.mobileAppProfile.profile_id,
+          project_id: req.params.projectId,
+        }
+      );
+
+      if (!session) {
+        // no uncompleted session found, register a new one
+        session = await db.oneOrNone(db.getQuery("sessions/create-session"), {
+          profile_id: req.mobileAppProfile.profile_id,
+          project_id: req.params.projectId,
+        });
+
+        if (!session) {
+          res.status(400).json({ msg: "Invalid project ID." });
+          return;
+        }
+
+        console.log(
+          `Registered a new session for profile ${req.mobileAppProfile.profile_id} on project ${req.params.projectId}.`
+        );
+      }
+
+      // now we have an incomplete session that we need to complete
+      // first get a list of prompts available in this project
+      //const projectPrompts = await db.any(db.getQuery(""));
+
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
   }
 );
 

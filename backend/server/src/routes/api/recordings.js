@@ -4,7 +4,7 @@ const router = express.Router();
 const db = require("../../db/db");
 const fs = require("fs");
 
-// APP: Upload a new recording associated with a given session
+// APP: Upload a new recording associated with a given project.
 router.post("/", (req, res) => {
   console.log("app");
   if (!req.body.recorded_file) {

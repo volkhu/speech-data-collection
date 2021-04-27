@@ -67,6 +67,7 @@ CREATE TABLE session (
     session_id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
     project_id INTEGER NOT NULL,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (profile_id) REFERENCES profile (profile_id),
     FOREIGN KEY (project_id) REFERENCES project (project_id)

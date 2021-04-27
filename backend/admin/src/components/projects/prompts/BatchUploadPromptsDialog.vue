@@ -131,6 +131,7 @@ export default {
         for (const previewPrompt of this.previewPrompts) {
           await axios.post("/prompts", {
             project_id: this.projectId,
+            instructions: "",
             description: previewPrompt,
           });
 
