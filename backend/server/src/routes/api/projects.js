@@ -3,7 +3,6 @@ const { body, param, validationResult } = require("express-validator");
 const db = require("../../db/db");
 const filestore = require("../../db/filestore");
 const router = express.Router();
-const path = require("path");
 const JSZip = require("jszip");
 
 // APP/ADMIN PANEL: Get a list of projects.
@@ -314,6 +313,19 @@ router.get(
     }
 
     try {
+      // get project's prompt related settings such as whether to randomize the order
+      const projectSettings = await db.oneOrNone(
+        db.getQuery("projects/get-project-settings"),
+        {
+          project_id: req.params.projectId,
+        }
+      );
+
+      if (!projectSettings || !projectSettings.active) {
+        res.status(400).json({ msg: "Invalid project ID." });
+        return;
+      }
+
       // see if we have an active session for this project
       let session = await db.oneOrNone(
         db.getQuery("sessions/get-active-session"),
@@ -324,16 +336,31 @@ router.get(
       );
 
       if (!session) {
-        // no uncompleted session found, register a new one
-        session = await db.oneOrNone(db.getQuery("sessions/create-session"), {
+        // no active session, check if we have completed one(s)
+        const completedSessions = await db.any(
+          db.getQuery("sessions/get-completed-sessions"),
+          {
+            profile_id: req.mobileAppProfile.profile_id,
+            project_id: req.params.projectId,
+          }
+        );
+
+        if (
+          completedSessions.length &&
+          !projectSettings.allow_repeated_sessions
+        ) {
+          res.status(403).json({
+            msg:
+              "You have already completed this project. Further sessions are not allowed.",
+          });
+          return;
+        }
+
+        // otherwise we can create our first session
+        session = await db.one(db.getQuery("sessions/create-session"), {
           profile_id: req.mobileAppProfile.profile_id,
           project_id: req.params.projectId,
         });
-
-        if (!session) {
-          res.status(400).json({ msg: "Invalid project ID." });
-          return;
-        }
 
         console.log(
           `Registered a new session for profile ${req.mobileAppProfile.profile_id} on project ${req.params.projectId}.`
@@ -342,9 +369,60 @@ router.get(
 
       // now we have an incomplete session that we need to complete
       // first get a list of prompts available in this project
-      //const projectPrompts = await db.any(db.getQuery(""));
+      const projectPrompts = await db.any(
+        db.getQuery("projects/list-project-prompts"),
+        {
+          project_id: req.params.projectId,
+        }
+      );
 
-      res.sendStatus(200);
+      // next get a list of prompts that we have completed in this session
+      const completedPromptIds = (
+        await db.any(db.getQuery("sessions/get-completed-prompts"), {
+          session_id: session.session_id,
+        })
+      ).map((prompt) => prompt.prompt_id);
+
+      // filter out already completed prompts from the list
+      const availablePrompts = projectPrompts.filter(
+        (prompt) => !completedPromptIds.includes(prompt.prompt_id)
+      );
+
+      if (!availablePrompts.length) {
+        // session is actually completed as no more prompts remain, but hasn't been marked so
+        // (due to for example administrator deleting the last prompt that wasn't recorded)
+        await db.none(db.getQuery("sessions/mark-session-completed"), {
+          session_id: session.session_id,
+        });
+
+        res.status(204).json({ msg: "Session completed." });
+        return;
+      }
+
+      // choose the prompt
+      let chosenPrompt = null;
+      if (projectSettings.randomize_prompt_order) {
+        chosenPrompt =
+          availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+      } else {
+        chosenPrompt = availablePrompts[0];
+      }
+
+      // provide image if needed
+      let imageData = null;
+      if (chosenPrompt.image) {
+        imageData = await filestore.getPromptImage(
+          chosenPrompt.prompt_id,
+          false
+        );
+      }
+
+      res.status(200).json({
+        prompt_id: chosenPrompt.prompt_id,
+        description: chosenPrompt.description,
+        instructions: chosenPrompt.instructions,
+        image_data: imageData,
+      });
     } catch (error) {
       console.error(error);
       res.sendStatus(500);
