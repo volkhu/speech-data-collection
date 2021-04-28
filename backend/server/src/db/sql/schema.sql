@@ -41,7 +41,7 @@ CREATE TABLE project (
     created_by INTEGER NOT NULL,
     last_edited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_edited_by INTEGER NOT NULL,
-    description TEXT,
+    description TEXT NOT NULL,
     FOREIGN KEY (created_by) REFERENCES account (account_id),
     FOREIGN KEY (last_edited_by) REFERENCES account (account_id)
 );

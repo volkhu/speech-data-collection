@@ -16,6 +16,7 @@
             outlined
             required
             label="Name"
+            maxlength="64"
             persistent-hint
             hint="Name to identify the project. This will be shown to the users and is required."
             :disabled="savingProjectDetails"

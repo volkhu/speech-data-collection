@@ -3,6 +3,8 @@ const { body, param, validationResult } = require("express-validator");
 const db = require("../../db/db");
 const filestore = require("../../db/filestore");
 const router = express.Router();
+const path = require("path");
+const fs = require("fs");
 const JSZip = require("jszip");
 
 // APP/ADMIN PANEL: Get a list of projects.
@@ -22,7 +24,9 @@ router.get("/", async (req, res) => {
   } else if (req.mobileAppProfile) {
     // mobile app user, show only active projects
     try {
-      const projects = await db.any(db.getQuery("projects/list-projects-app"));
+      const projects = await db.any(db.getQuery("projects/list-projects-app"), {
+        profile_id: req.mobileAppProfile.profile_id,
+      });
       res.status(200).json(projects);
     } catch (error) {
       console.error(error);
@@ -38,7 +42,7 @@ router.put(
   "/:projectId",
   [
     param("projectId").isInt(),
-    body("name").isString(),
+    body("name").isString().isLength({ min: 0, max: 64 }),
     body("description").isString(),
     body("randomize_prompt_order").isBoolean(),
     body("allow_repeated_sessions").isBoolean(),
@@ -87,7 +91,7 @@ router.put(
 router.post(
   "/",
   [
-    body("name").isString(),
+    body("name").isString().isLength({ min: 0, max: 64 }),
     body("description").isString(),
     body("randomize_prompt_order").isBoolean(),
     body("allow_repeated_sessions").isBoolean(),
@@ -251,10 +255,86 @@ router.post(
         return;
       }
 
-      const projectDetailsFilePath = `project_${req.params.projectId}_details.json`;
+      const projectDetailsFilePath = `project_${projectDetails.project_id}.json`;
       zip.file(projectDetailsFilePath, JSON.stringify(projectDetails, null, 2));
 
       // TODO: add recording file, profile data etc.
+
+      // get all recordings for this project
+      const projectRecordings = await db.any(
+        db.getQuery("recordings/get-project-recordings"),
+        {
+          project_id: projectDetails.project_id,
+        }
+      );
+
+      for (let recording of projectRecordings) {
+        const innerProjectFolder = `project_${recording.project_id}/`;
+        const innerProfileFolder =
+          innerProjectFolder + `profile_${recording.profile_id}/`;
+        const innerSessionFolder =
+          innerProfileFolder + `session_${recording.session_id}/`;
+
+        const audioFileGlobalDir = path.join(
+          __dirname,
+          "../../../files/audio/",
+          innerSessionFolder
+        );
+        const audioFileName = `project_${recording.project_id}_profile_${recording.profile_id}_session_${recording.session_id}_prompt_${recording.prompt_id}.m4a`;
+
+        const audioFileInnerPath = path.join(innerSessionFolder, audioFileName);
+        const audioFileGlobalPath = path.join(
+          audioFileGlobalDir,
+          audioFileName
+        );
+
+        const promptTextPath = audioFileInnerPath.replace(".m4a", ".txt");
+
+        zip.file(audioFileInnerPath, fs.readFileSync(audioFileGlobalPath));
+        zip.file(
+          promptTextPath,
+          recording.image
+            ? `IMAGE: ${recording.description}`
+            : recording.description
+        );
+
+        // session info file
+        const sessionFileInnerPath =
+          innerProfileFolder + `session_${recording.session_id}.json`;
+        zip.file(
+          sessionFileInnerPath,
+          JSON.stringify(
+            {
+              session_id: recording.session_id,
+              profile_id: recording.profile_id,
+              project_id: recording.project_id,
+              completed: recording.completed,
+              created_at: recording.session_created_at,
+            },
+            null,
+            2
+          )
+        );
+
+        // profile info file
+        const profileFileInnerPath =
+          innerProjectFolder + `profile_${recording.profile_id}.json`;
+        zip.file(
+          profileFileInnerPath,
+          JSON.stringify(
+            {
+              profile_id: recording.profile_id,
+              year_of_birth: recording.year_of_birth,
+              gender: recording.gender,
+              native_language: recording.native_language,
+              dialect: recording.dialect,
+              created_at: recording.created_at,
+            },
+            null,
+            2
+          )
+        );
+      }
 
       // pack and send zip file
       zipFileContent = await zip.generateAsync({ type: "nodebuffer" });
@@ -376,6 +456,8 @@ router.get(
         }
       );
 
+      console.log("projectPrompts: " + projectPrompts.length);
+
       // next get a list of prompts that we have completed in this session
       const completedPromptIds = (
         await db.any(db.getQuery("sessions/get-completed-prompts"), {
@@ -383,10 +465,14 @@ router.get(
         })
       ).map((prompt) => prompt.prompt_id);
 
+      console.log("completedPromptIds: " + completedPromptIds);
+
       // filter out already completed prompts from the list
       const availablePrompts = projectPrompts.filter(
         (prompt) => !completedPromptIds.includes(prompt.prompt_id)
       );
+
+      console.log("availablePrompts: " + availablePrompts.length);
 
       if (!availablePrompts.length) {
         // session is actually completed as no more prompts remain, but hasn't been marked so

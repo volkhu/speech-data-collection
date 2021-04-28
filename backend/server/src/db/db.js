@@ -4,7 +4,7 @@ const pgPromise = require("pg-promise");
 
 // init pg-promise
 const queryDir = path.join(__dirname, "./sql/queries");
-const alwaysReloadQueries = true;
+const alwaysReloadQueries = false;
 const loadedQueries = {};
 const pgpConfig = {
   extend(obj, dc) {

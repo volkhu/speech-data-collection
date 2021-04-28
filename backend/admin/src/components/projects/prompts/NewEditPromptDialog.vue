@@ -17,6 +17,7 @@
             label="Custom Prompt Instructions (optional)"
             hint="By default the user will be told to read the prompt description text or describe the image. Optionally it is possible to replace such instructions with a custom message here that will be displayed to the user alongside the description/image."
             persistent-hint
+            maxlength="255"
             :disabled="formBusy"
             :value="value.instructions"
             @input="updateComponentValue('instructions', $event)"

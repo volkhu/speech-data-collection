@@ -48,7 +48,7 @@ router.put(
   [
     param("promptId").isInt(),
     body("description").isString(),
-    body("instructions").isString(),
+    body("instructions").isString().isLength({ min: 0, max: 255 }),
   ],
   async (req, res) => {
     if (!req.hasAdminAccess()) {
@@ -108,7 +108,10 @@ router.put(
 // ADMIN PANEL: Add prompt to specified project.
 router.post(
   "/",
-  [body("description").isString(), body("instructions").isString()],
+  [
+    body("description").isString(),
+    body("instructions").isString().isLength({ min: 0, max: 255 }),
+  ],
   async (req, res) => {
     if (!req.hasAdminAccess()) {
       res.status(401).json({ msg: "Insufficient privileges." });
