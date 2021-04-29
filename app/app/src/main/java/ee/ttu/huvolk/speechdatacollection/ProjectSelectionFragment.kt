@@ -36,7 +36,7 @@ class ProjectSelectionFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_project_selection)
 
         val api = ServiceBuilder.buildBackendService()
-        api.getProjects().enqueue(object : Callback<List<Project>> {
+        api.getProjects(deviceId = (activity as MainActivity).getDeviceId()).enqueue(object : Callback<List<Project>> {
             override fun onResponse(call: Call<List<Project>>, response: Response<List<Project>>) {
                 (activity as MainActivity).disableLoadingIcon()
                 view.visibility = View.VISIBLE

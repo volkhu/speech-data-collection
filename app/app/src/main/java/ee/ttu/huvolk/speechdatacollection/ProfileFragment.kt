@@ -138,14 +138,14 @@ class ProfileFragment : Fragment() {
                     // disable loading prompt and go to the project selection fragment
                     (activity as MainActivity).disableLoadingIcon()
                     findNavController().navigate(R.id.action_profileFragment_to_projectSelectionFragment)
-                } else if (response.code() == 204) {
-                    Log.d("ProfileFragment", "Got response code 204, no profile created yet.")
+                } else if (response.code() == 404) {
+                    Log.d("ProfileFragment", "Got response code 404, no profile created yet.")
 
                     // remove progress indicator and show this fragment for user to create a new profile
                     view.visibility = View.VISIBLE
                     (activity as MainActivity).disableLoadingIcon()
                 } else {
-                    Log.d("ProfileFragment", "Unknown response: ${response.body()}")
+                    Log.d("ProfileFragment", "Unknown response: ${response.code()} and ${response.body()}")
                 }
             }
             override fun onFailure(call: Call<Profile>, t: Throwable) {

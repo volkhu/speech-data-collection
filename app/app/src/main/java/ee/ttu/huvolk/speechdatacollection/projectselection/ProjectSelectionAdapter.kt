@@ -38,8 +38,13 @@ class ProjectSelectionAdapter(
     }
 
     override fun onBindViewHolder(holder: ProjectSelectionViewHolder, position: Int) {
+        var inProgress = "No"
+        if (projects[position].sessionsInProgress == 1) {
+            inProgress = "Yes"
+        }
+
         holder.itemView.findViewById<TextView>(R.id.tvProjectTitle).text = projects[position].name
-        holder.itemView.findViewById<TextView>(R.id.tvProjectDescription).text = projects[position].description
+        holder.itemView.findViewById<TextView>(R.id.tvProjectDescription).text = "In progress: " + inProgress + ". Completed: " + projects[position].sessionsCompleted + " times."
     }
 
     override fun getItemCount(): Int {

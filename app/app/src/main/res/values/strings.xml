@@ -3,7 +3,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="welcome_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="welcome_text">Welcome to the Speech Data Collection App! </string>
 
     <string name="exit">Exit</string>
     <string name="back">Back</string>
@@ -32,6 +32,10 @@
     <string name="default_recording_instructions">Please read the following prompt while recording it using the button below.</string>
     <string name="start_recording_instructions">Press to start voice recording.</string>
     <string name="stop_recording_instructions">Recording. Speak now. Press to stop.</string>
+    <string name="default_image_instructions">Please describe the image below.</string>
+    <string name="please_allow_recording_permissions">Please allow recording permissions.</string>
+    <string name="project_completed_message">Project completed! Thank you for participating.</string>
+    <string name="project_already_completed">You have already completed this project and cannot start another session.</string>
 
 
     <string name="has_accepted_terms_key">hasAcceptedTerms</string>

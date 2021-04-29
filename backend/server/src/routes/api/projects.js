@@ -346,33 +346,6 @@ router.post(
       console.error(error);
       res.sendStatus(500);
     }
-    /*
-    db.any(
-      "SELECT * FROM recording INNER JOIN session USING (session_id) WHERE session.project_id = $1",
-      [req.params.projectId]
-    ).then((data) => {
-      data.forEach((item) => {
-        const audioFilename = `project_${item.project_id}_profile_${item.profile_id}_session_${item.session_id}_prompt_${item.prompt_id}.wav`;
-        const sourceAudioFilePath = path.join(
-          __dirname,
-          "../../../files/audio/",
-          `project_${item.project_id}/profile_${item.profile_id}/session_${item.session_id}/`,
-          audioFilename
-        );
-        const zippedAudioFilePath = path.join(
-          `profile_${item.profile_id}/session_${item.session_id}/`,
-          audioFilename
-        );
-
-        // TODO: swap out for file reading code after other things are fixed
-        zip.file(zippedAudioFilePath, require("crypto").randomBytes(4096));
-
-        console.log(audioFilename);
-        console.log(sourceAudioFilePath);
-        console.log(zippedAudioFilePath);
-        console.log(item);
-      });
-    });*/
   }
 );
 

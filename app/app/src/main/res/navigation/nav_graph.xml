@@ -64,5 +64,9 @@
             android:id="@+id/action_recordingFragment_self"
             app:destination="@id/recordingFragment"
             app:popUpTo="@id/projectSelectionFragment" />
+        <action
+            android:id="@+id/action_recordingFragment_to_projectSelectionFragment"
+            app:destination="@id/projectSelectionFragment"
+            app:popUpTo="@id/nav_graph.xml" />
     </fragment>
 </navigation>

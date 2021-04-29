@@ -11,11 +11,11 @@ interface BackendService {
     fun postProfile(@Header("X-DeviceId") deviceId: String, @Body profileData: Profile): Call<PostProfileResponse>
 
     @GET("/api/projects")
-    fun getProjects(): Call<List<Project>>
+    fun getProjects(@Header("X-DeviceId") deviceId: String): Call<List<Project>>
 
-    @POST("/api/sessions")
-    fun postSession(@Header("X-DeviceId") deviceId: String, @Body sessionData: Session): Call<PostSessionResponse>
+    @GET("/api/projects/{projectId}/prompt")
+    fun getPrompt(@Header("X-DeviceId") deviceId: String, @Path("projectId") projectId: Int): Call<Prompt>
 
-    @GET("/api/sessions/rprompt")
-    fun getRandomPrompt(@Query("pid") pid: Int): Call<Prompt>
+    @POST("/api/recordings")
+    fun postRecording(@Header("X-DeviceId") deviceId: String, @Body recordingData: Recording): Call<PostRecordingResponse>
 }

@@ -15,8 +15,14 @@ data class Project(
     @SerializedName("randomize_prompt_order")
     val randomizePromptOrder: Boolean? = null,
 
-    @SerializedName("allow_concurrent_sessions")
-    val allowConcurrentSessions: Boolean? = null,
+    @SerializedName("allow_repeated_sessions")
+    val allowRepeatedSessions: Boolean? = null,
+
+    @SerializedName("sessions_in_progress")
+    val sessionsInProgress: Int? = null,
+
+    @SerializedName("sessions_completed")
+    val sessionsCompleted: Int? = null,
 
     @SerializedName("created_at")
     val createdAt: String? = null,
