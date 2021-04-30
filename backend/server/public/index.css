@@ -1,10 +1,11 @@
 .centerDiv {
-  position: fixed;
+  position: absolute;
   text-align: center;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: Arial;
+  width: 90vw;
 }
 
 .centerButton {
