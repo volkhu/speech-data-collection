@@ -12,7 +12,6 @@ const pgpConfig = {
     obj.getQuery = (queryName) => {
       if (!loadedQueries[queryName] || alwaysReloadQueries) {
         const queryPath = path.join(queryDir, queryName + ".sql");
-        console.log("Loaded query file: " + queryPath);
         loadedQueries[queryName] = fs.readFileSync(queryPath).toString();
       }
 
