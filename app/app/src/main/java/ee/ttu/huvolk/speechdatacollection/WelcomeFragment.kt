@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentWelcomeBinding
@@ -16,7 +15,7 @@ class WelcomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentWelcomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -24,14 +23,18 @@ class WelcomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as MainActivity).setTitle(getString(R.string.title_welcome))
+        bindButtons()
+    }
+
+    private fun bindButtons() {
         binding.btExit.setOnClickListener {
-            activity?.finish();
+            activity?.finish()
         }
+
         binding.btNext.setOnClickListener {
             findNavController().navigate(R.id.action_welcomeFragment_to_termsFragment)
         }
-
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_welcome)
     }
 
     override fun onDestroyView() {

@@ -17,7 +17,7 @@ class TermsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTermsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -25,15 +25,19 @@ class TermsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as MainActivity).setTitle(getString(R.string.title_terms))
+        bindButtons()
+    }
+
+    private fun bindButtons() {
         binding.btBack.setOnClickListener {
             findNavController().navigate(R.id.action_termsFragment_to_welcomeFragment)
         }
+
         binding.btAgree.setOnClickListener {
             setTermsAccepted()
             findNavController().navigate(R.id.action_termsFragment_to_profileFragment)
         }
-
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_terms)
     }
 
     private fun setTermsAccepted() {

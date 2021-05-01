@@ -55,7 +55,7 @@ class RecordingFragment : Fragment() {
         mediaOutputPath = requireContext().cacheDir.toString() + "/temp_recording.m4a"
 
         view.visibility = View.INVISIBLE
-        (activity as MainActivity).enableLoadingIcon()
+        (activity as MainActivity).setIsLoading(true)
         (activity as AppCompatActivity).supportActionBar?.title = arguments?.getString("projectTitle")
 
         // get a new prompt
@@ -68,7 +68,7 @@ class RecordingFragment : Fragment() {
                 deviceId = (activity as MainActivity).getDeviceId()
         ).enqueue(object : Callback<Prompt> {
             override fun onResponse(call: Call<Prompt>, response: Response<Prompt>) {
-                (activity as MainActivity).disableLoadingIcon()
+                (activity as MainActivity).setIsLoading(false)
                 if (response.code() == 200) {
                     view.visibility = View.VISIBLE
                     Log.d("RecordingFragment", "Got response code 200, can list prompt")
@@ -184,7 +184,7 @@ class RecordingFragment : Fragment() {
 
     private fun finishRecording() {
         view?.visibility = View.INVISIBLE
-        (activity as MainActivity).enableLoadingIcon()
+        (activity as MainActivity).setIsLoading(true)
 
         mediaRecorder?.stop()
         mediaRecorder?.reset()

@@ -69,7 +69,7 @@ class ProfileFragment : Fragment() {
 
         // show progress indicator and hide this fragment while we check
         view.visibility = View.INVISIBLE
-        (activity as MainActivity).enableLoadingIcon()
+        (activity as MainActivity).setIsLoading(true)
 
         binding.tilYearOfBirth.editText?.doAfterTextChanged {
             validateYearOfBirthField()
@@ -86,7 +86,7 @@ class ProfileFragment : Fragment() {
             val genderValid = validateGenderField()
             if (yearOfBirthValid && genderValid) {
                 view.visibility = View.INVISIBLE
-                (activity as MainActivity).enableLoadingIcon()
+                (activity as MainActivity).setIsLoading(true)
 
                 // send request and move to next
                 val api = ServiceBuilder.buildBackendService()
@@ -101,7 +101,7 @@ class ProfileFragment : Fragment() {
                             call: Call<PostProfileResponse>,
                             response: Response<PostProfileResponse>
                         ) {
-                            (activity as MainActivity).disableLoadingIcon()
+                            (activity as MainActivity).setIsLoading(false)
 
                             if (response.code() == 200) {
                                 Log.d("ProfileFragment", "Posted profile successfully: " + response.body())
@@ -115,7 +115,7 @@ class ProfileFragment : Fragment() {
                         override fun onFailure(call: Call<PostProfileResponse>, t: Throwable) {
                             Log.d("ProfileFragment", "Failed to post profile: " + t.message)
                             view.visibility = View.VISIBLE
-                            (activity as MainActivity).disableLoadingIcon()
+                            (activity as MainActivity).setIsLoading(false)
                         }
                     }
                 )
@@ -136,14 +136,14 @@ class ProfileFragment : Fragment() {
                     Log.d("ProfileFragment", "Got response code 200, profile already exists.")
 
                     // disable loading prompt and go to the project selection fragment
-                    (activity as MainActivity).disableLoadingIcon()
+                    (activity as MainActivity).setIsLoading(false)
                     findNavController().navigate(R.id.action_profileFragment_to_projectSelectionFragment)
                 } else if (response.code() == 404) {
                     Log.d("ProfileFragment", "Got response code 404, no profile created yet.")
 
                     // remove progress indicator and show this fragment for user to create a new profile
                     view.visibility = View.VISIBLE
-                    (activity as MainActivity).disableLoadingIcon()
+                    (activity as MainActivity).setIsLoading(false)
                 } else {
                     Log.d("ProfileFragment", "Unknown response: ${response.code()} and ${response.body()}")
                 }

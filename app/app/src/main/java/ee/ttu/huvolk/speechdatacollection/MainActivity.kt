@@ -18,28 +18,48 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        generateDeviceId()
-        Log.d("MainActivity", "Device Id = " + getDeviceId())
+        if (!isDeviceIdGenerated()) {
+            generateDeviceId()
+        }
+
         createCustomNavGraph()
     }
 
-    private fun generateDeviceId() {
-        if (getDeviceId().isBlank()) {
-            val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
-            val generatedDeviceId = UUID.randomUUID().toString()
-            sharedPreferences.edit().putString(getString(R.string.device_id_key), generatedDeviceId).apply()
-        }
+    /**
+     * Check if this device's unique identifier is present in the application's saved preferences.
+     *
+     * @return whether the unique identifier is generated or not
+     */
+    private fun isDeviceIdGenerated() : Boolean {
+        return getDeviceId().isNotBlank();
     }
 
+    /**
+     * Get the generated unique identifier for this device from the application's saved preferences.
+     *
+     * @return this device's unique identifier from saved preferences
+     */
     fun getDeviceId(): String {
         val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
         return sharedPreferences.getString(getString(R.string.device_id_key), "").toString()
     }
 
-    // Set the app start fragment to profile if the user has already accepted the terms
-    // (skip welcome and terms fragments)
-    // app:navGraph="@navigation/nav_graph" must not be in activity_main.xml fragment element
-    // to avoid creating navGraph twice
+    /**
+     * Generate a new unique unique identifier for this device and save it in application's preferences.
+     */
+    private fun generateDeviceId() {
+        val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
+        val generatedDeviceId = UUID.randomUUID().toString()
+        sharedPreferences.edit().putString(getString(R.string.device_id_key), generatedDeviceId).apply()
+    }
+
+    /**
+     * Check if the user has already accepted the application's terms and if so, replace the
+     * starting fragment in the navigation graph with the profile fragment (ie. skip the
+     * welcome and terms screens). Note that the "app:navGraph" property must not be present
+     * in the navigation graph xml file (as it is by default) in order to prevent creating
+     * the navigation graph more than once.
+     */
     private fun createCustomNavGraph() {
         val navHostFragment = (supportFragmentManager.findFragmentById(R.id.fContainer) as NavHostFragment)
         val navInflater = navHostFragment.navController.navInflater
@@ -52,16 +72,30 @@ class MainActivity : AppCompatActivity() {
         navHostFragment.navController.graph = navGraph
     }
 
+    /**
+     * Check if the user has accepted the application's terms.
+     *
+     * @return whether the user has accepted terms
+     */
     private fun hasAcceptedTerms(): Boolean {
         val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
         return sharedPreferences.getBoolean(getString(R.string.has_accepted_terms_key), false)
     }
 
-    fun enableLoadingIcon() {
-        binding.pbLoading.visibility = View.VISIBLE
+    /**
+     * Enable or disable the application's global loading state and indicator that
+     * is shared between screens.
+     */
+    fun setIsLoading(isLoading: Boolean) {
+        binding.pbLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
-    fun disableLoadingIcon() {
-        binding.pbLoading.visibility = View.GONE
+    /**
+     * Set the title of the application that will be shown on the top below the system status bar.
+     *
+     * @param title title related to the current ongoing action or screen in the application
+     */
+    fun setTitle(title: String) {
+        (this as AppCompatActivity).supportActionBar?.title = title
     }
 }

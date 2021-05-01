@@ -1,21 +1,22 @@
 <resources>
     <string name="app_name">Speech Data Collection</string>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="welcome_text">Welcome to the Speech Data Collection App! </string>
-
+    <!-- Buttons -->
     <string name="exit">Exit</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="agree">Agree</string>
     <string name="confirm">Confirm</string>
 
+    <!-- Welcome screen -->
     <string name="title_welcome">Welcome</string>
-    <string name="title_terms">Terms</string>
-    <string name="title_profile">Profile</string>
-    <string name="title_project_selection">Select Project</string>
+    <string name="welcome_text">Welcome to the Speech Data Collection app!\n\nSpeech data is a collection of recorded audio clips of spoken human speech. This data is useful for training voice recognition systems and other research related to human speech. However, it is not always easy for researchers to get the data they need. The purpose of this application is to help with such data collection efforts by allowing users to anonymously record their speech on a mobile device and send the resulting data to the researchers.</string>
 
+    <!-- Terms screen -->
+    <string name="title_terms">Terms</string>
+
+    <!-- Profile screen -->
+    <string name="title_profile">Profile</string>
     <string name="profile_description">Please enter your details to be associated with your recordings.</string>
     <string name="year_of_birth">Year of birth</string>
     <string name="gender">Gender</string>
@@ -28,7 +29,11 @@
     <string name="dialect">Dialect (optional)</string>
     <string name="field_required">This field is required.</string>
 
+    <!-- Project selection screen -->
+    <string name="title_project_selection">Select Project</string>
     <string name="project_selection_instructions">You have entered your details and agreed to the terms. Please select a project you wish to participate in.</string>
+
+    <!-- Recording screen -->
     <string name="default_recording_instructions">Please read the following prompt while recording it using the button below.</string>
     <string name="start_recording_instructions">Press to start voice recording.</string>
     <string name="stop_recording_instructions">Recording. Speak now. Press to stop.</string>
@@ -37,8 +42,7 @@
     <string name="project_completed_message">Project completed! Thank you for participating.</string>
     <string name="project_already_completed">You have already completed this project and cannot start another session.</string>
 
-
+    <!-- Internal strings -->
     <string name="has_accepted_terms_key">hasAcceptedTerms</string>
     <string name="device_id_key">deviceId</string>
-
 </resources>
