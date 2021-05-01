@@ -2,13 +2,18 @@ package ee.ttu.huvolk.speechdatacollection
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentTermsBinding
+import ee.ttu.huvolk.speechdatacollection.network.BackendService
+import ee.ttu.huvolk.speechdatacollection.network.Profile
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TermsFragment : Fragment() {
     private var _binding: FragmentTermsBinding? = null
@@ -27,6 +32,7 @@ class TermsFragment : Fragment() {
 
         (activity as MainActivity).setTitle(getString(R.string.title_terms))
         bindButtons()
+        loadTerms()
     }
 
     private fun bindButtons() {
@@ -38,6 +44,21 @@ class TermsFragment : Fragment() {
             setTermsAccepted()
             findNavController().navigate(R.id.action_termsFragment_to_profileFragment)
         }
+    }
+
+    private fun loadTerms() {
+        view?.visibility = View.INVISIBLE
+        (activity as MainActivity).setIsLoading(true)
+
+        BackendService.service.getProfile().enqueue(object : Callback<Profile> {
+            override fun onResponse(call: Call<Profile>, response: Response<Profile>) {
+                Log.d("TermsFragment", "load success" + response.code())
+            }
+
+            override fun onFailure(call: Call<Profile>, t: Throwable) {
+                Log.d("TermsFragment", "load fail" + t.message)
+            }
+        })
     }
 
     private fun setTermsAccepted() {

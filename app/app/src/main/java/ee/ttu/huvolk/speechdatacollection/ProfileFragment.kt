@@ -15,7 +15,6 @@ import ee.ttu.huvolk.speechdatacollection.databinding.FragmentProfileBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
 import ee.ttu.huvolk.speechdatacollection.network.PostProfileResponse
 import ee.ttu.huvolk.speechdatacollection.network.Profile
-import ee.ttu.huvolk.speechdatacollection.network.ServiceBuilder
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -89,13 +88,13 @@ class ProfileFragment : Fragment() {
                 (activity as MainActivity).setIsLoading(true)
 
                 // send request and move to next
-                val api = ServiceBuilder.buildBackendService()
+                val api = BackendService.service
                 val profileData = Profile()
                 profileData.yearOfBirth = binding.tilYearOfBirth.editText?.text.toString().toInt()
                 profileData.gender = binding.tilGender.editText?.text.toString()
                 profileData.nativeLanguage = binding.tilNativeLanguage.editText?.text.toString()
                 profileData.dialect = binding.tilDialect.editText?.text.toString()
-                api.postProfile(deviceId = (activity as MainActivity).getDeviceId(), profileData = profileData).enqueue(
+                api.postProfile(profileData = profileData).enqueue(
                     object : Callback<PostProfileResponse> {
                         override fun onResponse(
                             call: Call<PostProfileResponse>,
@@ -127,10 +126,10 @@ class ProfileFragment : Fragment() {
         populateYearOfBirthDropdownMenu()
         populateGenderSelectionDropdownMenu()
 
-        val api = ServiceBuilder.buildBackendService()
+        val api = BackendService.service
 
         // check if user has already registered a profile
-        api.getProfile(deviceId = (activity as MainActivity).getDeviceId()).enqueue(object : Callback<Profile> {
+        api.getProfile().enqueue(object : Callback<Profile> {
             override fun onResponse(call: Call<Profile>, response: Response<Profile>) {
                 if (response.code() == 200) {
                     Log.d("ProfileFragment", "Got response code 200, profile already exists.")

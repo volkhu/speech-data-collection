@@ -24,9 +24,13 @@ class WelcomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as MainActivity).setTitle(getString(R.string.title_welcome))
+        (activity as MainActivity).setIsLoading(false)
         bindButtons()
     }
 
+    /**
+     * Add listeners to exit and next buttons to fulfill appropriate actions.
+     */
     private fun bindButtons() {
         binding.btExit.setOnClickListener {
             activity?.finish()

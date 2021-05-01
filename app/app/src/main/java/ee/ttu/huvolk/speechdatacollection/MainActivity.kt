@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import ee.ttu.huvolk.speechdatacollection.databinding.ActivityMainBinding
+import ee.ttu.huvolk.speechdatacollection.network.BackendService
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
             generateDeviceId()
         }
 
+        configureBackendService()
         createCustomNavGraph()
     }
 
@@ -51,6 +53,14 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
         val generatedDeviceId = UUID.randomUUID().toString()
         sharedPreferences.edit().putString(getString(R.string.device_id_key), generatedDeviceId).apply()
+    }
+
+    /**
+     * Configure back-end service with parameters such as the API base URL and device ID.
+     */
+    private fun configureBackendService() {
+        BackendService.baseUrl = getString(R.string.api_base_url)
+        BackendService.deviceId = getDeviceId()
     }
 
     /**

@@ -43,6 +43,7 @@
     <string name="project_already_completed">You have already completed this project and cannot start another session.</string>
 
     <!-- Internal strings -->
+    <string name="api_base_url">http://192.168.1.2:5000/api/</string>
     <string name="has_accepted_terms_key">hasAcceptedTerms</string>
     <string name="device_id_key">deviceId</string>
 </resources>

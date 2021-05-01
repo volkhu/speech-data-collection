@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentProjectSelectionBinding
+import ee.ttu.huvolk.speechdatacollection.network.BackendService
 import ee.ttu.huvolk.speechdatacollection.network.Project
-import ee.ttu.huvolk.speechdatacollection.network.ServiceBuilder
 import ee.ttu.huvolk.speechdatacollection.projectselection.ProjectSelectionAdapter
 import retrofit2.Call
 import retrofit2.Callback
@@ -35,8 +35,8 @@ class ProjectSelectionFragment : Fragment() {
         (activity as MainActivity).setIsLoading(true)
         (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_project_selection)
 
-        val api = ServiceBuilder.buildBackendService()
-        api.getProjects(deviceId = (activity as MainActivity).getDeviceId()).enqueue(object : Callback<List<Project>> {
+        val api = BackendService.service
+        api.getProjects().enqueue(object : Callback<List<Project>> {
             override fun onResponse(call: Call<List<Project>>, response: Response<List<Project>>) {
                 (activity as MainActivity).setIsLoading(false)
                 view.visibility = View.VISIBLE

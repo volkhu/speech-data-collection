@@ -59,13 +59,12 @@ class RecordingFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.title = arguments?.getString("projectTitle")
 
         // get a new prompt
-        val api = ServiceBuilder.buildBackendService()
+        val api = BackendService.service
         projectId = arguments?.getInt("projectId")!!
         projectTitle = arguments?.getString("projectTitle")!!
 
         api.getPrompt(
-                projectId = projectId,
-                deviceId = (activity as MainActivity).getDeviceId()
+                projectId = projectId
         ).enqueue(object : Callback<Prompt> {
             override fun onResponse(call: Call<Prompt>, response: Response<Prompt>) {
                 (activity as MainActivity).setIsLoading(false)
@@ -206,7 +205,7 @@ class RecordingFragment : Fragment() {
         }
 
         // already recording, stop and go to next prompt
-        val api = ServiceBuilder.buildBackendService()
+        val api = BackendService.service
 
         val recordingData = Recording()
         recordingData.projectId = projectId
@@ -214,7 +213,7 @@ class RecordingFragment : Fragment() {
         recordingData.recordedFile = audioFileContents
         recordingData.durationInSeconds = ((System.nanoTime() - recStart) / 1e9).toFloat()
 
-        api.postRecording(deviceId = (activity as MainActivity).getDeviceId(), recordingData = recordingData).enqueue(
+        api.postRecording(recordingData = recordingData).enqueue(
                 object : Callback<PostRecordingResponse> {
             override fun onResponse(call: Call<PostRecordingResponse>, response: Response<PostRecordingResponse>) {
                 Log.d("RecordingFragment", "onResponse: " + response.code() + " and " + response.body())
