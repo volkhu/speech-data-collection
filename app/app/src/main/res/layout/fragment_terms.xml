@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".TermsFragment">
 
+    <TextView
+        android:id="@+id/tvTermsInstructions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/terms_instructions"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/btBack"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -30,12 +43,13 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:fadeScrollbars="false"
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@+id/btBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/tvTermsInstructions">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,7 +62,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="Tingimused em. Mauris in aliquam sem fringilla ut morbi tincidunt augue interdum. Cursus vitae congue mauris rhoncus aenean vel elit. Massa vitae tortor condimentum lacinia quis vel eros donec. Blandit cursus risus at ultrices mi tempus imperdiet nulla malesuada. Blandit cursus risus at ultrices mi. Ornare massa eget egestas purus viverra accumsan in. Id diam maecenas ultricies mi eget. Lectus arcu bibendum at varius vel pharetra vel turpis."
+                android:text="@string/title_terms"
+                android:textAlignment="center"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

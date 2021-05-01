@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
      *
      * @return this device's unique identifier from saved preferences
      */
-    fun getDeviceId(): String {
+    private fun getDeviceId(): String {
         val sharedPreferences = getPreferences(Context.MODE_PRIVATE)
         return sharedPreferences.getString(getString(R.string.device_id_key), "").toString()
     }
@@ -93,11 +93,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * Show or hide the sub-fragment of this activity.
+     *
+     * @param shown whether to show or hide the fragment
+     */
+    private fun setFragmentShown(shown: Boolean) {
+        binding.llFragment.visibility = if (shown) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Show or hide the loading progress bar icon.
+     *
+     * @param shown whether to show or hide the loading icon
+     */
+    private fun setLoadingIconShown(shown: Boolean) {
+        binding.pbLoading.visibility = if (shown) View.VISIBLE else View.GONE
+    }
+
+    /**
      * Enable or disable the application's global loading state and indicator that
-     * is shared between screens.
+     * is shared between screens. Fragments will also be hidden during loading.
      */
     fun setIsLoading(isLoading: Boolean) {
-        binding.pbLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
+        setFragmentShown(!isLoading)
+        setLoadingIconShown(isLoading)
+    }
+
+    /**
+     * Show an error message with a retry button in case the call to the back-end
+     * API fails for example.
+     *
+     * @param shown whether to show the error message
+     * @param errorMessage error message to show above the retry button
+     */
+    fun setErrorShown(shown: Boolean, errorMessage: String) {
+        if (shown) {
+            setIsLoading(false)
+        }
+        setFragmentShown(!shown)
+
+        binding.tvErrorMessage.text = errorMessage
+        binding.tvErrorMessage.visibility = if (shown) View.VISIBLE else View.GONE
     }
 
     /**

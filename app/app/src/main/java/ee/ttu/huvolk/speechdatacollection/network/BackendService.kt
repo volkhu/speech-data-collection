@@ -8,6 +8,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 interface BackendService {
+    @GET("settings/terms")
+    fun getTerms(): Call<Terms>
+
     @GET("profiles")
     fun getProfile(): Call<Profile>
 

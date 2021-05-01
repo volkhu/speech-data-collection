@@ -43,4 +43,15 @@ router.put("/", [body("mobile_app_terms").isString()], async (req, res) => {
   }
 });
 
+// APP: Get application terms.
+router.get("/terms", async (req, res) => {
+  try {
+    const terms = await db.one(db.getQuery("settings/get-terms"));
+    res.status(200).json(terms);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
 module.exports = router;

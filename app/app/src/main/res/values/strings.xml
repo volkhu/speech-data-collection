@@ -1,12 +1,13 @@
 <resources>
     <string name="app_name">Speech Data Collection</string>
 
-    <!-- Buttons -->
+    <!-- Buttons and other general strings -->
     <string name="exit">Exit</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="agree">Agree</string>
     <string name="confirm">Confirm</string>
+    <string name="an_error_has_occurred">An error has occurred.</string>
 
     <!-- Welcome screen -->
     <string name="title_welcome">Welcome</string>
@@ -14,10 +15,11 @@
 
     <!-- Terms screen -->
     <string name="title_terms">Terms</string>
+    <string name="terms_instructions">In order to use this app, you must first read and agree to the following terms:</string>
 
     <!-- Profile screen -->
     <string name="title_profile">Profile</string>
-    <string name="profile_description">Please enter your details to be associated with your recordings.</string>
+    <string name="profile_description">Please enter your details to be associated with your recordings:</string>
     <string name="year_of_birth">Year of birth</string>
     <string name="gender">Gender</string>
     <string-array name="gender_list">
@@ -31,7 +33,7 @@
 
     <!-- Project selection screen -->
     <string name="title_project_selection">Select Project</string>
-    <string name="project_selection_instructions">You have entered your details and agreed to the terms. Please select a project you wish to participate in.</string>
+    <string name="project_selection_instructions">You have entered your details and agreed to the terms. Please select a project you wish to participate in:</string>
 
     <!-- Recording screen -->
     <string name="default_recording_instructions">Please read the following prompt while recording it using the button below.</string>
