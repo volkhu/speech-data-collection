@@ -145,10 +145,14 @@ router.post(
           req.body.image_data
         );
       } catch (fileError) {
+        await db.none(db.getQuery("prompts/delete-prompt-real"), {
+          prompt_id: addedPrompt.prompt_id,
+        });
+
         console.warn(`File upload unsuccessful: ${fileError.message}`);
         res
           .status(500)
-          .json({ msg: `Unable to update image: ${fileError.message}` });
+          .json({ msg: `Unable to upload image: ${fileError.message}` });
         return;
       }
 
