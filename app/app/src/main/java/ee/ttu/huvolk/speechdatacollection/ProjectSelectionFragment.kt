@@ -34,7 +34,18 @@ class ProjectSelectionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as MainActivity).setTitle(getString(R.string.title_project_selection))
+        bindElements()
         loadProjects()
+    }
+
+    /**
+     * Bind fragment elements such as swipe refresh to their appropriate actions.
+     */
+    private fun bindElements() {
+        binding.srlProjectsSelection.setOnRefreshListener {
+            binding.srlProjectsSelection.isRefreshing = false
+            loadProjects()
+        }
     }
 
     /**
