@@ -43,6 +43,7 @@ class ProjectSelectionFragment : Fragment() {
      */
     private fun bindElements() {
         binding.srlProjectsSelection.setOnRefreshListener {
+            // disable the built-in loader since we're using our own
             binding.srlProjectsSelection.isRefreshing = false
             loadProjects()
         }
