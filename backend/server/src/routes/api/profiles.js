@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
       dialect: req.mobileAppProfile.dialect,
     });
   } else {
-    res.status(404).json({ msg: "No profile exists with this device ID." });
+    res.status(204).json({ msg: "No profile exists with this device ID." });
   }
 });
 

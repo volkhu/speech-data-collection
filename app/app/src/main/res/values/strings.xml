@@ -29,7 +29,27 @@
         <item>Other / Undisclosed</item>
     </string-array>
     <string name="native_language">Native language (optional)</string>
+    <string-array name="native_language_list">
+        <item>Estonian</item>
+        <item>Russian</item>
+        <item>English</item>
+        <item>Finnish</item>
+        <item>Latvian</item>
+        <item>Other / Undisclosed</item>
+    </string-array>
     <string name="dialect">Dialect (optional)</string>
+    <string-array name="dialect_list">
+        <item>None</item>
+        <item>Ida</item>
+        <item>Kesk</item>
+        <item>Lääne</item>
+        <item>Mulgi</item>
+        <item>Ranniku</item>
+        <item>Saare</item>
+        <item>Tartu</item>
+        <item>Võru</item>
+        <item>Other / Undisclosed</item>
+    </string-array>
     <string name="field_required">This field is required.</string>
 
     <!-- Project selection screen -->
