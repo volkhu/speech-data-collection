@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentTermsBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
 import ee.ttu.huvolk.speechdatacollection.network.Terms
@@ -33,6 +34,7 @@ class TermsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as MainActivity).setTitle(getString(R.string.title_terms))
+
         bindButtons()
         loadTerms()
     }
@@ -55,24 +57,39 @@ class TermsFragment : Fragment() {
      * Load the application's terms of use from the remote back-end API.
      */
     private fun loadTerms() {
-        (activity as MainActivity).setIsLoading(true)
+        (activity as MainActivity).setViewState(ViewState.LOADING)
 
         loadTermsCall = BackendService.service.getTerms()
         loadTermsCall?.enqueue(object : Callback<Terms> {
             override fun onResponse(call: Call<Terms>, response: Response<Terms>) {
-                Log.d("TermsFragment", "load success" + response.code() + " " + response.body())
-
-                binding.tvTerms.text = response.body()?.mobileAppTerms
-                (activity as MainActivity).setIsLoading(false)
+                if (response.code() == 200) {
+                    binding.tvTerms.text = response.body()?.mobileAppTerms
+                    (activity as MainActivity).setViewState(ViewState.FRAGMENT)
+                } else {
+                    onLoadTermsFailed("Code " + response.code() + ": " + response.message())
+                }
             }
 
             override fun onFailure(call: Call<Terms>, t: Throwable) {
-                Log.d("TermsFragment", "load fail" + t.message)
-                if (loadTermsCall?.isCanceled != true) {
-                    (activity as MainActivity).setErrorShown(true, t.message.toString())
+                if (loadTermsCall?.isCanceled == false) {
+                    onLoadTermsFailed(t.message.toString())
                 }
             }
         })
+    }
+
+    /**
+     * Show user an error if loading terms fails for any reason.
+     *
+     * @param errorMessage error message to show to the user
+     */
+    private fun onLoadTermsFailed(errorMessage: String) {
+        val formattedErrorMessage = getString(R.string.an_error_has_occurred) + errorMessage
+        (activity as MainActivity).setViewState(ViewState.ERROR, formattedErrorMessage) {
+            if (activity != null) {
+                loadTerms()
+            }
+        }
     }
 
     /**

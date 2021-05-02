@@ -10,6 +10,7 @@
         android:id="@+id/llFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fContainer"
             android:name="androidx.navigation.fragment.NavHostFragment"
@@ -19,7 +20,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent">
 
         </androidx.fragment.app.FragmentContainerView>
     </LinearLayout>
@@ -37,18 +38,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvErrorMessage"
+    <LinearLayout
+        android:id="@+id/llError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/an_error_has_occurred"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="@+id/llFragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/an_error_has_occurred"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/btRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/retry" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

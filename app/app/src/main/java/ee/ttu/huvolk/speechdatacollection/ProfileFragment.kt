@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentProfileBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
 import ee.ttu.huvolk.speechdatacollection.network.PostProfileResponse
@@ -68,7 +69,7 @@ class ProfileFragment : Fragment() {
 
         // show progress indicator and hide this fragment while we check
         view.visibility = View.INVISIBLE
-        (activity as MainActivity).setIsLoading(true)
+        (activity as MainActivity).setViewState(ViewState.LOADING)
 
         binding.tilYearOfBirth.editText?.doAfterTextChanged {
             validateYearOfBirthField()
@@ -85,7 +86,7 @@ class ProfileFragment : Fragment() {
             val genderValid = validateGenderField()
             if (yearOfBirthValid && genderValid) {
                 view.visibility = View.INVISIBLE
-                (activity as MainActivity).setIsLoading(true)
+                (activity as MainActivity).setViewState(ViewState.LOADING)
 
                 // send request and move to next
                 val api = BackendService.service
@@ -100,7 +101,7 @@ class ProfileFragment : Fragment() {
                             call: Call<PostProfileResponse>,
                             response: Response<PostProfileResponse>
                         ) {
-                            (activity as MainActivity).setIsLoading(false)
+                            (activity as MainActivity).setViewState(ViewState.FRAGMENT)
 
                             if (response.code() == 200) {
                                 Log.d("ProfileFragment", "Posted profile successfully: " + response.body())
@@ -114,7 +115,7 @@ class ProfileFragment : Fragment() {
                         override fun onFailure(call: Call<PostProfileResponse>, t: Throwable) {
                             Log.d("ProfileFragment", "Failed to post profile: " + t.message)
                             view.visibility = View.VISIBLE
-                            (activity as MainActivity).setIsLoading(false)
+                            (activity as MainActivity).setViewState(ViewState.FRAGMENT)
                         }
                     }
                 )
@@ -135,14 +136,14 @@ class ProfileFragment : Fragment() {
                     Log.d("ProfileFragment", "Got response code 200, profile already exists.")
 
                     // disable loading prompt and go to the project selection fragment
-                    (activity as MainActivity).setIsLoading(false)
+                    (activity as MainActivity).setViewState(ViewState.FRAGMENT)
                     findNavController().navigate(R.id.action_profileFragment_to_projectSelectionFragment)
                 } else if (response.code() == 404) {
                     Log.d("ProfileFragment", "Got response code 404, no profile created yet.")
 
                     // remove progress indicator and show this fragment for user to create a new profile
                     view.visibility = View.VISIBLE
-                    (activity as MainActivity).setIsLoading(false)
+                    (activity as MainActivity).setViewState(ViewState.FRAGMENT)
                 } else {
                     Log.d("ProfileFragment", "Unknown response: ${response.code()} and ${response.body()}")
                 }

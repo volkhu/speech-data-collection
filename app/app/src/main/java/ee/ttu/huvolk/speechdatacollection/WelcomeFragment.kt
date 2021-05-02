@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentWelcomeBinding
 
 class WelcomeFragment : Fragment() {
@@ -23,8 +24,11 @@ class WelcomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as MainActivity).setTitle(getString(R.string.title_welcome))
-        (activity as MainActivity).setIsLoading(false)
+        (activity as MainActivity).apply {
+            setTitle(getString(R.string.title_welcome))
+            setViewState(ViewState.FRAGMENT)
+        }
+
         bindButtons()
     }
 

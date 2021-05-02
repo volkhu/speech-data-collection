@@ -19,6 +19,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentRecordingBinding
 import ee.ttu.huvolk.speechdatacollection.network.*
 import retrofit2.Call
@@ -55,7 +56,7 @@ class RecordingFragment : Fragment() {
         mediaOutputPath = requireContext().cacheDir.toString() + "/temp_recording.m4a"
 
         view.visibility = View.INVISIBLE
-        (activity as MainActivity).setIsLoading(true)
+        (activity as MainActivity).setViewState(ViewState.LOADING)
         (activity as AppCompatActivity).supportActionBar?.title = arguments?.getString("projectTitle")
 
         // get a new prompt
@@ -67,7 +68,7 @@ class RecordingFragment : Fragment() {
                 projectId = projectId
         ).enqueue(object : Callback<Prompt> {
             override fun onResponse(call: Call<Prompt>, response: Response<Prompt>) {
-                (activity as MainActivity).setIsLoading(false)
+                (activity as MainActivity).setViewState(ViewState.FRAGMENT)
                 if (response.code() == 200) {
                     view.visibility = View.VISIBLE
                     Log.d("RecordingFragment", "Got response code 200, can list prompt")
@@ -183,7 +184,7 @@ class RecordingFragment : Fragment() {
 
     private fun finishRecording() {
         view?.visibility = View.INVISIBLE
-        (activity as MainActivity).setIsLoading(true)
+        (activity as MainActivity).setViewState(ViewState.LOADING)
 
         mediaRecorder?.stop()
         mediaRecorder?.reset()

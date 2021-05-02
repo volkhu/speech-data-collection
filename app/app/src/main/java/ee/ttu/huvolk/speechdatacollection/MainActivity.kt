@@ -13,6 +13,12 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
+    enum class ViewState {
+        FRAGMENT,
+        LOADING,
+        ERROR
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -93,47 +99,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Show or hide the sub-fragment of this activity.
-     *
-     * @param shown whether to show or hide the fragment
+     * TODO
      */
-    private fun setFragmentShown(shown: Boolean) {
-        binding.llFragment.visibility = if (shown) View.VISIBLE else View.GONE
-    }
+    fun setViewState(viewState: ViewState, message: String? = null, actionCallback: (() -> Unit)? = null) {
+        when (viewState) {
+            ViewState.FRAGMENT -> {
+                binding.llFragment.visibility = View.VISIBLE
+                binding.pbLoading.visibility = View.GONE
+                binding.llError.visibility = View.GONE
+            }
+            ViewState.LOADING -> {
+                binding.llFragment.visibility = View.GONE
+                binding.pbLoading.visibility = View.VISIBLE
+                binding.llError.visibility = View.GONE
+            }
+            ViewState.ERROR -> {
+                binding.llFragment.visibility = View.GONE
+                binding.pbLoading.visibility = View.GONE
+                binding.tvErrorMessage.text = message
+                binding.llError.visibility = View.VISIBLE
 
-    /**
-     * Show or hide the loading progress bar icon.
-     *
-     * @param shown whether to show or hide the loading icon
-     */
-    private fun setLoadingIconShown(shown: Boolean) {
-        binding.pbLoading.visibility = if (shown) View.VISIBLE else View.GONE
-    }
-
-    /**
-     * Enable or disable the application's global loading state and indicator that
-     * is shared between screens. Fragments will also be hidden during loading.
-     */
-    fun setIsLoading(isLoading: Boolean) {
-        setFragmentShown(!isLoading)
-        setLoadingIconShown(isLoading)
-    }
-
-    /**
-     * Show an error message with a retry button in case the call to the back-end
-     * API fails for example.
-     *
-     * @param shown whether to show the error message
-     * @param errorMessage error message to show above the retry button
-     */
-    fun setErrorShown(shown: Boolean, errorMessage: String) {
-        if (shown) {
-            setIsLoading(false)
+                binding.btRetry.setOnClickListener {
+                    if (actionCallback != null) {
+                        actionCallback()
+                    }
+                }
+            }
         }
-        setFragmentShown(!shown)
-
-        binding.tvErrorMessage.text = errorMessage
-        binding.tvErrorMessage.visibility = if (shown) View.VISIBLE else View.GONE
     }
 
     /**
