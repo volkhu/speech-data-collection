@@ -9,24 +9,21 @@ data class Project(
     @SerializedName("name")
     val name: String? = null,
 
-    @SerializedName("active")
-    val active: Boolean? = null,
+    @SerializedName("description")
+    val description: String? = null,
 
-    @SerializedName("randomize_prompt_order")
-    val randomizePromptOrder: Boolean? = null,
+    @SerializedName("num_prompts")
+    val numPrompts: Int? = null,
+
+    @SerializedName("num_recordings_in_active_session")
+    val numRecordingsInActiveSession: Int? = null,
+
+    @SerializedName("num_active_sessions")
+    val numActiveSessions: Int? = null,
+
+    @SerializedName("num_sessions_completed")
+    val numSessionsCompleted: Int? = null,
 
     @SerializedName("allow_repeated_sessions")
-    val allowRepeatedSessions: Boolean? = null,
-
-    @SerializedName("sessions_in_progress")
-    val sessionsInProgress: Int? = null,
-
-    @SerializedName("sessions_completed")
-    val sessionsCompleted: Int? = null,
-
-    @SerializedName("created_at")
-    val createdAt: String? = null,
-
-    @SerializedName("description")
-    val description: String? = null
+    val allowRepeatedSessions: Boolean? = null
 )

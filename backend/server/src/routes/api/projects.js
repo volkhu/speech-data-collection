@@ -24,9 +24,19 @@ router.get("/", async (req, res) => {
   } else if (req.mobileAppProfile) {
     // mobile app user, show only active projects
     try {
-      const projects = await db.any(db.getQuery("projects/list-projects-app"), {
+      let projects = await db.any(db.getQuery("projects/list-projects-app"), {
         profile_id: req.mobileAppProfile.profile_id,
       });
+
+      // don't show empty projects or ones users can't complete
+      projects = projects.filter(
+        (project) =>
+          project.num_prompts > 0 &&
+          (project.num_sessions_completed == 0 ||
+            project.num_active_sessions > 0 ||
+            project.allow_repeated_sessions)
+      );
+
       res.status(200).json(projects);
     } catch (error) {
       console.error(error);

@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             ViewState.ERROR -> {
                 binding.llFragment.visibility = View.GONE
                 binding.pbLoading.visibility = View.GONE
-                binding.tvErrorMessage.text = message
+                binding.tvErrorMessage.text = getString(R.string.an_error_has_occurred, message)
                 binding.llError.visibility = View.VISIBLE
 
                 binding.btRetry.setOnClickListener {

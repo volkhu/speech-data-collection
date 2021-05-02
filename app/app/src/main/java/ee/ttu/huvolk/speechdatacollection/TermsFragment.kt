@@ -84,8 +84,7 @@ class TermsFragment : Fragment() {
      * @param errorMessage error message to show to the user
      */
     private fun onLoadTermsFailed(errorMessage: String) {
-        val formattedErrorMessage = getString(R.string.an_error_has_occurred) + errorMessage
-        (activity as MainActivity).setViewState(ViewState.ERROR, formattedErrorMessage) {
+        (activity as MainActivity).setViewState(ViewState.ERROR, errorMessage) {
             if (activity != null) {
                 loadTerms()
             }
