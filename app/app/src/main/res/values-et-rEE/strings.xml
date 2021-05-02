@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kõnekorpuste Kogumine</string>
+
+    <!-- Buttons and other general strings -->
+    <string name="exit">Välju</string>
+    <string name="back">Tagasi</string>
+    <string name="next">Edasi</string>
+    <string name="agree">Nõustu</string>
+    <string name="confirm">Kinnita</string>
+    <string name="retry">Proovi Uuesti</string>
+    <string name="unknown">Tundmatu</string>
+    <string name="an_error_has_occurred">Vabandame, on tekkinud viga. Palun kontrolli oma internetiühendust, proovi hiljem uuesti, või võta ühendust rakenduse administraatoriga. Detailid:\n\n%1$s</string>
+
+    <!-- Welcome screen -->
+    <string name="title_welcome">Tere Tulemast</string>
+    <string name="welcome_text">Tere tulemast nutitelefoni rakendusse kõnekorpuste salvestuseks!\n\nKõnekorpused koosnevad inimkõne sisaldavatest heliklippidest ja nende tekstilisest esitusest. Sellised andmed on kasulikud kõnetuvastussüsteemide arendamiseks ja muude inimkõnega seotud uuringute tegemiseks. Küll aga ei ole uuringute läbiviijatel alati lihtne soovitud andmeid saada. See rakendus on loodud eesmärgiga teha mainitud andmete kogumine lihtsamaks, lubades soovijatel anonüümselt oma mobiiltelefoni kasutades etteantud juhiste põhjal heliklippe salvestada ja neid uuringute läbiviijaile edastada.</string>
+
+    <!-- Terms screen -->
+    <string name="title_terms">Tingimused</string>
+    <string name="terms_instructions">Selle rakenduse kasutamiseks peate kõigepealt läbi lugema ja nõustuma järgnevate tingimustega:</string>
+
+    <!-- Profile screen -->
+    <string name="title_profile">Profiil</string>
+    <string name="profile_description">Palun sisestage oma andmed, mis seostatakse Teie salvestustega:</string>
+    <string name="year_of_birth">Sünniaasta</string>
+    <string name="gender">Sugu</string>
+    <string-array name="gender_list">
+        <item>Mees</item>
+        <item>Naine</item>
+        <item>Muu / Ei soovi avaldada</item>
+    </string-array>
+    <string name="native_language">Emakeel (vabatahtlik)</string>
+    <string-array name="native_language_list">
+        <item>Eesti</item>
+        <item>Vene</item>
+        <item>Inglise</item>
+        <item>Soome</item>
+        <item>Läti</item>
+        <item>Muu / Ei soovi avaldada</item>
+    </string-array>
+    <string name="dialect">Murre (vabatahtlik)</string>
+    <string-array name="dialect_list">
+        <item>Puudub</item>
+        <item>Ida</item>
+        <item>Kesk</item>
+        <item>Lääne</item>
+        <item>Mulgi</item>
+        <item>Ranniku</item>
+        <item>Saare</item>
+        <item>Tartu</item>
+        <item>Võru</item>
+        <item>Muu / Ei soovi avaldada</item>
+    </string-array>
+    <string name="field_required">See väli on nõutud.</string>
+
+    <!-- Project selection screen -->
+    <string name="title_project_selection">Vali Projekt</string>
+    <string name="project_selection_instructions">Sa oled sisestanud enda andmed ja nõustunud tingimustega. Palun vali projekt, milles soovid osaleda:</string>
+    <string name="project_description">%1$d%% lõpetatud</string>
+    <string name="project_can_be_repeated">(võimalik korrata)</string>
+
+    <!-- Recording screen -->
+    <string name="title_recording_screen">Salvesta: %1$s</string>
+    <string name="default_recording_instructions">Palun lugege järgnev tekst salvestades oma kõne allpool oleva nupuga.</string>
+    <string name="start_recording_instructions">Vajuta, et alustada helisalvestust.</string>
+    <string name="stop_recording_instructions">Salvestan. Rääkige nüüd. Vajuta lõpetamiseks.</string>
+    <string name="default_image_instructions">Palun kirjeldage järgnevat pilti.</string>
+    <string name="please_allow_recording_permissions">Palun andke rakendusele heli salvestamiseks vajalikud õigused.</string>
+    <string name="project_completed_message">Projekt lõpetatud! Täname osaluse eest.</string>
+    <string name="project_already_completed">Te olete selle projekti juba läbinud ega saa alustada uut sessiooni.</string>
+</resources>

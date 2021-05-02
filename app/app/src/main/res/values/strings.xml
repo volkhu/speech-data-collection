@@ -13,7 +13,7 @@
 
     <!-- Welcome screen -->
     <string name="title_welcome">Welcome</string>
-    <string name="welcome_text">Welcome to the Speech Data Collection app!\n\nSpeech data is a collection of recorded audio clips of spoken human speech. This data is useful for training voice recognition systems and other research related to human speech. However, it is not always easy for researchers to get the data they need. The purpose of this application is to help with such data collection efforts by allowing users to anonymously record their speech on a mobile device and send the resulting data to the researchers.</string>
+    <string name="welcome_text">Welcome to the Speech Data Collection app!  Speech data is a collection of recorded audio clips of spoken human speech. This data is useful for training voice recognition systems and other research related to human speech. However, it is not always easy for researchers to get the data they need. The purpose of this application is to help with such data collection efforts by allowing users to anonymously record their speech on a mobile device and send the resulting data to the researchers.</string>
 
     <!-- Terms screen -->
     <string name="title_terms">Terms</string>
@@ -70,8 +70,8 @@
     <string name="project_already_completed">You have already completed this project and cannot start another session.</string>
 
     <!-- Internal strings -->
-    <string name="api_base_url">http://192.168.1.2:5000/api/</string>
-    <string name="has_accepted_terms_key">hasAcceptedTerms</string>
-    <string name="device_id_key">deviceId</string>
-    <string name="temp_recording_filename">temp_recording.wav</string>
+    <string name="api_base_url" translatable="false">https://example.com/api/</string>
+    <string name="has_accepted_terms_key" translatable="false">hasAcceptedTerms</string>
+    <string name="device_id_key" translatable="false">deviceId</string>
+    <string name="temp_recording_filename" translatable="false">temp_recording.wav</string>
 </resources>
