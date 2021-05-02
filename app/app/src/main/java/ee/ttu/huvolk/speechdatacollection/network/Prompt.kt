@@ -4,16 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 data class Prompt(
     @SerializedName("prompt_id")
-    val promptId: Int? = null,
+    val promptId: Int,
 
     @SerializedName("project_id")
     val projectId: Int? = null,
 
     @SerializedName("description")
     val description: String? = null,
-
-    @SerializedName("image")
-    val image: Boolean? = null,
 
     @SerializedName("image_data")
     val imageData: String? = null,

@@ -62,7 +62,7 @@ router.post(
         "../../../files/audio/",
         `project_${session.project_id}/profile_${session.profile_id}/session_${session.session_id}/`
       );
-      const fileName = `project_${session.project_id}_profile_${session.profile_id}_session_${session.session_id}_prompt_${req.body.prompt_id}.m4a`;
+      const fileName = `project_${session.project_id}_profile_${session.profile_id}_session_${session.session_id}_prompt_${req.body.prompt_id}.wav`;
       const filePath = path.join(fileDir, fileName);
 
       // create directory if needed, decode base64, save file

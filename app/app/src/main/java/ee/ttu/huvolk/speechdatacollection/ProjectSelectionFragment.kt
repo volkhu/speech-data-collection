@@ -1,7 +1,6 @@
 package ee.ttu.huvolk.speechdatacollection
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -58,9 +57,9 @@ class ProjectSelectionFragment : Fragment() {
         loadProjectsCall = BackendService.service.getProjects()
         loadProjectsCall?.enqueue(object : Callback<List<Project>> {
             override fun onResponse(call: Call<List<Project>>, response: Response<List<Project>>) {
-                val responseBody = response.body()
-                if (response.code() == 200 && responseBody != null) {
-                    val projects: List<Project> = responseBody
+                val projects = response.body()
+
+                if (response.code() == 200 && projects != null) {
                     val adapter = ProjectSelectionAdapter(projects)
                     binding.rvProjectSelection.adapter = adapter
                     binding.rvProjectSelection.layoutManager = LinearLayoutManager(context)

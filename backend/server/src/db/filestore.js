@@ -64,17 +64,21 @@ const saveRotatedResizedJpeg = async (imageBuffer, maxDimensions, filePath) => {
 };
 
 // Returns the specified prompt's image (or thumbnail) as a jpeg file in data URI base64 format
-const getPromptImage = async (promptId, thumbnail) => {
+const getPromptImage = async (promptId, thumbnail, withPrefixData = true) => {
   const filePath = thumbnail
     ? getPromptThumbnailPath(promptId)
     : getPromptImagePath(promptId);
 
   try {
-    const base64ImageData = await fs.promises.readFile(filePath, {
+    let base64ImageData = await fs.promises.readFile(filePath, {
       encoding: "base64",
     });
 
-    return "data:image/jpeg;base64," + base64ImageData;
+    if (withPrefixData) {
+      base64ImageData = "data:image/jpeg;base64," + base64ImageData;
+    }
+
+    return base64ImageData;
   } catch (error) {
     console.error(error);
     return null;

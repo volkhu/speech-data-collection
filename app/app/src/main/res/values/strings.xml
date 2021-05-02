@@ -8,6 +8,7 @@
     <string name="agree">Agree</string>
     <string name="confirm">Confirm</string>
     <string name="retry">Retry</string>
+    <string name="unknown">Unknown</string>
     <string name="an_error_has_occurred">Sorry, an error has occurred while loading this page. Please check your internet connection, try again later or contact the administrator of this application. Details:\n\n%1$s</string>
 
     <!-- Welcome screen -->
@@ -59,6 +60,7 @@
     <string name="project_can_be_repeated">(can be repeated)</string>
 
     <!-- Recording screen -->
+    <string name="title_recording_screen">Record: %1$s</string>
     <string name="default_recording_instructions">Please read the following prompt while recording it using the button below.</string>
     <string name="start_recording_instructions">Press to start voice recording.</string>
     <string name="stop_recording_instructions">Recording. Speak now. Press to stop.</string>
@@ -71,4 +73,5 @@
     <string name="api_base_url">http://192.168.1.2:5000/api/</string>
     <string name="has_accepted_terms_key">hasAcceptedTerms</string>
     <string name="device_id_key">deviceId</string>
+    <string name="temp_recording_filename">temp_recording.wav</string>
 </resources>

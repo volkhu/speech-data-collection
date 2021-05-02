@@ -290,7 +290,7 @@ router.post(
           "../../../files/audio/",
           innerSessionFolder
         );
-        const audioFileName = `project_${recording.project_id}_profile_${recording.profile_id}_session_${recording.session_id}_prompt_${recording.prompt_id}.m4a`;
+        const audioFileName = `project_${recording.project_id}_profile_${recording.profile_id}_session_${recording.session_id}_prompt_${recording.prompt_id}.wav`;
 
         const audioFileInnerPath = path.join(innerSessionFolder, audioFileName);
         const audioFileGlobalPath = path.join(
@@ -298,7 +298,7 @@ router.post(
           audioFileName
         );
 
-        const promptTextPath = audioFileInnerPath.replace(".m4a", ".txt");
+        const promptTextPath = audioFileInnerPath.replace(".wav", ".txt");
 
         zip.file(audioFileInnerPath, fs.readFileSync(audioFileGlobalPath));
         zip.file(
@@ -439,8 +439,6 @@ router.get(
         }
       );
 
-      console.log("projectPrompts: " + projectPrompts.length);
-
       // next get a list of prompts that we have completed in this session
       const completedPromptIds = (
         await db.any(db.getQuery("sessions/get-completed-prompts"), {
@@ -448,14 +446,10 @@ router.get(
         })
       ).map((prompt) => prompt.prompt_id);
 
-      console.log("completedPromptIds: " + completedPromptIds);
-
       // filter out already completed prompts from the list
       const availablePrompts = projectPrompts.filter(
         (prompt) => !completedPromptIds.includes(prompt.prompt_id)
       );
-
-      console.log("availablePrompts: " + availablePrompts.length);
 
       if (!availablePrompts.length) {
         // session is actually completed as no more prompts remain, but hasn't been marked so
@@ -482,6 +476,7 @@ router.get(
       if (chosenPrompt.image) {
         imageData = await filestore.getPromptImage(
           chosenPrompt.prompt_id,
+          false,
           false
         );
       }
