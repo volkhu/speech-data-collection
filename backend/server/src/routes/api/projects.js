@@ -347,7 +347,10 @@ router.post(
       }
 
       // pack and send zip file
-      zipFileContent = await zip.generateAsync({ type: "nodebuffer" });
+      zipFileContent = await zip.generateAsync({
+        type: "nodebuffer",
+        compression: "DEFLATE",
+      });
       res.set("Content-Type", "application/zip");
       res.set("Content-Disposition", `filename="${zipFileName}"`);
       res.set("Content-Length", zipFileContent.length);
