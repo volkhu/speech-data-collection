@@ -1,4 +1,4 @@
-package ee.ttu.huvolk.speechdatacollection.projectselection
+package ee.ttu.huvolk.speechdatacollection.fragments.projects
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ee.ttu.huvolk.speechdatacollection.R
-import ee.ttu.huvolk.speechdatacollection.network.Project
+import ee.ttu.huvolk.speechdatacollection.network.data.Project
 
 class ProjectSelectionAdapter(
     var projects: List<Project>

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/welcomeFragment"
-        android:name="ee.ttu.huvolk.speechdatacollection.WelcomeFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.fragments.welcome.WelcomeFragment"
         android:label="fragment_welcome"
         tools:layout="@layout/fragment_welcome">
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/termsFragment"
-        android:name="ee.ttu.huvolk.speechdatacollection.TermsFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.fragments.terms.TermsFragment"
         android:label="fragment_terms"
         tools:layout="@layout/fragment_terms" >
         <action
@@ -31,7 +31,7 @@
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="ee.ttu.huvolk.speechdatacollection.ProfileFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.fragments.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
         <action
@@ -41,7 +41,7 @@
     </fragment>
     <fragment
         android:id="@+id/projectSelectionFragment"
-        android:name="ee.ttu.huvolk.speechdatacollection.ProjectSelectionFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.fragments.projects.ProjectSelectionFragment"
         android:label="fragment_project_selection"
         tools:layout="@layout/fragment_project_selection" >
         <action
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/recordingFragment"
-        android:name="ee.ttu.huvolk.speechdatacollection.RecordingFragment"
+        android:name="ee.ttu.huvolk.speechdatacollection.fragments.recording.RecordingFragment"
         android:label="fragment_recording"
         tools:layout="@layout/fragment_recording" >
         <argument

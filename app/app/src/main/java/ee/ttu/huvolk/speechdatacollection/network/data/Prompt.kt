@@ -1,10 +1,10 @@
-package ee.ttu.huvolk.speechdatacollection.network
+package ee.ttu.huvolk.speechdatacollection.network.data
 
 import com.google.gson.annotations.SerializedName
 
 data class Prompt(
     @SerializedName("prompt_id")
-    val promptId: Int,
+    val promptId: Int? = null,
 
     @SerializedName("project_id")
     val projectId: Int? = null,

@@ -1,5 +1,6 @@
 package ee.ttu.huvolk.speechdatacollection.network
 
+import ee.ttu.huvolk.speechdatacollection.network.data.*
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -31,7 +32,7 @@ interface BackendService {
         lateinit var deviceId: String
 
         val service: BackendService by lazy {
-            BackendService.build()
+            build()
         }
 
         /**

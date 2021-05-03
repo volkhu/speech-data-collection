@@ -1,16 +1,19 @@
-package ee.ttu.huvolk.speechdatacollection
+package ee.ttu.huvolk.speechdatacollection.fragments.terms
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ee.ttu.huvolk.speechdatacollection.MainActivity
 import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
+import ee.ttu.huvolk.speechdatacollection.R
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentTermsBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
-import ee.ttu.huvolk.speechdatacollection.network.Terms
+import ee.ttu.huvolk.speechdatacollection.network.data.Terms
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

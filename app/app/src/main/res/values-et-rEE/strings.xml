@@ -4,6 +4,9 @@
 
     <!-- Buttons and other general strings -->
     <string name="exit">Välju</string>
+    <string name="exit_confirmation_message">Kas olete kindel, et soovite väljuda?</string>
+    <string name="yes">Jah</string>
+    <string name="no">Ei</string>
     <string name="back">Tagasi</string>
     <string name="next">Edasi</string>
     <string name="agree">Nõustu</string>

@@ -1,4 +1,4 @@
-package ee.ttu.huvolk.speechdatacollection
+package ee.ttu.huvolk.speechdatacollection.fragments.recording
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -17,14 +17,18 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.github.squti.androidwaverecorder.WaveRecorder
 import com.google.android.material.snackbar.Snackbar
+import ee.ttu.huvolk.speechdatacollection.MainActivity
 import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
+import ee.ttu.huvolk.speechdatacollection.R
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentRecordingBinding
 import ee.ttu.huvolk.speechdatacollection.network.*
+import ee.ttu.huvolk.speechdatacollection.network.data.PostRecordingResponse
+import ee.ttu.huvolk.speechdatacollection.network.data.Prompt
+import ee.ttu.huvolk.speechdatacollection.network.data.Recording
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.io.IOException
 
 // constants related to automatic resizing of prompt text
 private const val PROMPT_TEXT_BASE_SIZE: Float = 36.0f
@@ -175,7 +179,7 @@ class RecordingFragment : Fragment() {
         // update and resize prompt text
         binding.tvPrompt.text = prompt.description
         resizePromptFont()
-        promptId = prompt.promptId
+        promptId = prompt.promptId ?: 0
 
         (activity as MainActivity).setViewState(ViewState.FRAGMENT)
     }

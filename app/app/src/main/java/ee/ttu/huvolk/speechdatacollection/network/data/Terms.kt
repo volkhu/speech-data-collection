@@ -1,4 +1,4 @@
-package ee.ttu.huvolk.speechdatacollection.network
+package ee.ttu.huvolk.speechdatacollection.network.data
 
 import com.google.gson.annotations.SerializedName
 

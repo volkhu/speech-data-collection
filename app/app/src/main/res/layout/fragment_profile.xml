@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".fragments.profile.ProfileFragment">
 
     <Button
         android:id="@+id/btExit"
@@ -91,6 +91,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/gender"
                     android:maxLines="1"
+                    android:maxLength="32"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -111,7 +112,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/native_language"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:maxLength="64" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -132,7 +134,8 @@
                     android:layout_height="wrap_content"
                     android:nextFocusDown="@id/btConfirm"
                     android:hint="@string/dialect"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:maxLength="64" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

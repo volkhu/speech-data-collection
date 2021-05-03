@@ -3,6 +3,9 @@
 
     <!-- Buttons and other general strings -->
     <string name="exit">Exit</string>
+    <string name="exit_confirmation_message">Are you sure you want to exit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="agree">Agree</string>

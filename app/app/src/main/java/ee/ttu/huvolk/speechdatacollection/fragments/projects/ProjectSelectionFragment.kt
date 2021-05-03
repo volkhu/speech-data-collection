@@ -1,4 +1,4 @@
-package ee.ttu.huvolk.speechdatacollection
+package ee.ttu.huvolk.speechdatacollection.fragments.projects
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,11 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import ee.ttu.huvolk.speechdatacollection.MainActivity
 import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
+import ee.ttu.huvolk.speechdatacollection.R
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentProjectSelectionBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
-import ee.ttu.huvolk.speechdatacollection.network.Project
-import ee.ttu.huvolk.speechdatacollection.projectselection.ProjectSelectionAdapter
+import ee.ttu.huvolk.speechdatacollection.network.data.Project
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

@@ -1,4 +1,4 @@
-package ee.ttu.huvolk.speechdatacollection
+package ee.ttu.huvolk.speechdatacollection.fragments.welcome
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ee.ttu.huvolk.speechdatacollection.MainActivity
 import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
+import ee.ttu.huvolk.speechdatacollection.R
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentWelcomeBinding
 
 class WelcomeFragment : Fragment() {
@@ -37,7 +39,7 @@ class WelcomeFragment : Fragment() {
      */
     private fun bindButtons() {
         binding.btExit.setOnClickListener {
-            activity?.finish()
+            (activity as MainActivity).showExitDialog()
         }
 
         binding.btNext.setOnClickListener {

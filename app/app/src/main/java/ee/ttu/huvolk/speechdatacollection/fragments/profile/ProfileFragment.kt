@@ -1,7 +1,6 @@
-package ee.ttu.huvolk.speechdatacollection
+package ee.ttu.huvolk.speechdatacollection.fragments.profile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +9,13 @@ import android.widget.AutoCompleteTextView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ee.ttu.huvolk.speechdatacollection.MainActivity
 import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
+import ee.ttu.huvolk.speechdatacollection.R
 import ee.ttu.huvolk.speechdatacollection.databinding.FragmentProfileBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
-import ee.ttu.huvolk.speechdatacollection.network.PostProfileResponse
-import ee.ttu.huvolk.speechdatacollection.network.Profile
+import ee.ttu.huvolk.speechdatacollection.network.data.PostProfileResponse
+import ee.ttu.huvolk.speechdatacollection.network.data.Profile
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -81,8 +82,8 @@ class ProfileFragment : Fragment() {
     private fun populateGenderSelectionDropdownMenu() {
         val adapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.gender_list,
-                R.layout.item_dropdown
+            R.array.gender_list,
+            R.layout.item_dropdown
         )
         (binding.tilGender.editText as? AutoCompleteTextView)?.setAdapter(adapter)
     }
@@ -93,8 +94,8 @@ class ProfileFragment : Fragment() {
     private fun populateNativeLanguageSelectionDropdownMenu() {
         val adapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.native_language_list,
-                R.layout.item_dropdown
+            R.array.native_language_list,
+            R.layout.item_dropdown
         )
         (binding.tilNativeLanguage.editText as? AutoCompleteTextView)?.setAdapter(adapter)
     }
@@ -105,8 +106,8 @@ class ProfileFragment : Fragment() {
     private fun populateDialectSelectionDropdownMenu() {
         val adapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.dialect_list,
-                R.layout.item_dropdown
+            R.array.dialect_list,
+            R.layout.item_dropdown
         )
         (binding.tilDialect.editText as? AutoCompleteTextView)?.setAdapter(adapter)
     }
@@ -116,7 +117,7 @@ class ProfileFragment : Fragment() {
      */
     private fun bindButtons() {
         binding.btExit.setOnClickListener {
-            activity?.finish()
+            (activity as MainActivity).showExitDialog()
         }
 
         binding.btConfirm.setOnClickListener {

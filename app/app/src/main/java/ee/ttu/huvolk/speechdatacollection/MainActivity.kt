@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import ee.ttu.huvolk.speechdatacollection.databinding.ActivityMainBinding
 import ee.ttu.huvolk.speechdatacollection.network.BackendService
 import java.util.*
@@ -135,5 +138,39 @@ class MainActivity : AppCompatActivity() {
      */
     fun setTitle(title: String) {
         (this as AppCompatActivity).supportActionBar?.title = title
+    }
+
+    /**
+     * Show the user an exit confirmation dialog when the back button
+     * would otherwise take them out of the application right now.
+     */
+    override fun onBackPressed() {
+        if (binding.fContainer.findNavController().previousBackStackEntry == null) {
+            showExitDialog()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    /**
+     * Show an exit dialog to user with yes/no options to make sure that they
+     * don't accidentally exit the application. This may also be called from
+     * sub-fragments when for example a dedicated exit button is present.
+     */
+    fun showExitDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setIcon(R.mipmap.ic_launcher)
+        builder.setTitle(R.string.app_name)
+        builder.setMessage(R.string.exit_confirmation_message)
+
+        builder.setPositiveButton(R.string.yes) { _, _ ->
+            finish()
+        }
+
+        builder.setNegativeButton(R.string.no) { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
     }
 }
