@@ -6,6 +6,7 @@
   transform: translate(-50%, -50%);
   font-family: Arial;
   width: 90vw;
+  max-width: 768px;
 }
 
 .centerButton {
