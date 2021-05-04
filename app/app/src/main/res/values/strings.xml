@@ -59,8 +59,10 @@
     <!-- Project selection screen -->
     <string name="title_project_selection">Select Project</string>
     <string name="project_selection_instructions">You have entered your details and agreed to the terms. Please select a project you wish to participate in:</string>
-    <string name="project_description">%1$d%% completed</string>
+    <string name="project_status">%1$d%% completed</string>
     <string name="project_can_be_repeated">(can be repeated)</string>
+    <string name="project_description">Number of prompts: %1$d\nTimes completed: %2$d\nDescription: %3$s</string>
+    <string name="start_recording">Start Recording</string>
 
     <!-- Recording screen -->
     <string name="title_recording_screen">Record: %1$s</string>

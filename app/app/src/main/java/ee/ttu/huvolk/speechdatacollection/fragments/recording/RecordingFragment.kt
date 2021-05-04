@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.media.AudioFormat
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Base64
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -40,6 +42,7 @@ private const val PROMPT_TEXT_SCALE_FACTOR: Float = 0.05f
 private const val AUDIO_SAMPLE_RATE = 44100 // 44100 is guaranteed to work on all devices
 private const val AUDIO_CHANNEL_MODE = AudioFormat.CHANNEL_IN_MONO // mono works on all devices
 private const val AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT // PCM 16-bit is guaranteed to work
+private const val AUDIO_STOP_DELAY_MILLIS = 300L // how long to keep recording after user presses stop button
 
 class RecordingFragment : Fragment() {
     private var _binding: FragmentRecordingBinding? = null
@@ -54,6 +57,8 @@ class RecordingFragment : Fragment() {
     private var recording: Boolean = false
     private var recordingStartTime: Long = 0
     private var recordingEndTime: Long = 0
+    private var stopRecorderDelayHandler: Handler? = null
+    private val stopRecordingRunnable: Runnable = Runnable { finishRecording() }
 
     private var loadPromptCall: Call<Prompt>? = null
     private var postRecordingCall: Call<PostRecordingResponse>? = null
@@ -267,7 +272,11 @@ class RecordingFragment : Fragment() {
         if (!recording) {
             startRecording()
         } else {
-            finishRecording()
+            // delay the stopping of recording a bit to make sure we don't cut off
+            // last words due to a little delay in the Android audio recorder
+            (requireActivity() as MainActivity).setViewState(ViewState.LOADING)
+            stopRecorderDelayHandler = Handler(Looper.getMainLooper())
+            stopRecorderDelayHandler?.postDelayed(stopRecordingRunnable, AUDIO_STOP_DELAY_MILLIS)
         }
     }
 
@@ -397,6 +406,7 @@ class RecordingFragment : Fragment() {
     override fun onDestroyView() {
         loadPromptCall?.cancel()
         postRecordingCall?.cancel()
+        stopRecorderDelayHandler?.removeCallbacks(stopRecordingRunnable)
         waveRecorder.stopRecording()
 
         super.onDestroyView()
