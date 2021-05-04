@@ -3,6 +3,7 @@ package ee.ttu.huvolk.speechdatacollection.fragments.projects
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.os.bundleOf
@@ -26,11 +27,18 @@ class ProjectSelectionAdapter(
         holder.itemView.setOnClickListener {
             val itemPosition = holder.adapterPosition
 
-            val projectId = projects[itemPosition].projectId
+            /*val projectId = projects[itemPosition].projectId
             val projectTitle = projects[itemPosition].name
 
             val bundle = bundleOf("projectId" to projectId, "projectTitle" to projectTitle)
-            parent.findNavController().navigate(R.id.action_projectSelectionFragment_to_recordingFragment, bundle)
+            parent.findNavController().navigate(R.id.action_projectSelectionFragment_to_recordingFragment, bundle)*/
+
+            // expand the clicked item and collapse others
+            projects.forEachIndexed { index, project ->
+                project.expanded = index == itemPosition && !project.expanded
+            }
+
+            notifyDataSetChanged()
         }
 
         return holder
@@ -76,6 +84,10 @@ class ProjectSelectionAdapter(
         holder.itemView.findViewById<TextView>(R.id.tvProjectTitle).text = projects[position].name
         holder.itemView.findViewById<TextView>(R.id.tvProjectDescription).text = descriptionText
         holder.itemView.findViewById<ProgressBar>(R.id.pbProjectCompletion).progress = completionPercentage
+
+        // rotate the expand icon accordingly
+        val rotation = if (projects[position].expanded) 180.0f else 0.0f
+        holder.itemView.findViewById<ImageView>(R.id.ivSelectIcon).rotation = rotation
     }
 
     override fun getItemCount(): Int {

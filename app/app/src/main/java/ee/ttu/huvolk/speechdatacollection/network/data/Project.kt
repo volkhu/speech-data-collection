@@ -25,5 +25,7 @@ data class Project(
     val numSessionsCompleted: Int? = null,
 
     @SerializedName("allow_repeated_sessions")
-    val allowRepeatedSessions: Boolean? = null
+    val allowRepeatedSessions: Boolean? = null,
+
+    var expanded: Boolean = false
 )

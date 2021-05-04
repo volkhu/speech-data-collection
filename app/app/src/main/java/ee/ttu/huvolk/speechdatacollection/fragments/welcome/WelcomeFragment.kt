@@ -39,7 +39,7 @@ class WelcomeFragment : Fragment() {
      */
     private fun bindButtons() {
         binding.btExit.setOnClickListener {
-            (activity as MainActivity).showExitDialog()
+            activity?.finish()
         }
 
         binding.btNext.setOnClickListener {

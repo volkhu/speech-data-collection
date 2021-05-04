@@ -1,13 +1,16 @@
 package ee.ttu.huvolk.speechdatacollection.fragments.profile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import ee.ttu.huvolk.speechdatacollection.MainActivity
 import ee.ttu.huvolk.speechdatacollection.MainActivity.ViewState
@@ -113,7 +116,7 @@ class ProfileFragment : Fragment() {
     }
 
     /**
-     * Add listeners to exit and confirm buttons to fulfill appropriate actions.
+     * Add listeners to exit, confirm and back buttons to fulfill appropriate actions.
      */
     private fun bindButtons() {
         binding.btExit.setOnClickListener {
@@ -123,6 +126,14 @@ class ProfileFragment : Fragment() {
         binding.btConfirm.setOnClickListener {
             postProfile()
         }
+
+        // show a dialog when back button is pressed so the user would
+        // not accidentally exit the app and lose their inputted data
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                (requireActivity() as MainActivity).showExitDialog()
+            }
+        })
     }
 
     /**
@@ -256,6 +267,8 @@ class ProfileFragment : Fragment() {
             }
         }
     }
+
+
 
     override fun onDestroyView() {
         loadProfileCall?.cancel()

@@ -141,18 +141,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Show the user an exit confirmation dialog when the back button
-     * would otherwise take them out of the application right now.
-     */
-    override fun onBackPressed() {
-        if (binding.fContainer.findNavController().previousBackStackEntry == null) {
-            showExitDialog()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    /**
      * Show an exit dialog to user with yes/no options to make sure that they
      * don't accidentally exit the application. This may also be called from
      * sub-fragments when for example a dedicated exit button is present.
