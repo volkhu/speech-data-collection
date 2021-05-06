@@ -13,11 +13,11 @@
     <string name="confirm">Kinnita</string>
     <string name="retry">Proovi Uuesti</string>
     <string name="unknown">Tundmatu</string>
-    <string name="an_error_has_occurred">Vabandame, on tekkinud viga. Palun kontrolli oma internetiühendust, proovi hiljem uuesti, või võta ühendust rakenduse administraatoriga. Detailid:\n\n%1$s</string>
+    <string name="an_error_has_occurred">Vabandame, on tekkinud viga. Palun kontrollige oma internetiühendust, proovige hiljem uuesti, või võtke ühendust rakenduse administraatoriga. Vea detailid:\n\n%1$s</string>
 
     <!-- Welcome screen -->
     <string name="title_welcome">Tere Tulemast</string>
-    <string name="welcome_text">Tere tulemast nutitelefoni rakendusse kõnekorpuste salvestuseks!\n\nKõnekorpused koosnevad inimkõne sisaldavatest heliklippidest ja nende tekstilisest esitusest. Sellised andmed on kasulikud kõnetuvastussüsteemide arendamiseks ja muude inimkõnega seotud uuringute tegemiseks. Küll aga ei ole uuringute läbiviijatel alati lihtne soovitud andmeid saada. See rakendus on loodud eesmärgiga teha mainitud andmete kogumine lihtsamaks, lubades soovijatel anonüümselt oma mobiiltelefoni kasutades etteantud juhiste põhjal heliklippe salvestada ja neid uuringute läbiviijaile edastada.</string>
+    <string name="welcome_text">Tere tulemast nutitelefoni rakendusse kõnekorpuste salvestuseks!\n\nKõnekorpused koosnevad inimkõne sisaldavatest heliklippidest ja nende tekstilisest esitusest. Sellised andmed on kasulikud kõnetuvastussüsteemide arendamiseks ja muude inimkõnega seotud uuringute tegemiseks. Küll aga ei ole uuringute läbiviijatel alati kerge soovitud andmeid saada. See rakendus on loodud eesmärgiga teha mainitud andmete kogumine lihtsamaks, lubades soovijatel anonüümselt oma mobiiltelefoni kasutades etteantud juhiste põhjal heliklippe salvestada ja neid uuringute läbiviijaile edastada.</string>
 
     <!-- Terms screen -->
     <string name="title_terms">Tingimused</string>
@@ -59,7 +59,7 @@
 
     <!-- Project selection screen -->
     <string name="title_project_selection">Vali Projekt</string>
-    <string name="project_selection_instructions">Sa oled sisestanud enda andmed ja nõustunud tingimustega. Palun vali projekt, milles soovid osaleda:</string>
+    <string name="project_selection_instructions">Te olete sisestanud oma andmed ja nõustunud tingimustega. Palun valige projekt, milles soovite osaleda:</string>
     <string name="project_status">%1$d%% lõpetatud</string>
     <string name="project_can_be_repeated">(võimalik korrata)</string>
     <string name="project_description">Kõnenäidete juhiste arv: %1$d\nLäbitud kordade arv: %2$d\nKirjeldus: %3$s</string>
@@ -68,8 +68,8 @@
     <!-- Recording screen -->
     <string name="title_recording_screen">Salvesta: %1$s</string>
     <string name="default_recording_instructions">Palun lugege järgnev tekst salvestades oma kõne allpool oleva nupuga.</string>
-    <string name="start_recording_instructions">Vajuta, et alustada helisalvestust.</string>
-    <string name="stop_recording_instructions">Salvestan. Rääkige nüüd. Vajuta lõpetamiseks.</string>
+    <string name="start_recording_instructions">Vajutage, et alustada helisalvestust.</string>
+    <string name="stop_recording_instructions">Salvestan. Rääkige nüüd. Vajutage lõpetamiseks.</string>
     <string name="default_image_instructions">Palun kirjeldage järgnevat pilti.</string>
     <string name="please_allow_recording_permissions">Palun andke rakendusele heli salvestamiseks vajalikud õigused.</string>
     <string name="project_completed_message">Projekt lõpetatud! Täname osaluse eest.</string>
