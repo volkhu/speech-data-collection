@@ -102,7 +102,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * TODO
+     * Set this main activity to either show the current view's fragment,
+     * a loading icon, or an error page.
+     *
+     * @param viewState show either the fragment, loading icon or error page
+     * @param message error message to display if on the error page
+     * @param actionCallback function to be called when user presses the
+     * retry button on the error page
      */
     fun setViewState(viewState: ViewState, message: String? = null, actionCallback: (() -> Unit)? = null) {
         when (viewState) {
