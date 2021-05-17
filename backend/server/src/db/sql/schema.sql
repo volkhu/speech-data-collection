@@ -83,9 +83,11 @@ CREATE TABLE recording (
     duration_in_seconds REAL,
     file_size INTEGER,
     FOREIGN KEY (session_id) REFERENCES session (session_id),
+    FOREIGN KEY (prompt_id) REFERENCES prompt (prompt_id),
     UNIQUE (session_id, prompt_id)
 );
 CREATE INDEX ixfk_recording_session ON recording (session_id);
+CREATE INDEX ixfk_recording_prompt ON prompt (prompt_id);
 
 -- Grant permissions for newly created tables
 GRANT ALL ON ALL TABLES IN SCHEMA public TO speech_app;
