@@ -6,10 +6,22 @@ const filesFolder = path.resolve(__dirname, "../../files");
 const promptImagesFolder = path.resolve(filesFolder, "prompt_images");
 const audioFilesFolder = path.resolve(filesFolder, "audio");
 
+/**
+ * Get the absolute path of a prompt's image on the disk.
+ *
+ * @param {*} promptId ID of the prompt whose image to get
+ * @returns a string containing the absolute path of the specified prompt's image
+ */
 const getPromptImagePath = (promptId) => {
   return path.resolve(promptImagesFolder, path.normalize(`${promptId}.jpg`));
 };
 
+/**
+ * Get the absolute path of a prompt's thumbnail on the disk.
+ *
+ * @param {*} promptId ID of the prompt whose thumbnail to get
+ * @returns a string containing the absolute path of the specified prompt's thumbnail
+ */
 const getPromptThumbnailPath = (promptId) => {
   return path.resolve(
     promptImagesFolder,
@@ -17,6 +29,12 @@ const getPromptThumbnailPath = (promptId) => {
   );
 };
 
+/**
+ * Save or update an image associated with a prompt.
+ *
+ * @param {*} promptId ID of the prompt whose image to update
+ * @param {*} imageData image data as a base64 encoded URI format string
+ */
 const updatePromptImage = async (promptId, imageData) => {
   const imagePath = getPromptImagePath(promptId);
   const thumbnailPath = getPromptThumbnailPath(promptId);
@@ -49,6 +67,14 @@ const updatePromptImage = async (promptId, imageData) => {
   }
 };
 
+/**
+ * Save an image buffer as a JPEG file. Apply any rotation metadata and scale the image
+ * down to maximum specified dimensions if necessary.
+ *
+ * @param {*} imageBuffer input data representing the image as a buffer
+ * @param {*} maxDimensions maximum image dimensions to allow, if larger then the image will be scaled to these
+ * @param {*} filePath where to save the image file
+ */
 const saveRotatedResizedJpeg = async (imageBuffer, maxDimensions, filePath) => {
   await sharp(imageBuffer)
     .rotate() // apply any rotation from EXIF data
@@ -63,7 +89,7 @@ const saveRotatedResizedJpeg = async (imageBuffer, maxDimensions, filePath) => {
     .toFile(filePath);
 };
 
-// Returns the specified prompt's image (or thumbnail) as a jpeg file in data URI base64 format
+// Return the specified prompt's image (or thumbnail) as a jpeg file in data URI base64 format
 const getPromptImage = async (promptId, thumbnail, withPrefixData = true) => {
   const filePath = thumbnail
     ? getPromptThumbnailPath(promptId)
