@@ -9,7 +9,7 @@ const audioFilesFolder = path.resolve(filesFolder, "audio");
 /**
  * Get the absolute path of a prompt's image on the disk.
  *
- * @param {*} promptId ID of the prompt whose image to get
+ * @param promptId ID of the prompt whose image to get
  * @returns a string containing the absolute path of the specified prompt's image
  */
 const getPromptImagePath = (promptId) => {
@@ -19,7 +19,7 @@ const getPromptImagePath = (promptId) => {
 /**
  * Get the absolute path of a prompt's thumbnail on the disk.
  *
- * @param {*} promptId ID of the prompt whose thumbnail to get
+ * @param promptId ID of the prompt whose thumbnail to get
  * @returns a string containing the absolute path of the specified prompt's thumbnail
  */
 const getPromptThumbnailPath = (promptId) => {
@@ -32,8 +32,8 @@ const getPromptThumbnailPath = (promptId) => {
 /**
  * Save or update an image associated with a prompt.
  *
- * @param {*} promptId ID of the prompt whose image to update
- * @param {*} imageData image data as a base64 encoded URI format string
+ * @param promptId ID of the prompt whose image to update
+ * @param imageData image data as a base64 encoded URI format string
  */
 const updatePromptImage = async (promptId, imageData) => {
   const imagePath = getPromptImagePath(promptId);
@@ -71,9 +71,9 @@ const updatePromptImage = async (promptId, imageData) => {
  * Save an image buffer as a JPEG file. Apply any rotation metadata and scale the image
  * down to maximum specified dimensions if necessary.
  *
- * @param {*} imageBuffer input data representing the image as a buffer
- * @param {*} maxDimensions maximum image dimensions to allow, if larger then the image will be scaled to these
- * @param {*} filePath where to save the image file
+ * @param imageBuffer input data representing the image as a buffer
+ * @param maxDimensions maximum image dimensions to allow, if larger then the image will be scaled to these
+ * @param filePath where to save the image file
  */
 const saveRotatedResizedJpeg = async (imageBuffer, maxDimensions, filePath) => {
   await sharp(imageBuffer)
@@ -89,7 +89,14 @@ const saveRotatedResizedJpeg = async (imageBuffer, maxDimensions, filePath) => {
     .toFile(filePath);
 };
 
-// Return the specified prompt's image (or thumbnail) as a jpeg file in data URI base64 format
+/**
+ * Get the specified prompt's image (or thumbnail) as a jpeg file in data URI base64 format
+ *
+ * @param promptId ID of the prompt whose image/thumbnail to get
+ * @param thumbnail whether to get the thumbnail or full-size image
+ * @param withPrefixData whether to include prefix for URI format
+ * @returns requested image data in a Base64 formatted string
+ */
 const getPromptImage = async (promptId, thumbnail, withPrefixData = true) => {
   const filePath = thumbnail
     ? getPromptThumbnailPath(promptId)

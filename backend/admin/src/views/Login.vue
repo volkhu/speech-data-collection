@@ -33,6 +33,10 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Open the Google sign in pop-up, wait for the result and
+     * update the login status based on it.
+     */
     async loginWithGoogle() {
       try {
         const gUser = await this.$gAuth.signIn();

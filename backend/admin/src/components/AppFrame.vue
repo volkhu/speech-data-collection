@@ -131,6 +131,10 @@ export default {
   },
 
   methods: {
+    /**
+     * Show or hide the navigation drawer usually on the left side of the
+     * screen depending on its current state.
+     */
     toggleNavigationDrawer() {
       this.showNavigationDrawer = !this.showNavigationDrawer;
     },

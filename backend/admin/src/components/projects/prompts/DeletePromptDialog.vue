@@ -51,10 +51,17 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Tell the parent component of this component's visibility status.
+     */
     setIsShown(value) {
       this.$emit("update:isShown", value);
     },
 
+    /**
+     * Delete the selected prompt by sending a corresponding request
+     * to the back-end API.
+     */
     async deletePrompt() {
       this.deletingPrompt = true;
 

@@ -111,6 +111,9 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Open a dialog to create a new project.
+     */
     openNewProjectDialog() {
       this.newEditProjectDialogData = {
         name: "",
@@ -122,12 +125,18 @@ export default {
       this.isNewEditProjectDialogShown = true;
     },
 
+    /**
+     * Open a dialog to edit existing project's details.
+     */
     openEditProjectDetailsDialog(item) {
       this.newEditProjectDialogData = JSON.parse(JSON.stringify(item));
 
       this.isNewEditProjectDialogShown = true;
     },
 
+    /**
+     * Load or update the list of projects from the back-end API.
+     */
     async loadProjectsTableItems() {
       this.isProjectsTableLoading = true;
 

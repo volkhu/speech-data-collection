@@ -11,6 +11,9 @@
 <script>
 export default {
   computed: {
+    /**
+     * Construct a hierarchical navigation list of the current page and its parents.
+     */
     breadcrumbsItems() {
       // base list, always visible
       let crumbsList = [

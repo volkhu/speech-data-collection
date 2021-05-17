@@ -90,15 +90,27 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Clean the form fields, including the file picker.
+     */
     resetForm() {
       this.inputFilePicker = null;
       this.previewPrompts = [];
     },
 
+    /**
+     * Tell the parent component of this component's visibility status.
+     */
     setIsShown(value) {
       this.$emit("update:isShown", value);
     },
 
+    /**
+     * When the input file changes, read its contents using FileReader
+     * and update the prompts preview table accordingly.
+     *
+     * @param newFile new file that was picked
+     */
     onInputFileChange(newFile) {
       if (newFile != null) {
         // construct callback for filereader
@@ -114,6 +126,12 @@ export default {
       }
     },
 
+    /**
+     * Update the preview table showing how the prompts
+     * were read from the chosen file.
+     *
+     * @param fileString contents of the chosen file as a string
+     */
     updatePreviewPromptsFromFileString(fileString) {
       const nonEmptyLines = fileString
         .split("\n")
@@ -123,6 +141,11 @@ export default {
       this.previewPrompts = nonEmptyLines;
     },
 
+    /**
+     * Upload the list of prompts that was parsed from the uploaded
+     * text file and is currently shown in the preview table to the
+     * back-end API.
+     */
     async batchUploadPrompts() {
       this.batchUploadingPrompts = true;
 
@@ -152,6 +175,7 @@ export default {
 
   watch: {
     isShown(value) {
+      // reset the form if the dialog has been shown or hidden
       if (value) {
         this.resetForm();
       }

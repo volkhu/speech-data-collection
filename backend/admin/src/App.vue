@@ -24,6 +24,9 @@ export default {
   computed: {
     ...mapState(["appReady", "globalSnackbarMessage"]),
 
+    /**
+     * Computed property to delegate the visibility of the global snackbar notification message.
+     */
     isGlobalSnackbarShown: {
       set(value) {
         this.$store.commit("setIsGlobalSnackbarShown", value);

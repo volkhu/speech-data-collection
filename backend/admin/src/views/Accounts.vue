@@ -73,6 +73,9 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Load the list of accounts from the back-end API.
+     */
     async loadAccountsTableItems() {
       this.isAccountsTableLoading = true;
 
@@ -86,7 +89,10 @@ export default {
       this.isAccountsTableLoading = false;
     },
 
-    // update admin or superuser access flags on server side too
+    /**
+     * Update an account along with admin or superuser access
+     * flags on server side too.
+     */
     async updateAccount(item) {
       item.modifiable = false;
 

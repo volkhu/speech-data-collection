@@ -22,10 +22,16 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Tell the parent component of this component's visibility status.
+     */
     setIsShown(value) {
       this.$emit("update:isShown", value);
     },
 
+    /**
+     * Initiate the logout process.
+     */
     async logout() {
       try {
         await this.$gAuth.signOut();

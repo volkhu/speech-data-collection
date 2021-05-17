@@ -78,16 +78,35 @@ export default {
   }),
 
   computed: {
+    /**
+     * Compute the title for this dialog depending if
+     * this is a new prompt or an existing one that is
+     * being updated.
+     *
+     * @returns the title of this dialog
+     */
     dialogTitle() {
       return this.value.prompt_id ? "Edit Prompt" : "Create New Prompt";
     },
 
+    /**
+     * Specify a different dialog subtitle depending if a new
+     * prompt is being created or an existing one updated.
+     *
+     * @returns dialog's subtitle as a string
+     */
     dialogSubtitle() {
       return this.value.prompt_id
         ? "Edit this prompt's details."
         : "Create a new prompt assigned to this project.";
     },
 
+    /**
+     * Depending on if this prompt is being updated or created,
+     * the text on the dialog's submit button needs to be different.
+     *
+     * @returns submit button text as a string
+     */
     submitButtonText() {
       return this.value.prompt_id ? "Save" : "Create";
     },
@@ -96,14 +115,27 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Tell the parent component of this component's visibility status.
+     */
     setIsShown(value) {
       this.$emit("update:isShown", value);
     },
 
+    /**
+     * Update this component's value by notifying the parent component about it.
+     */
     updateComponentValue(elementKey, elementValue) {
       this.$emit("input", { ...this.value, [elementKey]: elementValue });
     },
 
+    /**
+     * Called when the content of the image file picker has been changed. If it is
+     * empty, remove the preview image. If not, use FileReader to read its contents
+     * and update the preview accordingly.
+     *
+     * @param newFile new file that was chosen
+     */
     onImageFileChange(newFile) {
       if (newFile != null) {
         // construct callback for filereader
@@ -119,19 +151,35 @@ export default {
       }
     },
 
+    /**
+     * Reset the image picker to an empty state.
+     */
     resetImagePicker() {
       this.imageFilePicker = null;
     },
 
+    /**
+     * Set the image picker to a blank state representing that an image is present,
+     * but was not uploaded in the current session. This way the cancel icon will
+     * still be shown and the user can click it to remove the image from the prompt
+     * altogether.
+     */
     setBlankImagePicker() {
       this.imageFilePicker = [{}];
     },
 
+    /**
+     * Remove the image from this prompt.
+     */
     removeImage() {
       this.resetImagePicker();
       this.updateComponentValue("image_data", null);
     },
 
+    /**
+     * Load details about the prompt that this dialog is supposed to represent. This
+     * includes a full-size image if it is present.
+     */
     async loadPrompt() {
       this.formBusy = true;
 
@@ -154,6 +202,9 @@ export default {
       this.formBusy = false;
     },
 
+    /**
+     * Create or save this prompt on the back-end API.
+     */
     async savePrompt() {
       this.formBusy = true;
 
@@ -175,6 +226,9 @@ export default {
       this.formBusy = false;
     },
 
+    /**
+     * When this dialog is shown, reset the image picker before loading the prompt.
+     */
     onShowDialog() {
       this.resetImagePicker();
 
@@ -186,6 +240,7 @@ export default {
 
   watch: {
     isShown(value) {
+      // the show dialog event hook is implemented from here
       if (value) {
         this.onShowDialog();
       }

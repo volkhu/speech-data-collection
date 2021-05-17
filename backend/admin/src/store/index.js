@@ -41,7 +41,13 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    // wait for Google API to load and check login status for the first time after
+    /**
+     * Wait for Google API to load and check login status for the first time after
+     * initial page load.
+     *
+     * @returns promise that will be finished when Google API has loaded and initial
+     * login status determined
+     */
     initApp(context) {
       return new Promise((resolve, reject) => {
         const checkInterval = setInterval(() => {
@@ -62,11 +68,20 @@ export default new Vuex.Store({
       });
     },
 
+    /**
+     * Show a global notification with a specified message for a limited time.
+     *
+     * @param message text to display on the notification
+     */
     showGlobalSnackbar(context, message) {
       context.commit("setGlobalSnackbarMessage", message);
       context.commit("setIsGlobalSnackbarShown", true);
     },
 
+    /**
+     * Check if user has logged in via their Google account and either
+     * fetch their account privileges and other data or log them out.
+     */
     async updateLoginStatus(context) {
       try {
         const gAuth = this._vm.$gAuth;

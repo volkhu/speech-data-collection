@@ -130,15 +130,26 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Show a confirmation dialog before truly deleting the selected prompt.
+     *
+     * @param item the prompt that was chosen for deletion
+     */
     openDeletePromptDialog(item) {
       this.deletedPromptDetails = JSON.parse(JSON.stringify(item));
       this.isDeletePromptDialogShown = true;
     },
 
+    /**
+     * Open the dialog to upload multiple prompts at once from a text file.
+     */
     openBatchUploadPromptsDialog() {
       this.isBatchUploadPromptsDialogShown = true;
     },
 
+    /**
+     * Open a dialog to add a new prompt to this project.
+     */
     openNewPromptDialog() {
       this.newEditedPromptDetails = {
         project_id: this.projectId,
@@ -148,16 +159,28 @@ export default {
       this.isNewEditPromptDialogShown = true;
     },
 
+    /**
+     * Show a dialog that will allow the admin to edit this prompt's details.
+     *
+     * @param item the prompt that was chosen for editing
+     */
     openEditPromptDialog(item) {
       this.newEditedPromptDetails = { prompt_id: item.prompt_id };
       this.isNewEditPromptDialogShown = true;
     },
 
+    /**
+     * When a prompt is updated or deleted, or if the user just manually requests
+     * an update, load the new information from the back-end API.
+     */
     onPromptsChanged() {
       this.loadPromptsTableItems();
       this.$emit("promptsChanged");
     },
 
+    /**
+     * Load the list of prompts from the back-end API.
+     */
     async loadPromptsTableItems() {
       this.isPromptsTableLoading = true;
 

@@ -55,6 +55,9 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Load settings from the back-end API.
+     */
     async loadSettings() {
       try {
         const settingsResponse = await axios.get("/settings");
@@ -65,6 +68,9 @@ export default {
       }
     },
 
+    /**
+     * Save modified settings on the back-end API.
+     */
     async saveSettings() {
       try {
         const settingsResponse = await axios.put("/settings", this.settings);

@@ -108,18 +108,37 @@ export default {
   }),
 
   computed: {
+    /**
+     * Compute the title for this dialog depending if
+     * this is a new project or an existing one that is simply
+     * being updated.
+     *
+     * @returns the title of this dialog
+     */
     dialogTitle() {
       return this.value.project_id
         ? "Edit Project Details"
         : "Create New Project";
     },
 
+    /**
+     * Specify a different dialog subtitle depending if a new
+     * project is being created or an existing one updated.
+     *
+     * @returns dialog's subtitle as a string
+     */
     dialogSubtitle() {
       return this.value.project_id
         ? "Edit this speech data collection project's details."
         : "Create a new speech data collection project.";
     },
 
+    /**
+     * Depending on if the project is being updated or created,
+     * the text on the dialog's submit button needs to be different.
+     *
+     * @returns submit button text as a string
+     */
     submitButtonText() {
       return this.value.project_id ? "Save" : "Create";
     },
@@ -128,14 +147,23 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Tell the parent component of this component's visibility status.
+     */
     setIsShown(value) {
       this.$emit("update:isShown", value);
     },
 
+    /**
+     * Update this component's value by notifying the parent component about it.
+     */
     updateComponentValue(elementKey, elementValue) {
       this.$emit("input", { ...this.value, [elementKey]: elementValue });
     },
 
+    /**
+     * Create or save the project's details on the back-end API.
+     */
     async saveProjectDetails() {
       this.savingProjectDetails = true;
 

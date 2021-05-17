@@ -112,6 +112,11 @@ export default {
   methods: {
     ...mapActions(["showGlobalSnackbar"]),
 
+    /**
+     * Called when user wants to download this project's recordings. In
+     * here the auth token will be saved in the download form hidden
+     * input to pass along to the server via a POST request in the end.
+     */
     downloadRecordingsButtonClicked(event) {
       if (this.$gAuth.isInit && this.$gAuth.isAuthorized) {
         this.downloadRecordingsAuthToken = this.$gAuth.GoogleAuth.currentUser
@@ -125,6 +130,9 @@ export default {
       }
     },
 
+    /**
+     * Show the dialog to edit this project's details.
+     */
     openEditProjectDetailsDialog() {
       this.editProjectDetailsDialogData = JSON.parse(
         JSON.stringify(this.projectDetails)
@@ -133,6 +141,9 @@ export default {
       this.isEditProjectDetailsDialogShown = true;
     },
 
+    /**
+     * Load or update this project's details from the back-end API.
+     */
     async loadProjectDetails() {
       this.loadingProjectDetails = true;
       this.recordingsDownloadUrl = `${process.env.VUE_APP_ENDPOINT_BASE_URL}/projects/${this.$route.params.projectId}/downloadRecordings`;
