@@ -62,10 +62,12 @@ const adminPanelAuthentication = async (req, res, next) => {
   next();
 };
 
+// helper function supplied to routes to check if current API user has administrator privileges
 function hasAdminAccess() {
   return this.adminPanelAccount && this.adminPanelAccount.has_admin_access;
 }
 
+// helper function supplied to routes to check if current API user has superuser privileges
 function isSuperuser() {
   return (
     this.adminPanelAccount &&
