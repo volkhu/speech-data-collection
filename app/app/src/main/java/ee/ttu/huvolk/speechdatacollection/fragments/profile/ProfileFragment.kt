@@ -268,8 +268,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
-
     override fun onDestroyView() {
         loadProfileCall?.cancel()
         postProfileCall?.cancel()
