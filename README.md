@@ -22,4 +22,4 @@ Some of the more important folders are:
 * `/backend/server/src/routes/api/` - REST API routes
 * `/backend/server/src/middleware/` - oauth2 authentication for API calls
 
-Further details are available at https://digikogu.taltech.ee/et/Item/cb25a4f4-2243-4766-bd78-e6fccad12b18 (in Estonian).
+Further details are available at https://digikogu.taltech.ee/en/Item/cb25a4f4-2243-4766-bd78-e6fccad12b18 (in Estonian).
